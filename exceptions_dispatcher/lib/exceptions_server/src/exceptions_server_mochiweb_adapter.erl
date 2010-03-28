@@ -119,7 +119,8 @@ handle_request(Req, DocRoot) ->
 
                                     % Declare queues
                                     lists:foreach(fun(Key) ->
-                                                    es_rabbit_backend:create_queue(Key,Key)
+                                                          QueueName = io_lib:format("queue~p~p",[Key,self()]),
+                                                          es_rabbit_backend:create_queue(list_to_binary(QueueName),Key)
                                                   end,
                                                   Keys),
 
@@ -171,18 +172,8 @@ handle_request(Req, DocRoot) ->
                             {exception, C, M, JsonStr} ->  Keys = [<<Exception/binary,C/binary,Star/binary>>,
                                                                    <<Exception/binary,C/binary,M/binary>>,
                                                                    <<Exception/binary,Star/binary,Star/binary>>],
-                                                           % Declare queues
-                                                           lists:foreach(fun(Key) ->
-                                                                                 es_rabbit_backend:create_queue(Key,Key)
-                                                                         end,
-                                                                         Keys),
                                                            es_rabbit_backend:publish(JsonStr, Keys) ;
                             {notification, C, JsonStr } -> Keys = [<<C/binary,Star/binary,Star/binary>>],
-                                                           % Declare queues
-                                                           lists:foreach(fun(Key) ->
-                                                                                 es_rabbit_backend:create_queue(Key,Key)
-                                                                         end,
-                                                                         Keys),
                                                            es_rabbit_backend:publish(JsonStr, Keys) ;
                             _ -> dont_care
                         end,

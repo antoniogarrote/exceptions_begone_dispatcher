@@ -92,18 +92,18 @@ init(_Arguments) ->
 handle_call({create, Options}, _From, State) ->
     error_logger:info_msg("3",[]),
     error_logger:info_msg("es_rabbit_backend handle_call create ~p",[Options]),
-    AlreadyDeclared = proplists:is_defined(proplists:get_value(name,Options),State#rabbit_queue_state.queues),
-    if AlreadyDeclared =:= false ->
-            error_logger:info_msg("4",[]),
-            try declare_queue(Options, State) of
-                {_Q,NewQueue} -> error_logger:info_msg("5",[]),
-                                 { reply, ok, State#rabbit_queue_state{ queues = [ NewQueue | State#rabbit_queue_state.queues ] } }
-            catch
-                Exception    -> error_logger:info_msg("Error declaring queue ~p with ~p",[Options, Exception]),
-                                { reply, error, State }
-            end ;
-       true -> {reply, ok, State}
+%%     AlreadyDeclared = proplists:is_defined(proplists:get_value(name,Options),State#rabbit_queue_state.queues),
+%%     if AlreadyDeclared =:= false ->
+%%             error_logger:info_msg("4",[]),
+    try declare_queue(Options, State) of
+        {_Q,NewQueue} -> error_logger:info_msg("5",[]),
+                         { reply, ok, State#rabbit_queue_state{ queues = [ NewQueue | State#rabbit_queue_state.queues ] } }
+    catch
+        Exception    -> error_logger:info_msg("Error declaring queue ~p with ~p",[Options, Exception]),
+                        { reply, error, State }
     end ;
+%%        true -> {reply, ok, State}
+%%     end ;
 
 handle_call({publish, Content, RoutingKeys}, _From, State) ->
     Counter = State#rabbit_queue_state.counter + 1,
