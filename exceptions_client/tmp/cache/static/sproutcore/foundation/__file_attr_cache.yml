@@ -4,40 +4,64 @@
     value: []
 
     mtime: 1269632160
+  digest: 
+    value: 4543aba4a7a82e68b8c24de6fec1a7a0e7d586da
+    mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/english.lproj/core.css: 
   scan_source: 
     value: []
 
+    mtime: 1269632160
+  digest: 
+    value: 16c4262b9a46edf0dcd067fad6ca2d39c6878c62
     mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/english.lproj/debug/control-test-pane.css: 
   scan_source: 
     value: []
 
     mtime: 1269632160
+  digest: 
+    value: 1f8bf59e1c93d12c53aabbb8a113c2da08a4860f
+    mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/english.lproj/inline_editor.css: 
   scan_source: 
     value: []
 
+    mtime: 1269632160
+  digest: 
+    value: fdc26ee0fb7284736f4adb6f642d234f46a69c71
     mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/english.lproj/label.css: 
   scan_source: 
     value: []
 
     mtime: 1269632160
+  digest: 
+    value: 7868caf138d77a56ef12214f76a4a69c7fc96066
+    mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/english.lproj/static_layout.css: 
   scan_source: 
     value: []
 
+    mtime: 1269632160
+  digest: 
+    value: 924df49510ec0c158a528061eef490c1f8246323
     mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/english.lproj/text_field.css: 
   scan_source: 
     value: []
 
     mtime: 1269632160
+  digest: 
+    value: 84abccd525e0d0989f392af6ac79549298100315
+    mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/english.lproj/view.css: 
   scan_source: 
     value: []
 
+    mtime: 1269632160
+  digest: 
+    value: 6abe9d82751372d79fd6b485ded2b5fdf26cdd9b
     mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/controllers/array.js: 
   scan_source: 
@@ -49,10 +73,16 @@
       - "'"
       - mixins/selection_support
     mtime: 1269632160
+  digest: 
+    value: 4ee2a2e50e13de2d479154f39e610849b8b6246b
+    mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/controllers/controller.js: 
   scan_source: 
     value: []
 
+    mtime: 1269632160
+  digest: 
+    value: 642e4c6603986a79aa3086c34f31bf326620ed31
     mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/controllers/object.js: 
   scan_source: 
@@ -60,6 +90,9 @@
     - - require
       - "'"
       - controllers/controller
+    mtime: 1269632160
+  digest: 
+    value: 0104ddf6faa5a08da725e8a3a89f7a595bfaa7e6
     mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/controllers/tree.js: 
   scan_source: 
@@ -74,10 +107,16 @@
       - "'"
       - private/tree_item_observer
     mtime: 1269632160
+  digest: 
+    value: ddee17614937a56ad7908d1ce62ec200d6d0660b
+    mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/core.js: 
   scan_source: 
     value: []
 
+    mtime: 1269632160
+  digest: 
+    value: 0e91556e3cc1c62fe80bab737b3eb74d023a88fd
     mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/debug/control_test_pane.js: 
   scan_source: 
@@ -86,6 +125,9 @@
       - "'"
       - panes/pane
     mtime: 1269632160
+  digest: 
+    value: e4fec1c898d2a00e767e807275836589b8b557ab
+    mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/english.lproj/strings.js: 
   scan_source: 
     value: 
@@ -93,35 +135,56 @@
       - "'"
       - system/locale
     mtime: 1269632160
+  digest: 
+    value: 74670ac4292c1ab59105830133dd06ffadc36443
+    mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/ext/object.js: 
   scan_source: 
     value: []
 
+    mtime: 1269632160
+  digest: 
+    value: c8371622528b707c507d5d919bc117c13e69acfa
     mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/ext/run_loop.js: 
   scan_source: 
     value: []
 
     mtime: 1269632160
+  digest: 
+    value: a621777da23f7db0453b76f352e0314d2ef49e8d
+    mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/license.js: 
   scan_source: 
     value: []
 
+    mtime: 1269632160
+  digest: 
+    value: 959c6c13478402e478edfaabfd54a24f6535d13c
     mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/mixins/button.js: 
   scan_source: 
     value: []
 
     mtime: 1269632160
+  digest: 
+    value: a897f04f7d118ef023dd2518f3362b13e42398e9
+    mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/mixins/collection_content.js: 
   scan_source: 
     value: []
 
     mtime: 1269632160
+  digest: 
+    value: 5b06d9a9b64a75b09e8f4ffc548dc9a02038f037
+    mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/mixins/content_display.js: 
   scan_source: 
     value: []
 
+    mtime: 1269632160
+  digest: 
+    value: 1103b2a5b07028703c21c0a7c8034ae11bf01e25
     mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/mixins/control.js: 
   scan_source: 
@@ -130,10 +193,16 @@
       - "'"
       - mixins/string
     mtime: 1269632160
+  digest: 
+    value: e5406b027e53ee63859d8a32b0332e38d3403b5f
+    mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/mixins/editable.js: 
   scan_source: 
     value: []
 
+    mtime: 1269632160
+  digest: 
+    value: 6cd7bb0c9847e497eb955f6367e659fcc5b33349
     mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/mixins/inline_text_field.js: 
   scan_source: 
@@ -142,15 +211,24 @@
       - "'"
       - views/text_field
     mtime: 1269632160
+  digest: 
+    value: f6f21c856f3da41d38e8e91a5bfad3c5b9f422b7
+    mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/mixins/selection_support.js: 
   scan_source: 
     value: []
 
     mtime: 1269632160
+  digest: 
+    value: 67dc13b434ced785cf3773014a6fe6b5b213a0d8
+    mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/mixins/static_layout.js: 
   scan_source: 
     value: []
 
+    mtime: 1269632160
+  digest: 
+    value: d6ffa6538b8626459190d8c9c43c3e0ec8f4283e
     mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/mixins/string.js: 
   scan_source: 
@@ -159,15 +237,24 @@
       - "'"
       - system/locale
     mtime: 1269632160
+  digest: 
+    value: 8d10d5ea6c115ac7b835b5593b07c257f8a4ebb1
+    mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/mixins/tree_item_content.js: 
   scan_source: 
     value: []
 
     mtime: 1269632160
+  digest: 
+    value: 2bcbb601820866c1fa6a048645e519880f1b8a0e
+    mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/mixins/validatable.js: 
   scan_source: 
     value: []
 
+    mtime: 1269632160
+  digest: 
+    value: 674a8dec8906113f8b4941a385140c31d53a182a
     mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/panes/main.js: 
   scan_source: 
@@ -176,12 +263,18 @@
       - "'"
       - panes/pane
     mtime: 1269632160
+  digest: 
+    value: 1c78e18971d5f38e612837637bfe15c87d1ecf47
+    mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/panes/pane.js: 
   scan_source: 
     value: 
     - - require
       - "'"
       - views/view
+    mtime: 1269632160
+  digest: 
+    value: 0455680fd26388c88b886c3779411d229abd98bb
     mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/private/tree_item_observer.js: 
   scan_source: 
@@ -193,10 +286,16 @@
       - "'"
       - mixins/collection_content
     mtime: 1269632160
+  digest: 
+    value: 6d7686ccd78db600dff9e5a9cc3be74e652bb8e4
+    mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/protocols/inline_editor_delegate.js: 
   scan_source: 
     value: []
 
+    mtime: 1269632160
+  digest: 
+    value: b7ac7a7118382f4a366a3d3b9e7b73284a714f71
     mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/system/application.js: 
   scan_source: 
@@ -205,6 +304,9 @@
       - "'"
       - system/responder_context
     mtime: 1269632160
+  digest: 
+    value: a431aa9c43529cb2472149e614420b34635320dd
+    mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/system/benchmark.js: 
   scan_source: 
     value: 
@@ -212,20 +314,32 @@
       - "'"
       - core
     mtime: 1269632160
+  digest: 
+    value: 9ea384b70c75dc9b23ac79cf2b2643e415fbfccb
+    mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/system/browser.js: 
   scan_source: 
     value: []
 
+    mtime: 1269632160
+  digest: 
+    value: e3cd70b11bf48a7f31064f36644dbf4ca8561ee0
     mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/system/builder.js: 
   scan_source: 
     value: []
 
     mtime: 1269632160
+  digest: 
+    value: d8258217588220f84e05e13baae7cb01cf3ebb77
+    mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/system/bundle.js: 
   scan_source: 
     value: []
 
+    mtime: 1269632160
+  digest: 
+    value: 829abf3840008c299cd6de800933e172d7560a28
     mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/system/core_query.js: 
   scan_source: 
@@ -234,15 +348,24 @@
       - "'"
       - system/builder
     mtime: 1269632160
+  digest: 
+    value: b7523f20c4fb688f8398b5703dd662556a8a6fc9
+    mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/system/cursor.js: 
   scan_source: 
     value: []
 
     mtime: 1269632160
+  digest: 
+    value: f65c14eaf04515b9db0f21bb571fc9d66fb9f3e2
+    mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/system/datetime.js: 
   scan_source: 
     value: []
 
+    mtime: 1269632160
+  digest: 
+    value: 0d8924017f78bf9c88f537e4812913c050c98f96
     mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/system/event.js: 
   scan_source: 
@@ -251,6 +374,9 @@
       - "'"
       - system/core_query
     mtime: 1269632160
+  digest: 
+    value: 3ce7c599cb737c5086c45cadbea460599ef654b6
+    mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/system/image_cache.js: 
   scan_source: 
     value: 
@@ -258,20 +384,32 @@
       - "'"
       - system/locale
     mtime: 1269632160
+  digest: 
+    value: ac879e6879cdb5adbeb0e7b760bfd7072dfc7d8f
+    mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/system/json.js: 
   scan_source: 
     value: []
 
+    mtime: 1269632160
+  digest: 
+    value: 60ced0a4002992918c7933057235cfea2404ce51
     mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/system/locale.js: 
   scan_source: 
     value: []
 
     mtime: 1269632160
+  digest: 
+    value: f85c38e2c92a8d207a36090a5bf408899e7b9fd6
+    mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/system/page.js: 
   scan_source: 
     value: []
 
+    mtime: 1269632160
+  digest: 
+    value: 2ab441f674cd45bed8054410f607d79f694a4126
     mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/system/ready.js: 
   scan_source: 
@@ -280,12 +418,18 @@
       - "'"
       - system/event
     mtime: 1269632160
+  digest: 
+    value: 0a48e9cfafbc462f090862703980211dda0f6d0e
+    mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/system/render_context.js: 
   scan_source: 
     value: 
     - - sc_require
       - "'"
       - system/builder
+    mtime: 1269632160
+  digest: 
+    value: 2f5405fb706b9371e0f31a09baaa39f22d09a4f0
     mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/system/request.js: 
   scan_source: 
@@ -294,10 +438,16 @@
       - "'"
       - system/response
     mtime: 1269632160
+  digest: 
+    value: a6cbdfc18bc79559fb3f5fea5da88e1909dad564
+    mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/system/responder.js: 
   scan_source: 
     value: []
 
+    mtime: 1269632160
+  digest: 
+    value: d450e37a13e69c48b3cfc332c34d2182bc771cce
     mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/system/responder_context.js: 
   scan_source: 
@@ -306,10 +456,16 @@
       - "'"
       - system/responder
     mtime: 1269632160
+  digest: 
+    value: 312b4a1df41220ba5ce211a8a2a211cb72d576ef
+    mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/system/response.js: 
   scan_source: 
     value: []
 
+    mtime: 1269632160
+  digest: 
+    value: 3275451dc1f33a71227c0e45867dde4ff87aa230
     mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/system/root_responder.js: 
   scan_source: 
@@ -318,30 +474,48 @@
       - "'"
       - system/ready
     mtime: 1269632160
+  digest: 
+    value: 5cb1f3accfd6cfd00a192d85ef57a551e7159d2c
+    mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/system/routes.js: 
   scan_source: 
     value: []
 
+    mtime: 1269632160
+  digest: 
+    value: c2f254d64ccd87003638b77b7e0b775e286f522e
     mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/system/text_selection.js: 
   scan_source: 
     value: []
 
     mtime: 1269632160
+  digest: 
+    value: 85f14ae2912629e247bece35e2b8251712d01614
+    mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/system/time.js: 
   scan_source: 
     value: []
 
+    mtime: 1269632160
+  digest: 
+    value: 669cfb6f08d5cc6e3fb8c0f1910009921a74be89
     mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/system/timer.js: 
   scan_source: 
     value: []
 
     mtime: 1269632160
+  digest: 
+    value: e68d4b72a6630c3da28f18067fec77cbc679ad35
+    mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/system/user_defaults.js: 
   scan_source: 
     value: []
 
+    mtime: 1269632160
+  digest: 
+    value: 1bca39792fe87cd94d0f10b58a30583008d45f51
     mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/system/utils.js: 
   scan_source: 
@@ -350,12 +524,18 @@
       - "'"
       - system/browser
     mtime: 1269632160
+  digest: 
+    value: cbd572ccab64dfa1343aeffdc1b027a877422789
+    mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/validators/credit_card.js: 
   scan_source: 
     value: 
     - - sc_require
       - "'"
       - validators/validator
+    mtime: 1269632160
+  digest: 
+    value: 3c025f685966cbff053bf31b97f8010167c92cc0
     mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/validators/date.js: 
   scan_source: 
@@ -364,12 +544,18 @@
       - "'"
       - validators/validator
     mtime: 1269632160
+  digest: 
+    value: e24188b7a31b02f2968a1c0043ac4a5820ba5dce
+    mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/validators/email.js: 
   scan_source: 
     value: 
     - - sc_require
       - "'"
       - validators/validator
+    mtime: 1269632160
+  digest: 
+    value: aa56817f358ada52e75b03b626d7b3894ace72ec
     mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/validators/not_empty.js: 
   scan_source: 
@@ -378,12 +564,18 @@
       - "'"
       - validators/validator
     mtime: 1269632160
+  digest: 
+    value: 35e2c4e053cb5db5e0567e323a077d2cbab7611b
+    mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/validators/number.js: 
   scan_source: 
     value: 
     - - sc_require
       - "'"
       - validators/validator
+    mtime: 1269632160
+  digest: 
+    value: d60b2cca6df0e6f2f4ccdf4f1b035920d5c85c45
     mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/validators/password.js: 
   scan_source: 
@@ -392,10 +584,16 @@
       - "'"
       - validators/validator
     mtime: 1269632160
+  digest: 
+    value: 3af0833cff93cafd14b92cacb71e21c678a31f00
+    mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/validators/validator.js: 
   scan_source: 
     value: []
 
+    mtime: 1269632160
+  digest: 
+    value: 38e7b674e7488a68c2b7021319395d534c580724
     mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/views/container.js: 
   scan_source: 
@@ -403,6 +601,9 @@
     - - sc_require
       - "'"
       - views/view
+    mtime: 1269632160
+  digest: 
+    value: c3880c7c6baed89736130b2fdb690e038e4f5149
     mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/views/field.js: 
   scan_source: 
@@ -417,6 +618,9 @@
       - "'"
       - mixins/validatable
     mtime: 1269632160
+  digest: 
+    value: 75ac4f3768ddac700e36ca86cfbd2422b0e8d9df
+    mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/views/image.js: 
   scan_source: 
     value: 
@@ -427,6 +631,9 @@
       - "'"
       - mixins/control
     mtime: 1269632160
+  digest: 
+    value: 6994cd2455c2d12a0c90478606b78d5414835e2f
+    mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/views/label.js: 
   scan_source: 
     value: 
@@ -436,6 +643,9 @@
     - - sc_require
       - "'"
       - mixins/control
+    mtime: 1269632160
+  digest: 
+    value: 966082990913c82cc681e2b2814cf9fcfc746032
     mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/views/text_field.js: 
   scan_source: 
@@ -449,6 +659,9 @@
     - - sc_require
       - "'"
       - mixins/static_layout
+    mtime: 1269632160
+  digest: 
+    value: 46238d987b82e7291062957b5c62f139f27cd871
     mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/views/view.js: 
   scan_source: 
@@ -469,8 +682,602 @@
       - "'"
       - mixins/string
     mtime: 1269632160
+  digest: 
+    value: 700a2a3b43b293a06933c8a52893a0bb92ae9a8c
+    mtime: 1269632160
 /Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/english.lproj/bootstrap.rhtml: 
   scan_source: 
     value: []
 
+    mtime: 1269632160
+  digest: 
+    value: 5170b129f1a4ac4b9edd8c64527eaf27e437552a
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/controllers: 
+  digest: 
+    value: 
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/debug: 
+  digest: 
+    value: 
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/english.lproj: 
+  digest: 
+    value: 
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/english.lproj/blank.gif: 
+  digest: 
+    value: a1fdee122b95748d81cee426d717c05b5174fe96
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/english.lproj/debug: 
+  digest: 
+    value: 
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/english.lproj/images: 
+  digest: 
+    value: 
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/english.lproj/images/sproutcore-logo.png: 
+  digest: 
+    value: 653507c1c999c2fc2737c80ba5526357877b8c25
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/ext: 
+  digest: 
+    value: 
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/fixtures: 
+  digest: 
+    value: 
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/fixtures/file_exists.json: 
+  digest: 
+    value: ff7e35987fb4f069710ead3b9b0f4f4e0fb2300a
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/fixtures/malformed.json: 
+  digest: 
+    value: 691aa92f44a47316952542a15bb96e466b3b30a6
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/mixins: 
+  digest: 
+    value: 
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/panes: 
+  digest: 
+    value: 
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/private: 
+  digest: 
+    value: 
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/protocols: 
+  digest: 
+    value: 
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/system: 
+  digest: 
+    value: 
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/TESTING: 
+  digest: 
+    value: d074640e6416b1639d2f7dc52c8d08c137ff304a
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests: 
+  digest: 
+    value: 
+    mtime: 1269631417
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/controllers: 
+  digest: 
+    value: 
+    mtime: 1269631417
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/controllers/array: 
+  digest: 
+    value: 
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/controllers/array/array_case.js: 
+  digest: 
+    value: f5927ef347c85637da4e028d1b1ff9d88c1f875c
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/controllers/array/enum_case.js: 
+  digest: 
+    value: 676c48374459bb969e94c3d447ae2e5bc687798a
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/controllers/array/null_case.js: 
+  digest: 
+    value: b59157eda09c29bdaeda50b872c2fbd4b7ff8b46
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/controllers/array/single_case.js: 
+  digest: 
+    value: a9905a478bbd10831c5880fcf3904ce99c190226
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/controllers/object: 
+  digest: 
+    value: 
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/controllers/object/empty_case.js: 
+  digest: 
+    value: 5211ab17d99137cb3924c8fc0a14f7a918597541
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/controllers/object/multiple_case.js: 
+  digest: 
+    value: 8b6de577267a3182e7c938b78f876c717bf51587
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/controllers/object/single_case.js: 
+  digest: 
+    value: b39a9444dff0416b497c3b55c54a59f2429d6893
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/controllers/object/single_enumerable_case.js: 
+  digest: 
+    value: 7ef54ca24222f9277c147e58682ef8d78cbcddd7
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/controllers/tree: 
+  digest: 
+    value: 
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/controllers/tree/outline_case.js: 
+  digest: 
+    value: 651ec4217976bb9cbfeabec52c871e55879d9979
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/debug: 
+  digest: 
+    value: 
+    mtime: 1269631417
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/debug/control_test_pane: 
+  digest: 
+    value: 
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/debug/control_test_pane/methods.js: 
+  digest: 
+    value: fdb2437262e50df652fb2ee8edba38ba90131bdb
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/debug/control_test_pane/ui.js: 
+  digest: 
+    value: 4cfc22563224fd06d78642e27909db7357f0cc63
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/integration: 
+  digest: 
+    value: 
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/integration/creating_views.js: 
+  digest: 
+    value: cef5bd45dd356624b78f5c04750ef52329a9c8a7
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/mixins: 
+  digest: 
+    value: 
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/mixins/button: 
+  digest: 
+    value: 
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/mixins/button/content.js: 
+  digest: 
+    value: 1d658d083e2b046de2bffd0d6cf5418555aee314
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/mixins/button/displayProperties.js: 
+  digest: 
+    value: 4ddad4c5bc7c3201c0e7c3bde81ea3471df63dec
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/mixins/button/keyEquivalents.js: 
+  digest: 
+    value: 2888cfe98367cd5c105e57b16ec422653563687e
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/mixins/button/ui.js: 
+  digest: 
+    value: facfb018388aa1f0bb79b0a3815adde4a18fcd09
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/mixins/control: 
+  digest: 
+    value: 
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/mixins/control/content.js: 
+  digest: 
+    value: 55b8235fad65772b134f95c9184243a4cea66ec8
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/mixins/control/displayProperties.js: 
+  digest: 
+    value: d493b00a0aa95b46c585a1056b8e235c0f9f132f
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/mixins/staticLayout.js: 
+  digest: 
+    value: d5eeec84b74ef322d000de242cddaa5c757f8bf9
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/mixins/string.js: 
+  digest: 
+    value: efca735cdc32571580704d849f4ac5adc790ce82
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/private: 
+  digest: 
+    value: 
+    mtime: 1269631417
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/private/tree_item_observer: 
+  digest: 
+    value: 
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/private/tree_item_observer/flat_case.js: 
+  digest: 
+    value: e92547612c214f670db557f6d93c7e184cccbeaf
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/private/tree_item_observer/group_case.js: 
+  digest: 
+    value: d9b153e8654a01bccc4e7633581045ab5780792d
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/private/tree_item_observer/outline_case.js: 
+  digest: 
+    value: d1ca0667a1a0c8b340ebe0156164bc85485d78a7
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/system: 
+  digest: 
+    value: 
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/system/builder.js: 
+  digest: 
+    value: c11a2f25c69425ea295ac3dd712a6d5fa074faec
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/system/core_query: 
+  digest: 
+    value: 
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/system/core_query/jquery_core.js: 
+  digest: 
+    value: 85e4c8ba8b4569d7f39bdaf046164ac01c379e91
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/system/core_query/jquery_dimensions.js: 
+  digest: 
+    value: 08da2c5aef2c29d01288bd0a4685d430c83fc0d4
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/system/core_query/jquery_selector.js: 
+  digest: 
+    value: 6210821b8e0f5d343c3cba5265f9637205796ef8
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/system/core_query/setClass.js: 
+  digest: 
+    value: f87e67aa4613f28d40558f6a1f7cf61b79f028f4
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/system/core_query/within.js: 
+  digest: 
+    value: e19e33241f3b906adc3c532bf60ee5bfaf1ff2ad
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/system/datetime.js: 
+  digest: 
+    value: 24628ab71acc66a97321df1b2d53493ac0c7d690
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/system/json.js: 
+  digest: 
+    value: 4efe075329351729c95149dc9b92007037fa0be8
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/system/locale.js: 
+  digest: 
+    value: 0edcc61ee8fcef5af3aa5d67c20b1674e29bd3f0
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/system/render_context: 
+  digest: 
+    value: 
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/system/render_context/begin.js: 
+  digest: 
+    value: 680a9c6c07f11a233cfee1e52be3c7b669b14114
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/system/render_context/element.js: 
+  digest: 
+    value: 4fdc7a7e24531e39f97274007b875a9ac72ba9e6
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/system/render_context/end.js: 
+  digest: 
+    value: 3a1ae545198016a0b4b99edc95159b26cbd9298a
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/system/render_context/get.js: 
+  digest: 
+    value: b0d2bdd468eeab01d135e91ad5b74156f8ce5895
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/system/render_context/helpers_attr.js: 
+  digest: 
+    value: 73cddb2332d149efa8e4299c2dd14ab8e9701d98
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/system/render_context/helpers_basic.js: 
+  digest: 
+    value: 2f028a180e9902cd15be44367c9c81d1be719074
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/system/render_context/helpers_className.js: 
+  digest: 
+    value: 72647837ad1414c98a33850bb0eccb1faf98d145
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/system/render_context/helpers_style.js: 
+  digest: 
+    value: f9b7420b1c32fa678806eb8d0dc2cecf9115d8e9
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/system/render_context/init.js: 
+  digest: 
+    value: c0c567aa39559e798112e09197df8ee4118dc79d
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/system/render_context/join.js: 
+  digest: 
+    value: d8e1ef0f24a86db0e852135071051be4b7e549b0
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/system/render_context/push_text.js: 
+  digest: 
+    value: e75f9490c412e6f05c903c26bae220d53e2bb458
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/system/render_context/tag.js: 
+  digest: 
+    value: 73fa56f24d1d3eb3c9166e69dec0f2dd7b3dc27d
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/system/render_context/update.js: 
+  digest: 
+    value: 3dc741cae07b75b89a6cb70dabfb850d98ed908e
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/system/request.js: 
+  digest: 
+    value: 1481b30032db96f7ef2851f36cae48ea54a1a562
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/system/root_responder: 
+  digest: 
+    value: 
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/system/root_responder/makeKeyPane.js: 
+  digest: 
+    value: 8d3eca3b1e42c82b7379ace34cd512aa39c6b4e1
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/system/root_responder/makeMainPane.js: 
+  digest: 
+    value: a2916b9655447ea6806ae62c70314fb1f123057e
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/system/root_responder/root_responder.js: 
+  digest: 
+    value: b3904ed0b82838193c70af31a146a3526044b9b4
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/system/root_responder/targetForAction.js: 
+  digest: 
+    value: 342ddab39daaa6391a3f1161d359d7728b3d5070
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/system/routes.js: 
+  digest: 
+    value: d5a7f1972d9a99b842d6d23785be01140f77c33c
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/system/timer: 
+  digest: 
+    value: 
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/system/timer/invalidate.js: 
+  digest: 
+    value: 4abf692cafbb03b15514741a125654491d329250
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/system/timer/invokeLater.js: 
+  digest: 
+    value: 3736dfb83dcb1af8fee2354b91936f3f6ea79938
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/system/timer/isPaused.js: 
+  digest: 
+    value: c97872c9fcbc3d46f2804795c94f8c7d52014c55
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/system/timer/performAction.js: 
+  digest: 
+    value: b441df29ec012b7d1fb85865b7e213e4b80cfb60
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/system/timer/schedule.js: 
+  digest: 
+    value: 9c80f9645948ab8fc111b4602480e1931eab0ec4
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/system/user_defaults.js: 
+  digest: 
+    value: e9e2f937e59e80207ba40b2ec930e51bcb892c7c
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/system/utils: 
+  digest: 
+    value: 
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/system/utils/normalizeURL.js: 
+  digest: 
+    value: 4b75b98fb1eea82998ef649a52d82ec86ff6a14c
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/system/utils/range.js: 
+  digest: 
+    value: 0fc71a00bd27d9a76834651a6f224e7a4e12307c
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/system/utils/rect.js: 
+  digest: 
+    value: 3ec55e65629a0c35ce6a44e0aca2462ecc1db23f
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/validators: 
+  digest: 
+    value: 
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/validators/credit_card.js: 
+  digest: 
+    value: 20f19a410a46308eb4c83faf35fe5cb21e31b514
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/validators/date.js: 
+  digest: 
+    value: 548a4f4abfe56712aff5672694e45e4bcd7f25c0
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/validators/number.js: 
+  digest: 
+    value: 08af1d969e96a2db4053cdc296b8b487f5c6bb1f
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/validators/password.js: 
+  digest: 
+    value: 50f485a82148ecafc6e2aba1ef207aa28abcdc30
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/validators/validator.js: 
+  digest: 
+    value: dc5ce3d85fc3048d00971a8d2590d06345e382ba
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/views: 
+  digest: 
+    value: 
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/views/container: 
+  digest: 
+    value: 
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/views/container/methods.js: 
+  digest: 
+    value: 1baffc75df3e7fdbba602c14d91e7823de8d151c
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/views/container/ui.js: 
+  digest: 
+    value: 8935d8cd8d3ffb7aea10ee7efedd226d8fd97271
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/views/image: 
+  digest: 
+    value: 
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/views/image/ui.js: 
+  digest: 
+    value: 861abd5dece7386e0730aaadb5bb0b3a1799c0ed
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/views/label: 
+  digest: 
+    value: 
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/views/label/ui.js: 
+  digest: 
+    value: 550885b5bb26e2ee8a735161641e31eb5da5b4bc
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/views/main_pane.js: 
+  digest: 
+    value: e174870c7680eb45fd79d8d8c68bd7bed5a799e5
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/views/pane: 
+  digest: 
+    value: 
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/views/pane/append_remove.js: 
+  digest: 
+    value: 3e47bd2185e4e274176981819d8117da88a8d618
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/views/pane/firstResponder.js: 
+  digest: 
+    value: 6c8a8af960528ada210f38fb1c3e09761bead3a3
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/views/pane/keyPane.js: 
+  digest: 
+    value: 7439bc82016386dd44988075a5103f7b46144506
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/views/pane/sendEvent.js: 
+  digest: 
+    value: 36911118b641bc2a542d138a74de6e85a7e2f741
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/views/text_field: 
+  digest: 
+    value: 
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/views/text_field/methods.js: 
+  digest: 
+    value: 076a9d30719adba2aa2c22a9055086d253a69518
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/views/text_field/ui.js: 
+  digest: 
+    value: 060786da24e0dfd73fcc1d327ad39aa1ab259ff1
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/views/view: 
+  digest: 
+    value: 
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/views/view/clippingFrame.js: 
+  digest: 
+    value: 85354e6f3af743998e4987bfe6e2bd8b9b20452b
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/views/view/convertFrames.js: 
+  digest: 
+    value: e695ee5e99f95689423f77bb78345336716e8d1e
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/views/view/convertLayouts.js: 
+  digest: 
+    value: a43e3ef03e1f6f75a05031c91c1c1af2871ab158
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/views/view/createChildViews.js: 
+  digest: 
+    value: 1e9434838a0da22aa88f9cb2840327542e7a0a85
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/views/view/createLayer.js: 
+  digest: 
+    value: 5de6daf2003a8a85440c570658dda312aac8f797
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/views/view/destroyLayer.js: 
+  digest: 
+    value: 2d9681b95aeae3498f3ace50f7333fc01cfcd0a5
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/views/view/didAppendToDocument.js: 
+  digest: 
+    value: ad777bcb4ae72b911d0e841e19ec585086e178ca
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/views/view/findLayerInParentLayer.js: 
+  digest: 
+    value: c2beaf99bbd7cdc0cca7d68ff2d9c346311d7306
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/views/view/init.js: 
+  digest: 
+    value: 0c72f510ed1c9e25be72f339e4bbd594380fa1ba
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/views/view/insertBefore.js: 
+  digest: 
+    value: c8bbbb4ba0d8314d9a8124b4a0945c8a1bf0b015
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/views/view/isVisible.js: 
+  digest: 
+    value: 1d5647968eaab8f52012e56ae9651a8b7cac1c24
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/views/view/isVisibleInWindow.js: 
+  digest: 
+    value: dafd4defb7b8647551054811e30f2bc8cb6c7d64
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/views/view/layer.js: 
+  digest: 
+    value: 9d9993e645b1a3d6cb7367d432b808abb22a7427
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/views/view/layoutChildViews.js: 
+  digest: 
+    value: f91185125344cf408c76f0ccf3db97310f99bc49
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/views/view/layoutDidChange.js: 
+  digest: 
+    value: 6262e374cc03814570d976cfd0d756df8b305e33
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/views/view/layoutStyle.js: 
+  digest: 
+    value: 55268ae3695af27c9929363ec817a74cffd2b783
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/views/view/nextValidKeyView.js: 
+  digest: 
+    value: 755361ee2aa88ea79da90cce754ecae3efb5ef8e
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/views/view/parentViewDidChange.js: 
+  digest: 
+    value: 9ab096b0a80b82778ec085de9d0a464f26215f9b
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/views/view/prepareContext.js: 
+  digest: 
+    value: bcb509d1b6a1c81aa07d283ca3a16bab5cc4fd6a
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/views/view/removeChild.js: 
+  digest: 
+    value: c4de9d3a8fb46077dcdddee8bf491fb4d6b082b0
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/views/view/render.js: 
+  digest: 
+    value: d5feb53f08217f6a52d4bb421d094ef523695084
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/views/view/replaceChild.js: 
+  digest: 
+    value: 3edb4932a49ee71423303950fd6672ae10af356e
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/views/view/updateLayer.js: 
+  digest: 
+    value: cd58ed30969663059d7f58ae57d022d75baad9cc
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/views/view/updateLayerLocation.js: 
+  digest: 
+    value: 30e6ba66c93b08fbfcb1c2c08e194ade6aee8284
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/tests/views/view/viewDidResize.js: 
+  digest: 
+    value: dca9abef8e2bbe107a17ed88abf9e30e7c3b9e5b
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/validators: 
+  digest: 
+    value: 
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/foundation/views: 
+  digest: 
+    value: 
     mtime: 1269632160

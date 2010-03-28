@@ -15,7 +15,7 @@ sc_require('json');
 // - callbackFn: function that will be called when new new data can be read from the socket: callbackFn(event, exceptionData)
 // - errorFn: error callback: errorFn(event)
 // - unsupportedFn: function that will be called if the browser does not support web sockets: unsupportedFn()
-ExceptionsClient.openWebSocket = openWebSocket = function(domain, port, path, keys, callbackFn, errorFn, unsupportedFn) {
+ExceptionsClient.openWebSocket = openWebSocket = function(domain, port, path, keys, callbackFn, openFn, errorFn, unsupportedFn) {
     if ("WebSocket" in window) {
 
         var ws = new WebSocket("ws://"+ domain +":" + port + path);
@@ -23,15 +23,14 @@ ExceptionsClient.openWebSocket = openWebSocket = function(domain, port, path, ke
         ws.onopen = function() {
             ws.send(keys);
             console.log("open");
+            openFn(ws);
         };
 
         ws.onclose = function(evt) { errorFn(evt); };
 
         ws.onmessage = function(evt) {
-            //var json = eval("("+evt.data+")");
-            //callbackFn(data);
-            alert("ALGO!!! mas? " + evt.data );
-            //callback(data);
+            var json = eval("("+evt.data+")");
+            callbackFn(json);
         };
 
     } else {
@@ -48,19 +47,26 @@ ExceptionsClient.openWebSocket = openWebSocket = function(domain, port, path, ke
 //
 ExceptionsClient.main = function main() {
 
-  // Step 1: Instantiate Your Views
-  // The default code here will make the mainPane for your application visible
-  // on screen.  If you app gets any level of complexity, you will probably
-  // create multiple pages and panes.
-  ExceptionsClient.getPath('mainPage.mainPane').append() ;
+    // Step 1: Instantiate Your Views
+    // The default code here will make the mainPane for your application visible
+    // on screen.  If you app gets any level of complexity, you will probably
+    // create multiple pages and panes.
+    ExceptionsClient.getPath('loginPage.mainPane').append() ;
 
-  // Step 2. Set the content property on your primary controller.
-  // This will make your app come alive!
 
-  // TODO: Set the content property on your primary controller
-  // ex: ExceptionsClient.contactsController.set('content',ExceptionsClient.contacts);
-    var exceptions = ExceptionsClient.store.find(ExceptionsClient.Exception);
+    // Step 2. Set the content property on your primary controller.
+    // This will make your app come alive!
+
+    // We setup the login controller to the exception route being edited
+    var exceptionRoute = ExceptionsClient.ExceptionRoute.create({ exceptionController: '*', exceptionMethod: '*' });
+    ExceptionsClient.loginController.set('content', exceptionRoute);
+
+    var query = SC.Query.local(ExceptionsClient.Exception, { orderBy: 'timestamp DESC' });
+    var exceptions = ExceptionsClient.store.find(query);
     ExceptionsClient.exceptionsController.set('content', exceptions);
+
+    var exceptionRoutes = ExceptionsClient.store.find(ExceptionsClient.ExceptionRoute);
+    ExceptionsClient.exceptionRoutesController.set('content',exceptionRoutes);
 } ;
 
 function main() { ExceptionsClient.main(); }

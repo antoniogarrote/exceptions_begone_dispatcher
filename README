@@ -1,7 +1,49 @@
-Some sensible description here soon:
+=== Exceptions Begone Dispatcher and Client
 
-- Erlang server/dispatcher -> exceptions_dispatcher
-- JS websocket client -> exceptions_client
+Dispatcher: A web server written in Erlang capable of using RabbitMQ to process Exception Begone notifications and dispatch them through web socket connections.
+
+Client: A Sprotucore Javascript client that can be used to connect to a Exceptions Begone dispatcher:
+
+=== Exceptions Begone Client : Configuration
+
+  Edit /exceptions_client/apps/exception_client/configuration.js and with:
+  - The domain of the Dispatcher server
+  - The port of the Dispatcher server
+  - the path to the exceptions resource ("/exceptions" by default)
+
+=== Exceptions Begone Client : Build
+
+  - Install sproutcore (gem install sproutcore)
+  - $ sc-build
+
+=== Exceptions Begone Client : Running
+
+  - Deploy the resulting html + js files in a web server
+  - Alternatively, un sc-server and connect to http://localhost:4020/exceptions_client
+
+
+=== Exceptions Begone Server : Configuration
+
+  Edit /exceptions_dispatcher/lib/exceptions_server/ebin/exceptions_server.app with:
+  - Port where the server is going to listen
+  - Docroot for static files
+
+=== Exceptions Begone Server : Build
+
+  - Install Erlware Sinan
+  - $ sinan
+  - $ sinana test
+
+  If you don't have a mochiweb, rabbitmq and the rabbitmq client library you can install them
+  from the 'deps' directory of the project using Makefiles.
+
+=== Exceptions Begone Client : Running
+
+  - $ cd /exceptions_dispatcher/_build/development/apps/exceptions_server-0.1.0
+  - $ erl -pa ebin
+  - erl> application:start(exceptions_server) .
+
+
 
 Right now, it only slightly works.
 
