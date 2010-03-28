@@ -1,0 +1,8 @@
+Some sensible description here soon:
+
+- Erlang server/dispatcher -> exceptions_dispatcher
+- JS websocket client -> exceptions_client
+
+Right now, it only slightly works.
+
+Enjoy.

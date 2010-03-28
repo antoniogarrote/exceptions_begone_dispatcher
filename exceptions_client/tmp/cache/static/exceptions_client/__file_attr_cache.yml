@@ -1,0 +1,55 @@
+--- 
+/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/core.js: 
+  scan_source: 
+    value: []
+
+    mtime: 1269632202
+/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/main.js: 
+  scan_source: 
+    value: 
+    - - sc_require
+      - "'"
+      - json
+    mtime: 1269716501
+/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/resources/main_page.js: 
+  scan_source: 
+    value: []
+
+    mtime: 1269642790
+/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/resources/loading.rhtml: 
+  scan_source: 
+    value: []
+
+    mtime: 1269632202
+/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/fixtures/exception.js: 
+  scan_source: 
+    value: 
+    - - sc_require
+      - "'"
+      - models/exception
+    mtime: 1269632933
+/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/models/exception.js: 
+  scan_source: 
+    value: []
+
+    mtime: 1269633724
+/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/resources/details_page.js: 
+  scan_source: 
+    value: []
+
+    mtime: 1269639115
+/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/resources/flow_page.js: 
+  scan_source: 
+    value: []
+
+    mtime: 1269639098
+/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/controllers/exceptions.js: 
+  scan_source: 
+    value: []
+
+    mtime: 1269643207
+/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/json.js: 
+  scan_source: 
+    value: []
+
+    mtime: 1269690726

@@ -1,0 +1,23 @@
+--- 
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/bootstrap/core.js: 
+  scan_source: 
+    value: []
+
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/bootstrap/setup_body_class_names.js: 
+  scan_source: 
+    value: 
+    - - sc_resource
+      - "'"
+      - setup_body_class_names
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/bootstrap/system/browser.js: 
+  scan_source: 
+    value: []
+
+    mtime: 1269632160
+/Users/antonio.garrote/.rvm/gems/ruby/1.9.1/gems/sproutcore-1.0.1046/frameworks/sproutcore/frameworks/bootstrap/system/loader.js: 
+  scan_source: 
+    value: []
+
+    mtime: 1269632160
