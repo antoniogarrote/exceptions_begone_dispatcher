@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<title>Exceptions Begone Dispatcher</title>
+
+</head>
+
+<body>
+<h1>Exceptions Begone Dispatcher</h1>
+
+<div id="what" class="section">
+  <h2>What?</h2>
+  <div class="explanation">
+    A system for dispatching exceptions in 'real time' from a production Rails application to a web browser.
+  </div>
+  <div class="explanation">
+    Exceptions Begone original server is open source and was developed at XING AG.
+    The Exceptions Begone Dispatcher is still under development.
+ </div>
+</div>
+
+<div id="how" class="section">
+  <h2>How?</h2>
+  <div class="explanation">
+    <img src="images/components.png"></img>
+    <ul>
+      <li>A web client opens a web socket to the Exceptions Begone Dispatcher</li>
+      <li>A set of Erlang processes in the Exceptions Begone Dispatcher start listening for messages in some queues inside a RabbitMQ queue system. </li>
+      <li>The Exceptions Begone Rails plugin integrates with your application and send any raised exception to the Exceptions Begone Dispatcher using a JSON representation of the exception</li>
+      <li>Some Erlang process in the Exceptions Begone Dispatcher routes the exception to a AMQP exchange in a RabbitMQ queue system</li>
+      <li>RabbitMQ routes the exception to the queues of the listener Erlang processes</li>
+      <li>The listener Erlang processes receive the exception from RabbitMQ and send it back to the web browser through the open web socket</li>
+      <li>The web browser shows the information about the received exception</li>
+    </ul>
+  </div>
+</div>
+
+<div id="where" class="section">
+  <h2>Where?</h2>
+  <p>@github: </p>
+  <div class="explanation">
+    <li><a href="http://github.com/xing/exceptions_begone">Exceptions Begone original server</a> </li>
+    <li><a href="http://github.com/xing/exceptions_begone_notifier">Exceptions Begone original notification plugin</a> </li>
+    <li><a href="http://github.com/antoniogarrote/exceptions_begone_dispatcher">Exceptions Begone dispatcher</a> </li>
+    <li><a href="http://github.com/antoniogarrote/exceptions_begone_notifier">Exceptions Begone multiple-servers notificatication plugin</a> </li>
+  </div>
+</div>
+</body>
+</html>
