@@ -33,7 +33,6 @@ ExceptionsClient.Exception = SC.Record.extend(
         this.set('backtrace',Json['backtrace']);
         this.set('timestamp',Json['timestamp']);
         this.set('count', this.get('count') + 1);
-        ExceptionsClient.store.commitRecords();
     },
 
     display: function() {

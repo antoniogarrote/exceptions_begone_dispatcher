@@ -50,7 +50,6 @@ ExceptionsClient.exceptionsController = SC.ArrayController.create(
 
             var newException = ExceptionsClient.store.createRecord(ExceptionsClient.Exception, json);
             newException.set('timestamp', date);
-            ExceptionsClient.store.commitRecords();
         }
 
         return YES;
