@@ -89,13 +89,6 @@ handle_request(Req, DocRoot) ->
                                   {"Charset", "UTF-8"}],
                                  "Hola mundo!"}) ;
 
-                "test_message" ->
-                    es_rabbit_backend:publish("hola", [<<"test_key">>]),
-                    Req:respond({200,
-                                 [{"Content-Type", "text/plain"},
-                                  {"Charset", "UTF-8"}],
-                                 "message sent!"}) ;
-
                 "exceptions" ->
                     case parse_ws_upgrade(Req) of
                         false ->
@@ -157,16 +150,14 @@ handle_request(Req, DocRoot) ->
             end;
 
         'POST' ->
-            case Path of
-
-                "exceptions" ->
+            %case Path of
+             %
+             %   "exceptions" ->
                     error_logger:info_msg("received exception: ~p", [Req:parse_post()]),
                     try
                         Star = ?STAR,
                         Exception = ?EXCEPTION,
-                        error_logger:info_msg("Hey", []),
-                        error_logger:info_msg("Hey world ~p", [Req:parse_post()]),
-                        [{Data,[]}] = Req:parse_post(),
+                        Data = get(mochiweb_request_body),
                         error_logger:info_msg("received exception parsed: ~p", [Data]),
                         case es_json:process_json_message(Data) of
                             {exception, C, M, JsonStr} ->  Keys = [<<Exception/binary,C/binary,Star/binary>>,
@@ -186,8 +177,8 @@ handle_request(Req, DocRoot) ->
                                     [{"Content-Type", "text/plain"},
                                      {"Charset", "UTF-8"}],
                                     "error parsing request"})
-                    end
-            end;
+                    end ;
+            %end;
         _ ->
             Req:not_found()
     end.
