@@ -150,9 +150,11 @@ handle_request(Req, DocRoot) ->
             end;
 
         'POST' ->
-            %case Path of
-             %
-             %   "exceptions" ->
+            case regexp:first_match(Path,"\/projects\/.*\/notifications") of
+                nomatch ->
+                    Req:not_found() ;
+
+                _Path ->
                     error_logger:info_msg("received exception: ~p", [Req:parse_post()]),
                     try
                         Star = ?STAR,
@@ -177,8 +179,8 @@ handle_request(Req, DocRoot) ->
                                     [{"Content-Type", "text/plain"},
                                      {"Charset", "UTF-8"}],
                                     "error parsing request"})
-                    end ;
-            %end;
+                    end
+            end;
         _ ->
             Req:not_found()
     end.
