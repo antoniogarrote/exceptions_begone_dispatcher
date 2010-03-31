@@ -20,6 +20,8 @@
 
 -define(STAR, <<"*">>).
 -define(EXCEPTION,<<"exception">>).
+-define(DOT,<<".">>).
+-define(SHARP,<<"#">>).
 
 %% Public API
 
@@ -150,23 +152,23 @@ handle_request(Req, DocRoot) ->
             end;
 
         'POST' ->
-            case regexp:first_match(Path,"\/projects\/.*\/notifications") of
+            case match_project_path(Path) of
                 nomatch ->
+                    error_logger:info_msg("No hay match"),
                     Req:not_found() ;
 
-                _Path ->
+                _Match ->
                     error_logger:info_msg("received exception: ~p", [Req:parse_post()]),
                     try
                         Star = ?STAR,
                         Exception = ?EXCEPTION,
+                        Dot = ?DOT,
                         Data = get(mochiweb_request_body),
                         error_logger:info_msg("received exception parsed: ~p", [Data]),
                         case es_json:process_json_message(Data) of
-                            {exception, C, M, JsonStr} ->  Keys = [<<Exception/binary,C/binary,Star/binary>>,
-                                                                   <<Exception/binary,C/binary,M/binary>>,
-                                                                   <<Exception/binary,Star/binary,Star/binary>>],
+                            {exception, C, M, JsonStr} ->  Keys = [<<Exception/binary,Dot/binary,C/binary,Dot/binary,M/binary>>],
                                                            es_rabbit_backend:publish(JsonStr, Keys) ;
-                            {notification, C, JsonStr } -> Keys = [<<C/binary,Star/binary,Star/binary>>],
+                            {notification, C, JsonStr } -> Keys = [<<C/binary,Dot/binary,Star/binary,Dot/binary,Star/binary>>],
                                                            es_rabbit_backend:publish(JsonStr, Keys) ;
                             _ -> dont_care
                         end,
@@ -278,17 +280,29 @@ header(Req,Key) ->
 
 transform_keys(Json) ->
     Exception = ?EXCEPTION,
+    Dot = ?DOT,
     lists:map(fun([C,M]) ->
-                <<Exception/binary,C/binary,M/binary>>
+                <<Exception/binary,Dot/binary,C/binary,Dot/binary,M/binary>>
               end,
               Json).
+
+match_project_path(Path) ->
+    {ok,RE} = re:compile("projects\/.*\/notifications"),
+    re:run(Path,RE) .
 
 %%
 %% Test
 %%
 
 
+match_path_test() ->
+    Res1 = match_project_path("projects/test/notifications"),
+    ?assertEqual(Res1,{match,[{0,27}]}),
+    Res2 = match_project_path("projects_wrong/test/notifications"),
+    ?assertEqual(Res2,nomatch) .
+
+
 transform_keys_test() ->
     Json = [[<<"a">>,<<"b">>]],
     Keys = transform_keys(Json),
-    ?assertEqual([<<"exceptionab">>],Keys) .
+    ?assertEqual([<<"exception.a.b">>],Keys) .

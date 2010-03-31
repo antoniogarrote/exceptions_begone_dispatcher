@@ -12,22 +12,11 @@
 -include_lib("eunit/include/eunit.hrl").
 -include_lib("amqp_client.hrl").
 
--export([start/0, start_link/0, consume/2, publish/2, create_queue/2, exchange_default_values/0, test_consume/0]) .
+-export([start/0, start_link/0, consume/2, publish/2, create_queue/2, exchange_default_values/0]) .
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3]).
 
 
 %% public API
-
-test_consume() ->
-    Key = <<"test_key">>,
-    QueueName = <<"queue">>,
-    Callback = fun(Message) ->
-                       error_logger:info_msg("Callback comet handler, received some triples with count ~p, notifying handler",[Message])
-                       %gen_server:call(CometRequest#comet_request.ref, {notification, Message})
-               end,
-    error_logger:info_msg("1",[]),
-    es_rabbit_backend:create_queue(QueueName,Key),
-    es_rabbit_backend:consume(Callback,[Key]) .
 
 
 %% @doc
@@ -48,7 +37,6 @@ start_link() ->
 
 %% Creates a new queu with Options.
 create_queue(QueueName, RoutingKey) ->
-    error_logger:info_msg("2",[]),
     gen_server:call(es_rabbit_backend, {create, [{name, QueueName},{routing_key, RoutingKey}]}) .
 
 
@@ -67,7 +55,6 @@ consume(F, RoutingKeys) ->
 
 
 init(_Arguments) ->
-    error_logger:info_msg(" *** INIT -- 0",[]),
     Params = #amqp_params{ username = <<"guest">>,
                            password = <<"guest">> },
     ConnectionPid = amqp_connection:start_direct(Params),
@@ -76,10 +63,10 @@ init(_Arguments) ->
     X = es_exchange(),
     ExchangeDeclare = #'exchange.declare'{ticket = Ticket,
                                           exchange = X,
-                                          type= <<"direct">>,
+                                          type= <<"topic">>,
                                           passive = false,
                                           durable = false,
-                                          auto_delete=false,
+                                          auto_delete=true,
                                           internal = false,
                                           nowait = false,
                                           arguments = []},
@@ -90,11 +77,7 @@ init(_Arguments) ->
 
 
 handle_call({create, Options}, _From, State) ->
-    error_logger:info_msg("3",[]),
     error_logger:info_msg("es_rabbit_backend handle_call create ~p",[Options]),
-%%     AlreadyDeclared = proplists:is_defined(proplists:get_value(name,Options),State#rabbit_queue_state.queues),
-%%     if AlreadyDeclared =:= false ->
-%%             error_logger:info_msg("4",[]),
     try declare_queue(Options, State) of
         {_Q,NewQueue} -> error_logger:info_msg("5",[]),
                          { reply, ok, State#rabbit_queue_state{ queues = [ NewQueue | State#rabbit_queue_state.queues ] } }
@@ -102,8 +85,7 @@ handle_call({create, Options}, _From, State) ->
         Exception    -> error_logger:info_msg("Error declaring queue ~p with ~p",[Options, Exception]),
                         { reply, error, State }
     end ;
-%%        true -> {reply, ok, State}
-%%     end ;
+
 
 handle_call({publish, Content, RoutingKeys}, _From, State) ->
     Counter = State#rabbit_queue_state.counter + 1,
@@ -151,10 +133,10 @@ channel_default_values() ->
 %% Default values for exchange configuration
 %% options of RabbitMQ
 exchange_default_values() ->
-    [ {type, <<"direct">>},
+    [ {type, <<"topic">>},
       {passive, false},
       {durable, false},
-      {auto_delete, false},
+      {auto_delete, true},
       {internal, false},
       {nowait, false},
       {arguments, []} ] .
@@ -186,21 +168,19 @@ declare_queue(Options, State) ->
     Q = proplists:get_value(name, Options),
     BindKey = proplists:get_value(routing_key, Options),
     X = es_exchange(),
-    error_logger:info_msg("4.1",[]),
     QueueDeclare = #'queue.declare'{ticket = State#rabbit_queue_state.ticket,
                                     queue = Q,
                                     passive = false,
                                     durable = false,
                                     exclusive = false,
-                                    auto_delete = false,
+                                    auto_delete = true,
                                     nowait = false,
                                     arguments = []},
-    error_logger:info_msg("4.2",[]),
+
     #'queue.declare_ok'{queue = Q,
                         message_count = _MessageCount,
                         consumer_count = _ConsumerCount}  = amqp_channel:call(State#rabbit_queue_state.channel, QueueDeclare),
 
-    error_logger:info_msg("4.3",[]),
     QueueBind = #'queue.bind'{ticket = State#rabbit_queue_state.ticket,
                               queue = Q,
                               exchange = X,
