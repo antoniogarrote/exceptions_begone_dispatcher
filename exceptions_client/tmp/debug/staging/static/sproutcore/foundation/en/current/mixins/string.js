@@ -11,12 +11,6 @@ sc_require('system/locale');
 // SproutCore.
 /** @private */
 SC.STRING_TITLEIZE_REGEXP = (/([\s|\-|\_|\n])([^\s|\-|\_|\n]?)/g);
-SC.STRING_DECAMELIZE_REGEXP = (/([a-z])([A-Z])/g);
-SC.STRING_DASHERIZE_REGEXP = (/[ _]/g);
-SC.STRING_HUMANIZE_REGEXP = (/[\-_]/g);
-SC.STRING_TRIM_REGEXP = (/^\s+|\s+$/g);
-SC.STRING_TRIM_LEFT_REGEXP = (/^\s+/g);
-SC.STRING_TRIM_RIGHT_REGEXP = (/\s+$/g);
 
 /**
   @namespace
@@ -117,7 +111,7 @@ SC.String = {
     @return {String} titleized string.
   */
   titleize: function() {
-    var ret = this.replace(SC.STRING_DECAMELIZE_REGEXP,'$1_$2'); // decamelize
+    var ret = this.replace(/([a-z])([A-Z])/g,'$1_$2'); // decamelize
     return ret.replace(SC.STRING_TITLEIZE_REGEXP, 
       function(str,separater,character) { 
         return (character) ? (' ' + character.toUpperCase()) : ' ';
@@ -184,7 +178,7 @@ SC.String = {
     @returns {String} the decamelized string.
   */
   decamelize: function() { 
-    return this.replace(SC.STRING_DECAMELIZE_REGEXP,'$1_$2').toLowerCase();
+    return this.replace(/([a-z])([A-Z])/g,'$1_$2').toLowerCase();
   },
 
   /**
@@ -202,7 +196,7 @@ SC.String = {
     @returns {String} the dasherized string.
   */
   dasherize: function() {
-    return this.decamelize().replace(SC.STRING_DASHERIZE_REGEXP,'-') ;  
+    return this.decamelize().replace(/[ _]/g,'-') ;  
   },
   
   /**
@@ -220,7 +214,7 @@ SC.String = {
     @returns {String} the humanized string.
   */
   humanize: function() {
-    return this.decamelize().replace(SC.STRING_HUMANIZE_REGEXP,' ') ;
+    return this.decamelize().replace(/[\-_]/g,' ') ;
   },
   
   /**
@@ -301,8 +295,9 @@ SC.String = {
       diacriticMappingTable = SC.diacriticMappingTable;
     }
     
-    var original, replacement, ret = "",
-        length = this.length;
+    var original, replacement;
+    var ret = "";
+    var length = this.length;
     for (var i = 0; i <= length; ++i) {
       original = this.charAt(i);
       replacement = diacriticMappingTable[original];
@@ -323,7 +318,7 @@ SC.String = {
     @returns {String} the trimmed string
   */
   trim: function () {
-    return this.replace(SC.STRING_TRIM_REGEXP,"");
+    return this.replace(/^\s+|\s+$/g,"");
   },
   
   /**
@@ -332,7 +327,7 @@ SC.String = {
     @returns {String} the trimmed string
   */
   trimLeft: function () {
-    return this.replace(SC.STRING_TRIM_LEFT_REGEXP,"");
+    return this.replace(/^\s+/g,"");
   },
   
   /**
@@ -341,7 +336,7 @@ SC.String = {
     @returns {String} the trimmed string
   */
   trimRight: function () {
-    return this.replace(SC.STRING_TRIM_RIGHT_REGEXP,"");
+    return this.replace(/\s+$/g,"");
   }
     
 };

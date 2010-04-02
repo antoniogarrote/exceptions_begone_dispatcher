@@ -18,11 +18,11 @@
 %%   are Copyright (C) 2007-2008 LShift Ltd, Cohesive Financial
 %%   Technologies LLC, and Rabbit Technologies Ltd.
 %%
-%%   Portions created by LShift Ltd are Copyright (C) 2007-2009 LShift
+%%   Portions created by LShift Ltd are Copyright (C) 2007-2010 LShift
 %%   Ltd. Portions created by Cohesive Financial Technologies LLC are
-%%   Copyright (C) 2007-2009 Cohesive Financial Technologies
+%%   Copyright (C) 2007-2010 Cohesive Financial Technologies
 %%   LLC. Portions created by Rabbit Technologies Ltd are Copyright
-%%   (C) 2007-2009 Rabbit Technologies Ltd.
+%%   (C) 2007-2010 Rabbit Technologies Ltd.
 %%
 %%   All Rights Reserved.
 %%
@@ -42,6 +42,7 @@
          terminate/2, code_change/3]).
 
 -define(SERVER, ?MODULE).
+-define(SERIAL_FILENAME, "rabbit_serial").
 
 -record(state, {serial}).
 
@@ -59,17 +60,28 @@
 %%----------------------------------------------------------------------------
 
 start_link() ->
-    %% The persister can get heavily loaded, and we don't want that to
-    %% impact guid generation.  We therefore keep the serial in a
-    %% separate process rather than calling rabbit_persister:serial/0
-    %% directly in the functions below.
     gen_server:start_link({local, ?SERVER}, ?MODULE,
-                          [rabbit_persister:serial()], []).
+                          [update_disk_serial()], []).
+
+update_disk_serial() ->
+    Filename = filename:join(rabbit_mnesia:dir(), ?SERIAL_FILENAME),
+    Serial = case rabbit_misc:read_term_file(Filename) of
+                 {ok, [Num]}     -> Num;
+                 {error, enoent} -> rabbit_persister:serial();
+                 {error, Reason} ->
+                     throw({error, {cannot_read_serial_file, Filename, Reason}})
+             end,
+    case rabbit_misc:write_term_file(Filename, [Serial + 1]) of
+        ok -> ok;
+        {error, Reason1} ->
+            throw({error, {cannot_write_serial_file, Filename, Reason1}})
+    end,
+    Serial.
 
 %% generate a guid that is monotonically increasing per process.
 %%
 %% The id is only unique within a single cluster and as long as the
-%% persistent message store hasn't been deleted.
+%% serial store hasn't been deleted.
 guid() ->
     %% We don't use erlang:now() here because a) it may return
     %% duplicates when the system clock has been rewound prior to a
@@ -77,7 +89,7 @@ guid() ->
     %% now() to move ahead of the system time), and b) it is really
     %% slow since it takes a global lock and makes a system call.
     %%
-    %% rabbit_persister:serial/0, in combination with self/0 (which
+    %% A persisted serial number, in combination with self/0 (which
     %% includes the node name) uniquely identifies a process in space
     %% and time. We combine that with a process-local counter to give
     %% us a GUID that is monotonically increasing per process.
@@ -92,13 +104,8 @@ guid() ->
 %% generate a readable string representation of a guid. Note that any
 %% monotonicity of the guid is not preserved in the encoding.
 string_guid(Prefix) ->
-    %% we use the (undocumented) ssl_base64 module here because it is
-    %% present throughout OTP R11 and R12 whereas base64 only becomes
-    %% available in R11B-4.
-    %%
-    %% TODO: once debian stable and EPEL have moved from R11B-2 to
-    %% R11B-4 or later we should change this to use base64.
-    Prefix ++ "-" ++ ssl_base64:encode(erlang:md5(term_to_binary(guid()))).
+    Prefix ++ "-" ++ base64:encode_to_string(
+                       erlang:md5(term_to_binary(guid()))).
 
 binstring_guid(Prefix) ->
     list_to_binary(string_guid(Prefix)).

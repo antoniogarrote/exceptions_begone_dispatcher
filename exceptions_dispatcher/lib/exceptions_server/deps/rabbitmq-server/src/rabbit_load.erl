@@ -18,11 +18,11 @@
 %%   are Copyright (C) 2007-2008 LShift Ltd, Cohesive Financial
 %%   Technologies LLC, and Rabbit Technologies Ltd.
 %%
-%%   Portions created by LShift Ltd are Copyright (C) 2007-2009 LShift
+%%   Portions created by LShift Ltd are Copyright (C) 2007-2010 LShift
 %%   Ltd. Portions created by Cohesive Financial Technologies LLC are
-%%   Copyright (C) 2007-2009 Cohesive Financial Technologies
+%%   Copyright (C) 2007-2010 Cohesive Financial Technologies
 %%   LLC. Portions created by Rabbit Technologies Ltd are Copyright
-%%   (C) 2007-2009 Rabbit Technologies Ltd.
+%%   (C) 2007-2010 Rabbit Technologies Ltd.
 %%
 %%   All Rights Reserved.
 %%
@@ -41,7 +41,7 @@
 -ifdef(use_specs).
 
 -type(erlang_node() :: atom()).
--type(load() :: {{non_neg_integer(), float()}, erlang_node()}).
+-type(load() :: {{non_neg_integer(), integer() | 'unknown'}, erlang_node()}).
 -spec(local_load/0 :: () -> load()).
 -spec(remote_loads/0 :: () -> [load()]).
 -spec(pick/0 :: () -> erlang_node()).
@@ -52,8 +52,11 @@
 
 local_load() ->
     LoadAvg = case whereis(cpu_sup) of
-                  undefined -> 0.0;
-                  _Other -> cpu_sup:avg1()
+                  undefined -> unknown;
+                  _         -> case cpu_sup:avg1() of
+                                   L when is_integer(L) -> L;
+                                   {error, timeout}     -> unknown
+                               end
               end,
     {{statistics(run_queue), LoadAvg}, node()}.
 
@@ -65,8 +68,12 @@ remote_loads() ->
 pick() ->
     RemoteLoads = remote_loads(),
     {{RunQ, LoadAvg}, Node} = local_load(),
-    %% add bias towards current node
-    AdjustedLoadAvg = LoadAvg * ?FUDGE_FACTOR,
+    %% add bias towards current node; we rely on Erlang's term order
+    %% of SomeFloat < local_unknown < unknown.
+    AdjustedLoadAvg = case LoadAvg of
+                          unknown -> local_unknown;
+                          _       -> LoadAvg * ?FUDGE_FACTOR
+                      end,
     Loads = [{{RunQ, AdjustedLoadAvg}, Node} | RemoteLoads],
     {_, SelectedNode} = lists:min(Loads),
     SelectedNode.

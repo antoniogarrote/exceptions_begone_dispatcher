@@ -1,4 +1,4 @@
-%%   The contents of this file are subject to the Mozilla Public Licenses
+%%   The contents of this file are subject to the Mozilla Public License
 %%   Version 1.1 (the "License"); you may not use this file except in
 %%   compliance with the License. You may obtain a copy of the License at
 %%   http://www.mozilla.org/MPL/
@@ -18,11 +18,11 @@
 %%   are Copyright (C) 2007-2008 LShift Ltd, Cohesive Financial
 %%   Technologies LLC, and Rabbit Technologies Ltd.
 %%
-%%   Portions created by LShift Ltd are Copyright (C) 2007-2009 LShift
+%%   Portions created by LShift Ltd are Copyright (C) 2007-2010 LShift
 %%   Ltd. Portions created by Cohesive Financial Technologies LLC are
-%%   Copyright (C) 2007-2009 Cohesive Financial Technologies
+%%   Copyright (C) 2007-2010 Cohesive Financial Technologies
 %%   LLC. Portions created by Rabbit Technologies Ltd are Copyright
-%%   (C) 2007-2009 Rabbit Technologies Ltd.
+%%   (C) 2007-2010 Rabbit Technologies Ltd.
 %%
 %%   All Rights Reserved.
 %%
@@ -36,19 +36,34 @@
 -behaviour(gen_server2).
 
 -export([start_link/5, do/2, do/3, shutdown/1]).
--export([send_command/2, deliver/4, conserve_memory/2]).
+-export([send_command/2, deliver/4, conserve_memory/2, flushed/2]).
+-export([list/0, info_keys/0, info/1, info/2, info_all/0, info_all/1]).
 
--export([init/1, terminate/2, code_change/3, handle_call/3, handle_cast/2, handle_info/2]).
+-export([init/1, terminate/2, code_change/3,
+         handle_call/3, handle_cast/2, handle_info/2, handle_pre_hibernate/1]).
 
 -record(ch, {state, channel, reader_pid, writer_pid, limiter_pid,
              transaction_id, tx_participants, next_tag,
              uncommitted_ack_q, unacked_message_q,
-             username, virtual_host,
-             most_recently_declared_queue, consumer_mapping}).
+             username, virtual_host, most_recently_declared_queue,
+             consumer_mapping, blocking}).
 
--define(HIBERNATE_AFTER, 1000).
+-define(HIBERNATE_AFTER_MIN, 1000).
+-define(DESIRED_HIBERNATE, 10000).
 
 -define(MAX_PERMISSION_CACHE_SIZE, 12).
+
+-define(INFO_KEYS,
+        [pid,
+         connection,
+         number,
+         user,
+         vhost,
+         transactional,
+         consumer_count,
+         messages_unacknowledged,
+         acks_uncommitted,
+         prefetch_count]).
 
 %%----------------------------------------------------------------------------
 
@@ -60,8 +75,15 @@
 -spec(do/3 :: (pid(), amqp_method(), maybe(content())) -> 'ok').
 -spec(shutdown/1 :: (pid()) -> 'ok').
 -spec(send_command/2 :: (pid(), amqp_method()) -> 'ok').
--spec(deliver/4 :: (pid(), ctag(), bool(), msg()) -> 'ok').
--spec(conserve_memory/2 :: (pid(), bool()) -> 'ok').
+-spec(deliver/4 :: (pid(), ctag(), boolean(), msg()) -> 'ok').
+-spec(conserve_memory/2 :: (pid(), boolean()) -> 'ok').
+-spec(flushed/2 :: (pid(), pid()) -> 'ok').
+-spec(list/0 :: () -> [pid()]).
+-spec(info_keys/0 :: () -> [info_key()]).
+-spec(info/1 :: (pid()) -> [info()]).
+-spec(info/2 :: (pid(), [info_key()]) -> [info()]).
+-spec(info_all/0 :: () -> [[info()]]).
+-spec(info_all/1 :: ([info_key()]) -> [[info()]]).
 
 -endif.
 
@@ -89,7 +111,30 @@ deliver(Pid, ConsumerTag, AckRequired, Msg) ->
     gen_server2:cast(Pid, {deliver, ConsumerTag, AckRequired, Msg}).
 
 conserve_memory(Pid, Conserve) ->
-    gen_server2:cast(Pid, {conserve_memory, Conserve}).
+    gen_server2:pcast(Pid, 8, {conserve_memory, Conserve}).
+
+flushed(Pid, QPid) ->
+    gen_server2:cast(Pid, {flushed, QPid}).
+
+list() ->
+    pg_local:get_members(rabbit_channels).
+
+info_keys() -> ?INFO_KEYS.
+
+info(Pid) ->
+    gen_server2:pcall(Pid, 9, info, infinity).
+
+info(Pid, Items) ->
+    case gen_server2:pcall(Pid, 9, {info, Items}, infinity) of
+        {ok, Res}      -> Res;
+        {error, Error} -> throw(Error)
+    end.
+
+info_all() ->
+    rabbit_misc:filter_exit_map(fun (C) -> info(C) end, list()).
+
+info_all(Items) ->
+    rabbit_misc:filter_exit_map(fun (C) -> info(C, Items) end, list()).
 
 %%---------------------------------------------------------------------------
 
@@ -97,6 +142,7 @@ init([Channel, ReaderPid, WriterPid, Username, VHost]) ->
     process_flag(trap_exit, true),
     link(WriterPid),
     rabbit_alarm:register(self(), {?MODULE, conserve_memory, []}),
+    ok = pg_local:join(rabbit_channels, self()),
     {ok, #ch{state                   = starting,
              channel                 = Channel,
              reader_pid              = ReaderPid,
@@ -110,7 +156,19 @@ init([Channel, ReaderPid, WriterPid, Username, VHost]) ->
              username                = Username,
              virtual_host            = VHost,
              most_recently_declared_queue = <<>>,
-             consumer_mapping        = dict:new()}}.
+             consumer_mapping        = dict:new(),
+             blocking                = dict:new()},
+     hibernate,
+     {backoff, ?HIBERNATE_AFTER_MIN, ?HIBERNATE_AFTER_MIN, ?DESIRED_HIBERNATE}}.
+
+handle_call(info, _From, State) ->
+    reply(infos(?INFO_KEYS, State), State);
+
+handle_call({info, Items}, _From, State) ->
+    try
+        reply({ok, infos(Items, State)}, State)
+    catch Error -> reply({error, Error}, State)
+    end;
 
 handle_call(_Request, _From, State) ->
     noreply(State).
@@ -125,17 +183,20 @@ handle_cast({method, Method, Content}, State) ->
         stop ->
             {stop, normal, State#ch{state = terminating}}
     catch
-        exit:{amqp, Error, Explanation, none} ->
-            ok = notify_queues(internal_rollback(State)),
-            Reason = {amqp, Error, Explanation,
-                      rabbit_misc:method_record_type(Method)},
-            State#ch.reader_pid ! {channel_exit, State#ch.channel, Reason},
+        exit:Reason = #amqp_error{} ->
+            ok = rollback_and_notify(State),
+            MethodName = rabbit_misc:method_record_type(Method),
+            State#ch.reader_pid ! {channel_exit, State#ch.channel,
+                                   Reason#amqp_error{method = MethodName}},
             {stop, normal, State#ch{state = terminating}};
         exit:normal ->
             {stop, normal, State};
         _:Reason ->
             {stop, {Reason, erlang:get_stacktrace()}, State}
     end;
+
+handle_cast({flushed, QPid}, State) ->
+    {noreply, queue_blocked(QPid, State)};
 
 handle_cast(terminate, State) ->
     {stop, normal, State};
@@ -157,36 +218,38 @@ handle_cast({conserve_memory, Conserve}, State) ->
            State#ch.writer_pid, #'channel.flow'{active = not(Conserve)}),
     noreply(State).
 
+handle_info({'EXIT', WriterPid, Reason = {writer, send_failed, _Error}},
+            State = #ch{writer_pid = WriterPid}) ->
+    State#ch.reader_pid ! {channel_exit, State#ch.channel, Reason},
+    {stop, normal, State};
 handle_info({'EXIT', _Pid, Reason}, State) ->
     {stop, Reason, State};
+handle_info({'DOWN', _MRef, process, QPid, _Reason}, State) ->
+    {noreply, queue_blocked(QPid, State)}.
 
-handle_info(timeout, State) ->
+handle_pre_hibernate(State) ->
     ok = clear_permission_cache(),
-    %% TODO: Once we drop support for R11B-5, we can change this to
-    %% {noreply, State, hibernate};
-    proc_lib:hibernate(gen_server2, enter_loop, [?MODULE, [], State]).
+    {hibernate, State}.
 
-terminate(_Reason, #ch{writer_pid = WriterPid, limiter_pid = LimiterPid,
-                       state = terminating}) ->
-    rabbit_writer:shutdown(WriterPid),
-    rabbit_limiter:shutdown(LimiterPid);
+terminate(_Reason, State = #ch{state = terminating}) ->
+    terminate(State);
 
-terminate(Reason, State = #ch{writer_pid = WriterPid,
-                              limiter_pid = LimiterPid}) ->
-    Res = notify_queues(internal_rollback(State)),
+terminate(Reason, State) ->
+    Res = rollback_and_notify(State),
     case Reason of
         normal -> ok = Res;
         _      -> ok
     end,
-    rabbit_writer:shutdown(WriterPid),
-    rabbit_limiter:shutdown(LimiterPid).
+    terminate(State).
 
 code_change(_OldVsn, State, _Extra) ->
     {ok, State}.
 
 %%---------------------------------------------------------------------------
 
-noreply(NewState) -> {noreply, NewState, ?HIBERNATE_AFTER}.
+reply(Reply, NewState) -> {reply, Reply, NewState, hibernate}.
+
+noreply(NewState) -> {noreply, NewState, hibernate}.
 
 return_ok(State, true, _Msg)  -> {noreply, State};
 return_ok(State, false, Msg)  -> {reply, Msg, State}.
@@ -258,12 +321,6 @@ expand_routing_key_shortcut(<<>>, <<>>,
 expand_routing_key_shortcut(_QueueNameBin, RoutingKey, _State) ->
     RoutingKey.
 
-die_precondition_failed(Fmt, Params) ->
-    %% FIXME: 406 should be replaced with precondition_failed when we
-    %% move to AMQP spec >=8.1
-    rabbit_misc:protocol_error({false, 406, <<"PRECONDITION_FAILED">>},
-                               Fmt, Params).
-
 %% check that an exchange/queue name does not contain the reserved
 %% "amq."  prefix.
 %%
@@ -284,6 +341,20 @@ check_name(Kind, NameBin = <<"amq.", _/binary>>) ->
 check_name(_Kind, NameBin) ->
     NameBin.
 
+queue_blocked(QPid, State = #ch{blocking = Blocking}) ->
+    case dict:find(QPid, Blocking) of
+        error      -> State;
+        {ok, MRef} -> true = erlang:demonitor(MRef),
+                      Blocking1 = dict:erase(QPid, Blocking),
+                      ok = case dict:size(Blocking1) of
+                               0 -> rabbit_writer:send_command(
+                                      State#ch.writer_pid,
+                                      #'channel.flow_ok'{active = false});
+                               _ -> ok
+                           end,
+                      State#ch{blocking = Blocking1}
+    end.
+
 handle_method(#'channel.open'{}, _, State = #ch{state = starting}) ->
     {reply, #'channel.open_ok'{}, State#ch{state = running}};
 
@@ -295,7 +366,7 @@ handle_method(_Method, _, #ch{state = starting}) ->
     rabbit_misc:protocol_error(channel_error, "expected 'channel.open'", []);
 
 handle_method(#'channel.close'{}, _, State = #ch{writer_pid = WriterPid}) ->
-    ok = notify_queues(internal_rollback(State)),
+    ok = rollback_and_notify(State),
     ok = rabbit_writer:send_command(WriterPid, #'channel.close_ok'{}),
     stop;
 
@@ -489,27 +560,21 @@ handle_method(#'basic.qos'{global = true}, _, _State) ->
     rabbit_misc:protocol_error(not_implemented, "global=true", []);
 
 handle_method(#'basic.qos'{prefetch_size = Size}, _, _State) when Size /= 0 ->
-    rabbit_misc:protocol_error(not_implemented, 
+    rabbit_misc:protocol_error(not_implemented,
                                "prefetch_size!=0 (~w)", [Size]);
 
 handle_method(#'basic.qos'{prefetch_count = PrefetchCount},
-              _, State = #ch{ limiter_pid = LimiterPid }) ->
-    NewLimiterPid = case {LimiterPid, PrefetchCount} of
-                        {undefined, 0} ->
-                            undefined;
-                        {undefined, _} ->
-                            LPid = rabbit_limiter:start_link(self()),
-                            ok = limit_queues(LPid, State),
-                            LPid;
-                        {_, 0} ->
-                            ok = rabbit_limiter:shutdown(LimiterPid),
-                            ok = limit_queues(undefined, State),
-                            undefined;
-                        {_, _} ->
-                            LimiterPid
-                    end,
-    ok = rabbit_limiter:limit(NewLimiterPid, PrefetchCount),
-    {reply, #'basic.qos_ok'{}, State#ch{limiter_pid = NewLimiterPid}};
+              _, State = #ch{limiter_pid = LimiterPid}) ->
+    LimiterPid1 = case {LimiterPid, PrefetchCount} of
+                      {undefined, 0} -> undefined;
+                      {undefined, _} -> start_limiter(State);
+                      {_, _}         -> LimiterPid
+                  end,
+    LimiterPid2 = case rabbit_limiter:limit(LimiterPid1, PrefetchCount) of
+                      ok      -> LimiterPid1;
+                      stopped -> unlimit_queues(State)
+                  end,
+    {reply, #'basic.qos_ok'{}, State#ch{limiter_pid = LimiterPid2}};
 
 handle_method(#'basic.recover'{requeue = true},
               _, State = #ch{ transaction_id = none,
@@ -530,24 +595,24 @@ handle_method(#'basic.recover'{requeue = false},
               _, State = #ch{ transaction_id = none,
                               writer_pid = WriterPid,
                               unacked_message_q = UAMQ }) ->
-    lists:foreach(
-      fun ({_DeliveryTag, none, _Msg}) ->
-              %% Was sent as a basic.get_ok. Don't redeliver
-              %% it. FIXME: appropriate?
-              ok;
-          ({DeliveryTag, ConsumerTag,
-            {QName, QPid, MsgId, _Redelivered, Message}}) ->
-              %% Was sent as a proper consumer delivery.  Resend it as
-              %% before.
-              %%
-              %% FIXME: What should happen if the consumer's been
-              %% cancelled since?
-              %%
-              %% FIXME: should we allocate a fresh DeliveryTag?
-              ok = internal_deliver(
+    ok = rabbit_misc:queue_fold(
+           fun ({_DeliveryTag, none, _Msg}, ok) ->
+                   %% Was sent as a basic.get_ok. Don't redeliver
+                   %% it. FIXME: appropriate?
+                   ok;
+               ({DeliveryTag, ConsumerTag,
+                 {QName, QPid, MsgId, _Redelivered, Message}}, ok) ->
+                   %% Was sent as a proper consumer delivery.  Resend
+                   %% it as before.
+                   %%
+                   %% FIXME: What should happen if the consumer's been
+                   %% cancelled since?
+                   %%
+                   %% FIXME: should we allocate a fresh DeliveryTag?
+                   internal_deliver(
                      WriterPid, false, ConsumerTag, DeliveryTag,
                      {QName, QPid, MsgId, true, Message})
-      end, queue:to_list(UAMQ)),
+           end, ok, UAMQ),
     %% No answer required, apparently!
     {noreply, State};
 
@@ -608,8 +673,8 @@ handle_method(#'exchange.delete'{exchange = ExchangeNameBin,
         {error, not_found} ->
             rabbit_misc:not_found(ExchangeName);
         {error, in_use} ->
-            die_precondition_failed(
-              "~s in use", [rabbit_misc:rs(ExchangeName)]);
+            rabbit_misc:protocol_error(
+              precondition_failed, "~s in use", [rabbit_misc:rs(ExchangeName)]);
         ok ->
             return_ok(State, NoWait,  #'exchange.delete_ok'{})
     end;
@@ -683,11 +748,11 @@ handle_method(#'queue.delete'{queue = QueueNameBin,
            QueueName,
            fun (Q) -> rabbit_amqqueue:delete(Q, IfUnused, IfEmpty) end) of
         {error, in_use} ->
-            die_precondition_failed(
-              "~s in use", [rabbit_misc:rs(QueueName)]);
+            rabbit_misc:protocol_error(
+              precondition_failed, "~s in use", [rabbit_misc:rs(QueueName)]);
         {error, not_empty} ->
-            die_precondition_failed(
-              "~s not empty", [rabbit_misc:rs(QueueName)]);
+            rabbit_misc:protocol_error(
+              precondition_failed, "~s not empty", [rabbit_misc:rs(QueueName)]);
         {ok, PurgedMessageCount} ->
             return_ok(State, NoWait,
                       #'queue.delete_ok'{
@@ -742,9 +807,31 @@ handle_method(#'tx.rollback'{}, _, #ch{transaction_id = none}) ->
 handle_method(#'tx.rollback'{}, _, State) ->
     {reply, #'tx.rollback_ok'{}, internal_rollback(State)};
 
-handle_method(#'channel.flow'{active = _}, _, State) ->
-    %% FIXME: implement
-    {reply, #'channel.flow_ok'{active = true}, State};
+handle_method(#'channel.flow'{active = true}, _,
+              State = #ch{limiter_pid = LimiterPid}) ->
+    LimiterPid1 = case rabbit_limiter:unblock(LimiterPid) of
+                      ok      -> LimiterPid;
+                      stopped -> unlimit_queues(State)
+                  end,
+    {reply, #'channel.flow_ok'{active = true},
+     State#ch{limiter_pid = LimiterPid1}};
+
+handle_method(#'channel.flow'{active = false}, _,
+              State = #ch{limiter_pid = LimiterPid,
+                          consumer_mapping = Consumers}) ->
+    LimiterPid1 = case LimiterPid of
+                      undefined -> start_limiter(State);
+                      Other     -> Other
+                  end,
+    ok = rabbit_limiter:block(LimiterPid1),
+    QPids = consumer_queues(Consumers),
+    Queues = [{QPid, erlang:monitor(process, QPid)} || QPid <- QPids],
+    ok = rabbit_amqqueue:flush_all(QPids, self()),
+    case Queues of
+        [] -> {reply, #'channel.flow_ok'{active = false}, State};
+        _  -> {noreply, State#ch{limiter_pid = LimiterPid1,
+                                 blocking = dict:from_list(Queues)}}
+    end;
 
 handle_method(#'channel.flow_ok'{active = _}, _, State) ->
     %% TODO: We may want to correlate this to channel.flow messages we
@@ -760,9 +847,9 @@ handle_method(_MethodRecord, _Content, _State) ->
 
 binding_action(Fun, ExchangeNameBin, QueueNameBin, RoutingKey, Arguments,
                ReturnMethod, NoWait, State = #ch{virtual_host = VHostPath}) ->
-    %% FIXME: connection exception (!) on failure?? 
+    %% FIXME: connection exception (!) on failure??
     %% (see rule named "failure" in spec-XML)
-    %% FIXME: don't allow binding to internal exchanges - 
+    %% FIXME: don't allow binding to internal exchanges -
     %% including the one named "" !
     QueueName = expand_queue_name_shortcut(QueueNameBin, State),
     check_write_permitted(QueueName, State),
@@ -870,8 +957,13 @@ internal_rollback(State = #ch{transaction_id = TxnKey,
                              internal_error, "rollback failed: ~w", [Errors])
     end.
 
+rollback_and_notify(State = #ch{transaction_id = none}) ->
+    notify_queues(State);
+rollback_and_notify(State) ->
+    notify_queues(internal_rollback(State)).
+
 fold_per_queue(F, Acc0, UAQ) ->
-    D = lists:foldl(
+    D = rabbit_misc:queue_fold(
           fun ({_DTag, _CTag,
                 {_QName, QPid, MsgId, _Redelivered, _Message}}, D) ->
                   %% dict:append would be simpler and avoid the
@@ -882,18 +974,27 @@ fold_per_queue(F, Acc0, UAQ) ->
                               fun (MsgIds) -> [MsgId | MsgIds] end,
                               [MsgId],
                               D)
-          end, dict:new(), queue:to_list(UAQ)),
+          end, dict:new(), UAQ),
     dict:fold(fun (QPid, MsgIds, Acc) -> F(QPid, MsgIds, Acc) end,
               Acc0, D).
 
+start_limiter(State = #ch{unacked_message_q = UAMQ}) ->
+    LPid = rabbit_limiter:start_link(self(), queue:len(UAMQ)),
+    ok = limit_queues(LPid, State),
+    LPid.
+
 notify_queues(#ch{consumer_mapping = Consumers}) ->
     rabbit_amqqueue:notify_down_all(consumer_queues(Consumers), self()).
+
+unlimit_queues(State) ->
+    ok = limit_queues(undefined, State),
+    undefined.
 
 limit_queues(LPid, #ch{consumer_mapping = Consumers}) ->
     rabbit_amqqueue:limit_all(consumer_queues(Consumers), self(), LPid).
 
 consumer_queues(Consumers) ->
-    [QPid || QueueName <- 
+    [QPid || QueueName <-
                  sets:to_list(
                    dict:fold(fun (_ConsumerTag, QueueName, S) ->
                                      sets:add_element(QueueName, S)
@@ -911,9 +1012,9 @@ consumer_queues(Consumers) ->
 notify_limiter(undefined, _Acked) ->
     ok;
 notify_limiter(LimiterPid, Acked) ->
-    case lists:foldl(fun ({_, none, _}, Acc) -> Acc;
-                         ({_, _, _}, Acc)    -> Acc + 1
-                     end, 0, queue:to_list(Acked)) of
+    case rabbit_misc:queue_fold(fun ({_, none, _}, Acc) -> Acc;
+                                    ({_, _, _}, Acc)    -> Acc + 1
+                                end, 0, Acked) of
         0     -> ok;
         Count -> rabbit_limiter:ack(LimiterPid, Count)
     end.
@@ -950,3 +1051,28 @@ internal_deliver(WriterPid, Notify, ConsumerTag, DeliveryTag,
                         WriterPid, QPid, self(), M, Content);
              false -> rabbit_writer:send_command(WriterPid, M, Content)
          end.
+
+terminate(#ch{writer_pid = WriterPid, limiter_pid = LimiterPid}) ->
+    pg_local:leave(rabbit_channels, self()),
+    rabbit_writer:shutdown(WriterPid),
+    rabbit_limiter:shutdown(LimiterPid).
+
+infos(Items, State) -> [{Item, i(Item, State)} || Item <- Items].
+
+i(pid,            _)                                 -> self();
+i(connection,     #ch{reader_pid       = ReaderPid}) -> ReaderPid;
+i(number,         #ch{channel          = Channel})   -> Channel;
+i(user,           #ch{username         = Username})  -> Username;
+i(vhost,          #ch{virtual_host     = VHost})     -> VHost;
+i(transactional,  #ch{transaction_id   = TxnKey})    -> TxnKey =/= none;
+i(consumer_count, #ch{consumer_mapping = ConsumerMapping}) ->
+    dict:size(ConsumerMapping);
+i(messages_unacknowledged, #ch{unacked_message_q = UAMQ,
+                               uncommitted_ack_q = UAQ}) ->
+    queue:len(UAMQ) + queue:len(UAQ);
+i(acks_uncommitted, #ch{uncommitted_ack_q = UAQ}) ->
+    queue:len(UAQ);
+i(prefetch_count, #ch{limiter_pid = LimiterPid}) ->
+    rabbit_limiter:get_limit(LimiterPid);
+i(Item, _) ->
+    throw({bad_argument, Item}).

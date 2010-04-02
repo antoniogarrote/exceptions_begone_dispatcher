@@ -102,10 +102,10 @@ var SproutCore = SproutCore || SC ;
 */
 SC.mixin = function() {
   // copy reference to target object
-  var target = arguments[0] || {},
-      idx = 1,
-      length = arguments.length ,
-      options, copy , key;
+  var target = arguments[0] || {};
+  var idx = 1;
+  var length = arguments.length ;
+  var options ;
 
   // Handle case where we have only one item...extend SC
   if (length === 1) {
@@ -115,9 +115,9 @@ SC.mixin = function() {
 
   for ( ; idx < length; idx++ ) {
     if (!(options = arguments[idx])) continue ;
-    for(key in options) {
+    for(var key in options) {
       if (!options.hasOwnProperty(key)) continue ;
-      copy = options[key] ;
+      var copy = options[key] ;
       if (target===copy) continue ; // prevent never-ending loop
       if (copy !== undefined) target[key] = copy ;
     }
@@ -455,30 +455,11 @@ SC.mixin(/** @scope SC */ {
 
   */
   compare: function (v, w) {
-    // Doing a '===' check is very cheap, so in the case of equality, checking
-    // this up-front is a big win.
-    if (v === w) return 0;
     
     var type1 = SC.typeOf(v);
     var type2 = SC.typeOf(w);
-    
-    // If we haven't yet generated a reverse-mapping of SC.ORDER_DEFINITION,
-    // do so now.
-    var mapping = SC.ORDER_DEFINITION_MAPPING;
-    if (!mapping) {
-      var order = SC.ORDER_DEFINITION;
-      mapping = SC.ORDER_DEFINITION_MAPPING = {};
-      var idx, len;
-      for (idx = 0, len = order.length;  idx < len;  ++idx) {
-        mapping[order[idx]] = idx;
-      }
-      
-      // We no longer need SC.ORDER_DEFINITION.
-      delete SC.ORDER_DEFINITION;
-    }
-    
-    var type1Index = mapping[type1];
-    var type2Index = mapping[type2];
+    var type1Index = SC.ORDER_DEFINITION.indexOf(type1);
+    var type2Index = SC.ORDER_DEFINITION.indexOf(type2);
     
     if (type1Index < type2Index) return -1;
     if (type1Index > type2Index) return 1;
@@ -492,28 +473,24 @@ SC.mixin(/** @scope SC */ {
         return 0;
 
       case SC.T_STRING:
-        var comp = v.localeCompare(w);
-        if (comp<0) return -1;
-        if (comp>0) return 1;
+        if (v.localeCompare(w)<0) return -1;
+        if (v.localeCompare(w)>0) return 1;
         return 0;
 
       case SC.T_ARRAY:
-        var vLen = v.length;
-        var wLen = w.length;
-        var l = Math.min(vLen, wLen);
+        var l = Math.min(v.length,w.length);
         var r = 0;
         var i = 0;
-        var thisFunc = arguments.callee;
         while (r===0 && i < l) {
-          r = thisFunc(v[i],w[i]);
+          r = arguments.callee(v[i],w[i]);
+          if ( r !== 0 ) return r;
           i++;
         }
-        if (r !== 0) return r;
       
         // all elements are equal now
         // shorter array should be ordered first
-        if (vLen < wLen) return -1;
-        if (vLen > wLen) return 1;
+        if (v.length < w.length) return -1;
+        if (v.length > w.length) return 1;
         // arrays are equal now
         return 0;
         
@@ -1010,8 +987,8 @@ SC.mixin(Function.prototype,
 */
 String.prototype.fmt = function() {
   // first, replace any ORDERED replacements.
-  var args = arguments,
-      idx  = 0; // the current index for non-numerical replacements
+  var args = arguments;
+  var idx  = 0; // the current index for non-numerical replacements
   return this.replace(/%@([0-9]+)?/g, function(s, argIndex) {
     argIndex = (argIndex) ? parseInt(argIndex,0)-1 : idx++ ;
     s =args[argIndex];
@@ -1042,13 +1019,15 @@ String.prototype.loc = function() {
   @returns {Array} an array of non-empty strings
 */
 String.prototype.w = function() { 
-  var ary = [], ary2 = this.split(' '), len = ary2.length, str, idx=0;
-  for (idx=0; idx<len; ++idx) {
-    str = ary2[idx] ;
+  var ary = [], ary2 = this.split(' '), len = ary2.length ;
+  for (var idx=0; idx<len; ++idx) {
+    var str = ary2[idx] ;
     if (str.length !== 0) ary.push(str) ; // skip empty strings
   }
   return ary ;
 };
+
+
 
 /* >>>>>>>>>> BEGIN source/debug/test_suites/array/base.js */
 // ==========================================================================
@@ -2338,12 +2317,8 @@ SC.ObserverSet = {
   _membersCacheIsValid: NO,
   
   /**
-    Adds the named target/method observer to the set.  The method must be
-    a function, not a string.
-    
-    Note that in debugging mode only, this method is overridden to also record
-    the name of the object and function that resulted in the target/method
-    being added.
+    adds the named target/method observer to the set.  The method must be
+    a function, not a string..
   */
   add: function(target, method, context) {
     var targetGuid = (target) ? SC.guidFor(target) : "__this__";
@@ -2362,7 +2337,7 @@ SC.ObserverSet = {
     // implementation is intentionally lazy.
     if (context !== undefined) {
       var contexts = methods.contexts ;
-      if (!context) context = methods.contexts = {} ;
+      if (!context) contexts = {};
       contexts[SC.guidFor(method)] = context ;
     }
     
@@ -2763,9 +2738,8 @@ SC.Observable = {
         cachedep, cache, idx, dfunc ;
 
     // if there are any dependent keys and they use caching, then clear the
-    // cache.  (If we're notifying, then propertyDidChange will do this for
-    // us.)
-    if (!notify && this._kvo_cacheable && (cache = this._kvo_cache)) {
+    // cache.
+    if (this._kvo_cacheable && (cache = this._kvo_cache)) {
       // lookup the cached dependents for this key.  if undefined, compute.
       // note that if cachdep is set to null is means we figure out it has no
       // cached dependencies already.  this is different from undefined.
@@ -3209,7 +3183,7 @@ SC.Observable = {
     }
     if (!target) target = this ;
     if (SC.typeOf(method) === SC.T_STRING) method = target[method] ;
-    if (!method) throw "You must pass a method to removeObserver()" ;
+    if (!method) throw "You must pass a method to addObserver()" ;
 
     // if the key contains a '.', this is a chained observer.
     key = key.toString() ;
@@ -3297,19 +3271,18 @@ SC.Observable = {
     if (this._observableInited) return ;
     this._observableInited = YES ;
     
-    var loc, keys, key, value, observer, propertyPaths, propertyPathsLength,
-        len, ploc, path, dotIndex, root, propertyKey, keysLen;
+    var loc, keys, key, value, observer, propertyPaths, propertyPathsLength ;
     
     // Loop through observer functions and register them
     if (keys = this._observers) {
-      len = keys.length ;
+      var len = keys.length ;
       for(loc=0;loc<len;loc++) {
         key = keys[loc]; observer = this[key] ;
         propertyPaths = observer.propertyPaths ;
         propertyPathsLength = (propertyPaths) ? propertyPaths.length : 0 ;
-        for(ploc=0;ploc<propertyPathsLength;ploc++) {
-          path = propertyPaths[ploc] ;
-          dotIndex = path.indexOf('.') ;
+        for(var ploc=0;ploc<propertyPathsLength;ploc++) {
+          var path = propertyPaths[ploc] ;
+          var dotIndex = path.indexOf('.') ;
           // handle most common case, observing a local property
           if (dotIndex < 0) {
             this.addObserver(path, this, observer) ;
@@ -3322,7 +3295,7 @@ SC.Observable = {
           // will add the observer now or later when the named path becomes
           // available.
           } else {
-            root = null ;
+            var root = null ;
             
             // handle special cases for observers that look to the local root
             if (dotIndex === 0) {
@@ -3342,17 +3315,17 @@ SC.Observable = {
     // Add Bindings
     this.bindings = []; // will be filled in by the bind() method.
     if (keys = this._bindings) {
-      for(loc=0, keysLen = keys.length; loc < keysLen;loc++) {
+      for(loc=0;loc<keys.length;loc++) {
         // get propertyKey
         key = keys[loc] ; value = this[key] ;
-        propertyKey = key.slice(0,-7) ; // contentBinding => content
+        var propertyKey = key.slice(0,-7) ; // contentBinding => content
         this[key] = this.bind(propertyKey, value) ;
       }
     }
 
     // Add Properties
     if (keys = this._properties) {
-      for(loc=0, keysLen = keys.length; loc<keysLen;loc++) {
+      for(loc=0;loc<keys.length;loc++) {
         key = keys[loc];
         if (value = this[key]) {
 
@@ -3394,10 +3367,10 @@ SC.Observable = {
     
     SC.Observers.flush(this) ; // hookup as many observers as possible.
 
-    var log = SC.LOG_OBSERVERS && !(this.LOG_OBSERVING===NO),
-        observers, changes, dependents, starObservers, idx, keys, rev,
-        members, membersLength, member, memberLoc, target, method, loc, func,
-        context, spaces, cache ;
+    var log = SC.LOG_OBSERVERS && !(this.LOG_OBSERVING===NO) ;
+    var observers, changes, dependents, starObservers, idx, keys, rev ;
+    var members, membersLength, member, memberLoc, target, method, loc, func ;
+    var context, spaces, cache ;
 
     if (log) {
       spaces = SC.KVO_SPACES = (SC.KVO_SPACES || '') + '  ';
@@ -3558,14 +3531,14 @@ SC.Observable = {
   */
   bind: function(toKey, target, method) {
 
-    var binding , pathType;
+    var binding ;
 
     // normalize...
     if (method !== undefined) target = [target, method];
 
     // if a string or array (i.e. tuple) is passed, convert this into a
     // binding.  If a binding default was provided, use that.
-    pathType = SC.typeOf(target) ;
+    var pathType = SC.typeOf(target) ;
     if (pathType === SC.T_STRING || pathType === SC.T_ARRAY) {
       binding = this[toKey + 'BindingDefault'] || SC.Binding;
       binding = binding.beget().from(target) ;
@@ -3588,31 +3561,30 @@ SC.Observable = {
     }
   */  
   didChangeFor: function(context) { 
-    var valueCache, revisionCache, seenValues, seenRevisions, ret,
-        currentRevision, idx, key, value;
+    
     context = SC.hashFor(context) ; // get a hash key we can use in caches.
     
     // setup caches...
-    valueCache = this._kvo_didChange_valueCache ;
+    var valueCache = this._kvo_didChange_valueCache ;
     if (!valueCache) valueCache = this._kvo_didChange_valueCache = {};
-    revisionCache = this._kvo_didChange_revisionCache;
+    var revisionCache = this._kvo_didChange_revisionCache;
     if (!revisionCache) revisionCache=this._kvo_didChange_revisionCache={};
 
     // get the cache of values and revisions already seen in this context
-    seenValues = valueCache[context] || {} ;
-    seenRevisions = revisionCache[context] || {} ;
+    var seenValues = valueCache[context] || {} ;
+    var seenRevisions = revisionCache[context] || {} ;
     
     // prepare too loop!
-    ret = false ;
-    currentRevision = this._kvo_revision || 0  ;
-    idx = arguments.length ;
+    var ret = false ;
+    var currentRevision = this._kvo_revision || 0  ;
+    var idx = arguments.length ;
     while(--idx >= 1) {  // NB: loop only to 1 to ignore context arg.
-      key = arguments[idx];
+      var key = arguments[idx];
       
       // has the kvo revision changed since the last time we did this?
       if (seenRevisions[key] != currentRevision) {
         // yes, check the value with the last seen value
-        value = this.get(key) ;
+        var value = this.get(key) ;
         if (seenValues[key] !== value) {
           ret = true ; // did change!
           seenValues[key] = value;
@@ -3697,9 +3669,9 @@ SC.Observable = {
     @returns {Array} Values of property keys.
   */
   getEach: function() {
-    var keys = SC.A(arguments),
-        ret = [], idx, idxLen;
-    for(idx=0, idxLen = keys.length; idx < idxLen;idx++) {
+    var keys = SC.A(arguments) ;
+    var ret = [];
+    for(var idx=0; idx<keys.length;idx++) {
       ret[ret.length] = this.getPath(keys[idx]);
     }
     return ret ;
@@ -3789,10 +3761,9 @@ SC.Observable = {
     @param {String...} propertyNames one or more property names
   */
   logProperty: function() {
-    var props = SC.$A(arguments),
-        prop, propsLen, idx;
-    for(idx=0, propsLen = props.length; idx<propsLen; idx++) {
-      prop = props[idx] ;
+    var props = SC.$A(arguments) ;
+    for(var idx=0;idx<props.length; idx++) {
+      var prop = props[idx] ;
       console.log('%@:%@: '.fmt(SC.guidFor(this), prop), this.get(prop)) ;
     }
   },
@@ -3805,22 +3776,6 @@ SC.Observable = {
 SC.logChange = function logChange(target, key, value) {
   console.log("CHANGE: %@[%@] => %@".fmt(target, key, target.get(key))) ;
 };
-
-/**
-  Retrieves a property from an object, using get() if the
-  object implements SC.Observable.
-
-  @param  {Object}  object  the object to query
-  @param  {String}  key the property to retrieve
-*/
-SC.mixin(SC, {
-  get: function(object, key) {
-    if (!object) return undefined;
-    if (key === undefined) return this[object];
-    if (object.get) return object.get(key);
-    return object[key];
-  }
-});
 
 // Make all Array's observable
 SC.mixin(Array.prototype, SC.Observable) ;
@@ -5801,12 +5756,6 @@ SC.Array = {
   addRangeObserver: function(indexes, target, method, context) {
     var rangeob = this._array_rangeObservers;
     if (!rangeob) rangeob = this._array_rangeObservers = SC.CoreSet.create() ;
-
-    // The first time a range observer is added, cache the current length so
-    // we can properly notify observers the first time through
-    if (this._array_oldLength===undefined) {
-      this._array_oldLength = this.get('length') ;
-    }
     
     var C = this.rangeObserverClass ;
     var isDeep = NO; //disable this feature for now
@@ -6172,7 +6121,7 @@ SC.Copyable = {
   frozenCopy: function() {
     var isFrozen = this.get ? this.get('isFrozen') : this.isFrozen;
     if (isFrozen === YES) return this;
-    else if (isFrozen === undefined) throw "%@ does not support freezing".fmt(this);
+    else if (isFrozen === undefined) throw "%@ does not support freezing";
     else return this.copy().freeze();
   }
 };
@@ -6862,7 +6811,7 @@ SC.BENCHMARK_OBJECTS = NO;
   number of optimizations that can make init'ing a new object much faster
   including:
   
-  - concatenating concatenatedProperties
+  - concating concatenatedProperties
   - prepping a list of bindings, observers, and dependent keys
   - caching local observers so they don't need to be manually constructed.
 
@@ -7113,16 +7062,16 @@ SC.mixin(SC.Object, /** @scope SC.Object */ {
   /**
     Creates a new instance of the class.
 
-    Unlike most frameworks, you do not pass parameters to the init function
-    for an object.  Instead, you pass a hash of additional properties you 
+    Unlike most frameworks, you do not pass paramters into the init funciton
+    for an object.  Instead, you pass a hash of additonal properties you 
     want to have assigned to the object when it is first created.  This is
-    functionally like creating an anonymous subclass of the receiver and then
+    functionally like creating a anonymous subclass of the receiver and then
     instantiating it, but more efficient.
 
     You can use create() like you would a normal constructor in a 
     class-based system, or you can use it to create highly customized 
     singleton objects such as controllers or app-level objects.  This is 
-    often more efficient than creating subclasses and then instantiating 
+    often more efficient than creating subclasses and than instantiating 
     them.
 
     You can pass any hash of properties to this method, including mixins.
@@ -7358,7 +7307,7 @@ SC.Object.prototype = {
   },
   
   /**
-    Attemps to invoke the named method, passing the included two arguments.  
+    Attemps to invoked the named method, passing the included two arguments.  
     Returns NO if the method is either not implemented or if the handler 
     returns NO (indicating that it did not handle the event).  This method 
     is invoked to deliver actions from menu items and to deliver events.  
@@ -7492,10 +7441,7 @@ SC.Object.prototype = {
     too expensive to execute more than once, such as methods that update the
     DOM.
     
-    Note that in development mode only, the object and method that call this
-    method will be recorded, for help in debugging scheduled code.
-    
-    @param {Function|String} method method or method name
+    @param {Funciton|String} method method or method name
     @returns {SC.Object} receiver
   */
   invokeOnce: function(method) {
@@ -7513,7 +7459,7 @@ SC.Object.prototype = {
     A simple example is setting the selection on a collection controller to a 
     newly created object. Because the collection controller won't have its
     content collection updated until later in the run loop, setting the 
-    selection immediately will have no effect. In this situation, you could do
+    selection immediately will have no affect. In this situation, you could do
     this instead:
     
     {{{
@@ -7532,9 +7478,6 @@ SC.Object.prototype = {
     
     You can call invokeLast as many times as you like and the method will
     only be invoked once.
-    
-    Note that in development mode only, the object and method that call this
-    method will be recorded, for help in debugging scheduled code.
     
     @param {Funciton|String} method method or method name
     @returns {SC.Object} receiver
@@ -7618,7 +7561,7 @@ function findClassNames() {
 
   searchObject(null, window, 2) ;
 
-  // Internet Explorer doesn't loop over global variables...
+  // Internet Explorer doesn's loop over global variables...
   /*if ( SC.browser.isIE ) {
     searchObject('SC', SC, 2) ; // get names for the SC classes
 
@@ -8477,8 +8420,8 @@ SC.Binding = {
     Returns a builder function for compatibility.  
   */
   builder: function() {
-    var binding = this,
-        ret = function(fromProperty) { return binding.beget().from(fromProperty); };
+    var binding = this ;
+    var ret = function(fromProperty) { return binding.beget().from(fromProperty); };
     ret.beget = function() { return binding.beget(); } ;
     return ret ;
   },
@@ -8557,8 +8500,8 @@ SC.Binding = {
     if (!this._connectionPending) return; //nothing to do
     this._connectionPending = NO ;
 
-    var path, root,
-        bench = SC.BENCHMARK_BINDING_SETUP;
+    var path, root ;
+    var bench = SC.BENCHMARK_BINDING_SETUP;
 
     if (bench) SC.Benchmark.start("SC.Binding.connect()");
     
@@ -8688,7 +8631,7 @@ SC.Binding = {
   _computeBindingValue: function() {
     var source = this._bindingSource,
         key    = this._bindingKey,
-        v, idx;
+        v;
         
     if (!source) return ; // nothing to do
     this._bindingValue = v = source.getPath(key);
@@ -8696,10 +8639,9 @@ SC.Binding = {
     // apply any transforms to get the to property value also
     var transforms = this._transforms;
     if (transforms) {
-      var len = transforms.length,
-          transform;
-      for(idx=0;idx<len;idx++) {
-        transform = transforms[idx] ;
+      var len = transforms.length ;
+      for(var idx=0;idx<len;idx++) {
+        var transform = transforms[idx] ;
         v = transform(v, this) ;
       }
     }
@@ -8729,10 +8671,11 @@ SC.Binding = {
     this._isFlushing = YES ;
     SC.Observers.suspendPropertyObserving();
 
-    var didFlush = NO,
-        log = SC.LOG_BINDINGS,
-        // connect any bindings
-        queue, binding ;
+    var didFlush = NO ;
+    var log = SC.LOG_BINDINGS ;
+    
+    // connect any bindings
+    var queue, binding ;
     while((queue = this._connectQueue).length >0) {
       this._connectQueue = this._alternateConnectQueue ;
       this._alternateConnectQueue = queue ;
@@ -8779,10 +8722,10 @@ SC.Binding = {
     this._computeBindingTargets() ;
     this._computeBindingValue();
     
-    var v = this._bindingValue,
-        tv = this._transformedBindingValue,
-        bench = SC.BENCHMARK_BINDING_NOTIFICATIONS,
-        log = SC.LOG_BINDINGS ; 
+    var v = this._bindingValue ;
+    var tv = this._transformedBindingValue ;
+    var bench = SC.BENCHMARK_BINDING_NOTIFICATIONS ;
+    var log = SC.LOG_BINDINGS ; 
     
     // the from property value will always be the binding value, update if 
     // needed.
@@ -8823,8 +8766,8 @@ SC.Binding = {
     // we are connected, go ahead and sync
     } else {
       this._computeBindingTargets() ;
-      var target = this._fromTarget,
-          key = this._fromPropertyKey ;
+      var target = this._fromTarget ;
+      var key = this._fromPropertyKey ;
       if (!target || !key) return this ; // nothing to do
 
       // get the new value
@@ -10652,7 +10595,7 @@ SC.IndexSet.EMPTY = SC.IndexSet.create().freeze();
 
 /**
   If {@link SC.Logger.format} is true, this delimiter will be put between arguments.
-
+  
   @property {String}
 */
 SC.LOGGER_LOG_DELIMITER = ", ";
@@ -10660,7 +10603,7 @@ SC.LOGGER_LOG_DELIMITER = ", ";
 /**
   If {@link SC.Logger.error} falls back onto {@link SC.Logger.log}, this will be
   prepended to the output.
-
+  
   @property {String}
 */
 SC.LOGGER_LOG_ERROR = "ERROR: ";
@@ -10668,7 +10611,7 @@ SC.LOGGER_LOG_ERROR = "ERROR: ";
 /**
   If {@link SC.Logger.info} falls back onto {@link SC.Logger.log}, this will be
   prepended to the output.
-
+  
   @property {String}
 */
 SC.LOGGER_LOG_INFO = "INFO: ";
@@ -10676,102 +10619,86 @@ SC.LOGGER_LOG_INFO = "INFO: ";
 /**
   If {@link SC.Logger.warn} falls back onto {@link SC.Logger.log}, this will be
   prepended to the output.
-
+  
   @property {String}
 */
 SC.LOGGER_LOG_WARN = "WARNING: ";
 
-/**
-  If {@link SC.Logger.debug} falls back onto {@link SC.Logger.log}, this will be
-  prepended to the output.
-
-  @property {String}
-*/
-SC.LOGGER_LOG_DEBUG = "DEBUG: ";
-
 /** @class
-
+  
   Object to allow for safe logging actions, such as using the browser console.
-
+  
   The FireFox plugin Firebug was used as a function reference. Please see
   {@link <a href="http://getfirebug.com/logging.html">Firebug Logging Reference</a>}
   for further information.
-
+  
   @author Colin Campbell
-  @author Benedikt Böhm
   @extends SC.Object
   @since Sproutcore 1.0
   @see <a href="http://getfirebug.com/logging.html">Firebug Logging Reference</a>
 */
-SC.Logger = SC.Object.create({
-
+SC.Logger = SC.Object.create({ 
+  
   // ..........................................................
   // PROPERTIES
-  //
-
-  /**
-    Whether or not to enable debug logging.
-
-    @property: {Boolean}
-  */
-  debugEnabled: NO,
-
+  //   
+  
   /**
     Computed property that checks for the existence of the reporter object.
-
+    
     @property {Boolean}
   */
   exists: function() {
     return typeof(this.get('reporter')) !== 'undefined' && this.get('reporter') != null;
   }.property('reporter').cacheable(),
-
+  
   /**
     If console.log does not exist, SC.Logger will use window.alert instead.
-
+    
     This property is only used inside {@link SC.Logger.log}. If fallBackOnLog is
     false and you call a different function, an alert will not be opened.
-
+    
     @property {Boolean}
   */
   fallBackOnAlert: NO,
-
+  
   /**
     If some function, such as console.dir, does not exist,
     SC.Logger will try console.log if this is true.
-
+    
     @property {Boolean}
   */
   fallBackOnLog: YES,
-
+  
   /**
     Whether or not to format multiple arguments together
     or let the browser deal with that.
-
+    
     @property {Boolean}
   */
   format: YES,
-
+  
   /**
     The reporter is the object which implements the actual logging functions.
-
+    
     @default The browser's console
     @property {Object}
   */
   reporter: console,
-
+  
   // ..........................................................
   // METHODS
-  //
+  // 
 
   /**
     Log output to the console, but only if it exists.
-
+    
     @param {String|Array|Function|Object}
     @returns {Boolean} true if reporter.log exists, false otherwise
   */
   log: function() {
     var reporter = this.get('reporter');
-
+    
     // log through the reporter
     if (this.get('exists') && typeof(reporter.log) === "function") {
       if (this.get('format')) {
@@ -10782,7 +10709,7 @@ SC.Logger = SC.Object.create({
       }
       return true;
     }
-
+    
     // log through alert
     else if (this.fallBackOnAlert) {
       var s = this.get('format') ? this._argumentsToString.apply(this, arguments) : arguments;
@@ -10798,68 +10725,40 @@ SC.Logger = SC.Object.create({
     }
     return false;
   },
-
-  /**
-    Log a debug message to the console.
-
-    Logs the response using {@link SC.Logger.log} if reporter.debug does not exist and
-    {@link SC.Logger.fallBackOnLog} is true.
-
-    @param {String|Array|Function|Object}
-    @returns {Boolean} true if logged to reporter, false if not
-  */
-  debug: function() {
-    var reporter = this.get('reporter');
-
-    if (this.get('debugEnabled') !== YES) {
-      return false;
-    }
-
-    if (this.get('exists') && (typeof reporter.debug === "function")) {
-      reporter.debug.apply(reporter, arguments);
-      return true;
-    }
-    else if (this.fallBackOnLog) {
-      var a = this._argumentsToArray(arguments);
-      if (typeof(a.unshift) === "function") a.unshift(SC.LOGGER_LOG_DEBUG);
-      return this.log.apply(this, a);
-    }
-    return false;
-  },
-
+  
   /**
     Prints the properties of an object.
-
+    
     Logs the object using {@link SC.Logger.log} if the reporter.dir function does not exist and
     {@link SC.Logger.fallBackOnLog} is true.
-
+    
     @param {Object}
     @returns {Boolean} true if logged to console, false if not
   */
   dir: function() {
     var reporter = this.get('reporter');
-
-    if (this.get('exists') && typeof(reporter.dir) === "function") {
+    
+  	if (this.get('exists') && typeof(reporter.dir) === "function") {
       // Firebug's console.dir doesn't support multiple objects here
       // but maybe custom reporters will
-      reporter.dir.apply(reporter, arguments);
-      return true;
-    }
-    return (this.fallBackOnLog) ? this.log.apply(this, arguments) : false;
+  	  reporter.dir.apply(reporter, arguments);
+  	  return true;
+	  }
+  	return (this.fallBackOnLog) ? this.log.apply(this, arguments) : false;
   },
-
+  
   /**
     Prints an XML outline for any HTML or XML object.
-
+    
     Logs the object using {@link SC.Logger.log} if reporter.dirxml function does not exist and
     {@lnk SC.Logger.fallBackOnLog} is true.
-
+    
     @param {Object}
     @returns {Boolean} true if logged to reporter, false if not
   */
   dirxml: function() {
     var reporter = this.get('reporter');
-
+    
     if (this.get('exists') && typeof(reporter.dirxml) === "function") {
       // Firebug's console.dirxml doesn't support multiple objects here
       // but maybe custom reporters will
@@ -10868,19 +10767,19 @@ SC.Logger = SC.Object.create({
     }
     return (this.fallBackOnLog) ? this.log.apply(this, arguments) : false;
   },
-
+  
   /**
     Log an error to the console
-
+    
     Logs the error using {@link SC.Logger.log} if reporter.error does not exist and
     {@link SC.Logger.fallBackOnLog} is true.
-
+    
     @param {String|Array|Function|Object}
     @returns {Boolean} true if logged to reporter, false if not
   */
   error: function() {
     var reporter = this.get('reporter');
-
+    
     if (this.get('exists') && typeof(reporter.error) === "function") {
       reporter.error.apply(reporter, arguments);
       return true;
@@ -10892,53 +10791,53 @@ SC.Logger = SC.Object.create({
     }
     return false;
   },
-
+  
   /**
     Every log after this call until {@link SC.Logger.groupEnd} is called
     will be indented for readability. You can create as many levels
     as you want.
-
+    
     @param {String} [title] An optional title to display above the group
     @returns {Boolean} true if reporter.group exists, false otherwise
   */
   group: function(s) {
     var reporter = this.get('reporter');
-
+    
     if (this.get('exists') && typeof(reporter.group) === "function") {
       reporter.group(s);
       return true;
     }
     return false;
   },
-
+  
   /**
     Ends a group declared with {@link SC.Logger.group}.
-
+    
     @returns {Boolean} true if the reporter.groupEnd exists, false otherwise
     @see SC.Logger.group
   */
   groupEnd: function() {
     var reporter = this.get('reporter');
-
+    
     if (this.get('exists') && typeof(reporter.groupEnd) === "function") {
       reporter.groupEnd();
       return true;
     }
     return false;
   },
-
+  
   /**
     Log an information response to the reporter.
-
+    
     Logs the response using {@link SC.Logger.log} if reporter.info does not exist and
     {@link SC.Logger.fallBackOnLog} is true.
-
+    
     @param {String|Array|Function|Object}
     @returns {Boolean} true if logged to reporter, false if not
   */
   info: function() {
     var reporter = this.get('reporter');
-
+    
     if (this.get('exists') && typeof(reporter.info) === "function") {
       reporter.info.apply(reporter, arguments);
       return true;
@@ -10950,101 +10849,101 @@ SC.Logger = SC.Object.create({
     }
     return false;
   },
-
+  
   /**
     Begins the JavaScript profiler, if it exists. Call {@link SC.Logger.profileEnd}
     to end the profiling process and receive a report.
-
+    
     @returns {Boolean} true if reporter.profile exists, false otherwise
   */
   profile: function() {
     var reporter = this.get('reporter');
-
+    
     if (this.get('exists') && typeof(reporter.profile) === "function") {
       reporter.profile();
       return true;
     }
     return false;
   },
-
+  
   /**
     Ends the JavaScript profiler, if it exists.
-
+    
     @returns {Boolean} true if reporter.profileEnd exists, false otherwise
     @see SC.Logger.profile
   */
   profileEnd: function() {
     var reporter = this.get('reporter');
-
+    
     if (this.get('exists') && typeof(reporter.profileEnd) === "function") {
       reporter.profileEnd();
       return true;
     }
     return false;
   },
-
+  
   /**
     Measure the time between when this function is called and
     {@link SC.Logger.timeEnd} is called.
-
+    
     @param {String} name The name of the profile to begin
     @returns {Boolean} true if reporter.time exists, false otherwise
     @see SC.Logger.timeEnd
   */
   time: function(name) {
     var reporter = this.get('reporter');
-
+    
     if (this.get('exists') && typeof(reporter.time) === "function") {
       reporter.time(name);
       return true;
     }
     return false;
   },
-
+  
   /**
     Ends the profile specified.
-
+    
     @param {String} name The name of the profile to end
     @returns {Boolean} true if reporter.timeEnd exists, false otherwise
     @see SC.Logger.time
   */
   timeEnd: function(name) {
     var reporter = this.get('reporter');
-
+    
     if (this.get('exists') && typeof(reporter.timeEnd) === "function") {
       reporter.timeEnd(name);
       return true;
     }
     return false;
   },
-
+  
   /**
     Prints a stack-trace.
-
+    
     @returns {Boolean} true if reporter.trace exists, false otherwise
   */
   trace: function() {
     var reporter = this.get('reporter');
-
+    
     if (this.get('exists') && typeof(reporter.trace) === "function") {
       reporter.trace();
       return true;
     }
     return false;
   },
-
+  
   /**
     Log a warning to the console.
-
+    
     Logs the warning using {@link SC.Logger.log} if reporter.warning does not exist and
     {@link SC.Logger.fallBackOnLog} is true.
-
+    
     @param {String|Array|Function|Object}
     @returns {Boolean} true if logged to reporter, false if not
   */
   warn: function() {
     var reporter = this.get('reporter');
-
+    
     if (this.get('exists') && typeof(reporter.warn) === "function") {
       reporter.warn.apply(reporter, arguments);
       return true;
@@ -11056,17 +10955,17 @@ SC.Logger = SC.Object.create({
     }
     return false;
   },
-
+  
   // ..........................................................
   // INTERNAL SUPPORT
-  //
-
+  // 
+  
   /**
     @private
-
+    
     The arguments function property doesn't support Array#unshift. This helper
     copies the elements of arguments to a blank array.
-
+    
     @param {Array} arguments The arguments property of a function
     @returns {Array} An array containing the elements of arguments parameter
   */
@@ -11078,26 +10977,25 @@ SC.Logger = SC.Object.create({
     }
     return a;
   },
-
+  
   /**
     @private
-
+    
     Formats the arguments array of a function by creating a string
     with SC.LOGGER_LOG_DELIMITER between the elements.
-
+    
     @returns {String} A string of formatted arguments
   */
   _argumentsToString: function() {
-    var s = "";
-    for (var i = 0; i<arguments.length - 1; i++) {
-      s += arguments[i] + SC.LOGGER_LOG_DELIMITER;
-    }
-    s += arguments[arguments.length-1];
-    return s;
+  	var s = "";
+  	for (var i = 0; i<arguments.length - 1; i++) {
+  		s += arguments[i] + SC.LOGGER_LOG_DELIMITER;
+  	}
+  	s += arguments[arguments.length-1];
+  	return s;
   }
-
+  
 });
-
 /* >>>>>>>>>> BEGIN source/system/run_loop.js */
 // ==========================================================================
 // Project:   SproutCore Costello - Property Observing Library
@@ -11199,9 +11097,6 @@ SC.RunLoop = SC.Object.extend(/** @scope SC.RunLoop.prototype */ {
     Usually you will not call this method directly but use invokeOnce() 
     defined on SC.Object.
     
-    Note that in development mode only, the object and method that call this
-    method will be recorded, for help in debugging scheduled code.
-    
     @param {Object} target
     @param {Function} method
     @returns {SC.RunLoop} receiver
@@ -11228,9 +11123,6 @@ SC.RunLoop = SC.Object.extend(/** @scope SC.RunLoop.prototype */ {
     
     Usually you will not call this method directly but use invokeLast() 
     defined on SC.Object.
-    
-    Note that in development mode only, the object and method that call this
-    method will be recorded, for help in debugging scheduled code.
     
     @param {Object} target
     @param {Function} method

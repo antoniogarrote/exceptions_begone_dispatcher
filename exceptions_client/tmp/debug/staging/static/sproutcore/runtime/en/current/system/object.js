@@ -27,7 +27,7 @@ SC.BENCHMARK_OBJECTS = NO;
   number of optimizations that can make init'ing a new object much faster
   including:
   
-  - concatenating concatenatedProperties
+  - concating concatenatedProperties
   - prepping a list of bindings, observers, and dependent keys
   - caching local observers so they don't need to be manually constructed.
 
@@ -278,16 +278,16 @@ SC.mixin(SC.Object, /** @scope SC.Object */ {
   /**
     Creates a new instance of the class.
 
-    Unlike most frameworks, you do not pass parameters to the init function
-    for an object.  Instead, you pass a hash of additional properties you 
+    Unlike most frameworks, you do not pass paramters into the init funciton
+    for an object.  Instead, you pass a hash of additonal properties you 
     want to have assigned to the object when it is first created.  This is
-    functionally like creating an anonymous subclass of the receiver and then
+    functionally like creating a anonymous subclass of the receiver and then
     instantiating it, but more efficient.
 
     You can use create() like you would a normal constructor in a 
     class-based system, or you can use it to create highly customized 
     singleton objects such as controllers or app-level objects.  This is 
-    often more efficient than creating subclasses and then instantiating 
+    often more efficient than creating subclasses and than instantiating 
     them.
 
     You can pass any hash of properties to this method, including mixins.
@@ -523,7 +523,7 @@ SC.Object.prototype = {
   },
   
   /**
-    Attemps to invoke the named method, passing the included two arguments.  
+    Attemps to invoked the named method, passing the included two arguments.  
     Returns NO if the method is either not implemented or if the handler 
     returns NO (indicating that it did not handle the event).  This method 
     is invoked to deliver actions from menu items and to deliver events.  
@@ -657,10 +657,7 @@ SC.Object.prototype = {
     too expensive to execute more than once, such as methods that update the
     DOM.
     
-    Note that in development mode only, the object and method that call this
-    method will be recorded, for help in debugging scheduled code.
-    
-    @param {Function|String} method method or method name
+    @param {Funciton|String} method method or method name
     @returns {SC.Object} receiver
   */
   invokeOnce: function(method) {
@@ -678,7 +675,7 @@ SC.Object.prototype = {
     A simple example is setting the selection on a collection controller to a 
     newly created object. Because the collection controller won't have its
     content collection updated until later in the run loop, setting the 
-    selection immediately will have no effect. In this situation, you could do
+    selection immediately will have no affect. In this situation, you could do
     this instead:
     
     {{{
@@ -697,9 +694,6 @@ SC.Object.prototype = {
     
     You can call invokeLast as many times as you like and the method will
     only be invoked once.
-    
-    Note that in development mode only, the object and method that call this
-    method will be recorded, for help in debugging scheduled code.
     
     @param {Funciton|String} method method or method name
     @returns {SC.Object} receiver
@@ -783,7 +777,7 @@ function findClassNames() {
 
   searchObject(null, window, 2) ;
 
-  // Internet Explorer doesn't loop over global variables...
+  // Internet Explorer doesn's loop over global variables...
   /*if ( SC.browser.isIE ) {
     searchObject('SC', SC, 2) ; // get names for the SC classes
 

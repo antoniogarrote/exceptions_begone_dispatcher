@@ -19,40 +19,56 @@
 ##   are Copyright (C) 2007-2008 LShift Ltd, Cohesive Financial
 ##   Technologies LLC, and Rabbit Technologies Ltd.
 ##
-##   Portions created by LShift Ltd are Copyright (C) 2007-2009 LShift
+##   Portions created by LShift Ltd are Copyright (C) 2007-2010 LShift
 ##   Ltd. Portions created by Cohesive Financial Technologies LLC are
-##   Copyright (C) 2007-2009 Cohesive Financial Technologies
+##   Copyright (C) 2007-2010 Cohesive Financial Technologies
 ##   LLC. Portions created by Rabbit Technologies Ltd are Copyright
-##   (C) 2007-2009 Rabbit Technologies Ltd.
+##   (C) 2007-2010 Rabbit Technologies Ltd.
 ##
 ##   All Rights Reserved.
 ##
 ##   Contributor(s): ______________________________________.
 ##
 NODENAME=rabbit
-NODE_IP_ADDRESS=0.0.0.0
-NODE_PORT=5672
 SCRIPT_HOME=$(dirname $0)
 PIDS_FILE=/var/lib/rabbitmq/pids
 MULTI_ERL_ARGS=
 MULTI_START_ARGS=
+CONFIG_FILE=/etc/rabbitmq/rabbitmq
 
-[ -f /etc/rabbitmq/rabbitmq.conf ] && . /etc/rabbitmq/rabbitmq.conf
+. `dirname $0`/rabbitmq-env
 
+DEFAULT_NODE_IP_ADDRESS=0.0.0.0
+DEFAULT_NODE_PORT=5672
+[ "x" = "x$RABBITMQ_NODE_IP_ADDRESS" ] && [ "x" != "x$NODE_IP_ADDRESS" ] && RABBITMQ_NODE_IP_ADDRESS=${NODE_IP_ADDRESS}
+[ "x" = "x$RABBITMQ_NODE_PORT" ] && [ "x" != "x$NODE_PORT" ] && RABBITMQ_NODE_PORT=${NODE_PORT}
+if [ "x" = "x$RABBITMQ_NODE_IP_ADDRESS" ]
+then
+    if [ "x" != "x$RABBITMQ_NODE_PORT" ]
+    then RABBITMQ_NODE_IP_ADDRESS=${DEFAULT_NODE_IP_ADDRESS}
+    fi
+else
+    if [ "x" = "x$RABBITMQ_NODE_PORT" ]
+    then RABBITMQ_NODE_PORT=${DEFAULT_NODE_PORT}
+    fi
+fi
 [ "x" = "x$RABBITMQ_NODENAME" ] && RABBITMQ_NODENAME=${NODENAME}
-[ "x" = "x$RABBITMQ_NODE_IP_ADDRESS" ] && RABBITMQ_NODE_IP_ADDRESS=${NODE_IP_ADDRESS}
-[ "x" = "x$RABBITMQ_NODE_PORT" ] && RABBITMQ_NODE_PORT=${NODE_PORT}
 [ "x" = "x$RABBITMQ_SCRIPT_HOME" ] && RABBITMQ_SCRIPT_HOME=${SCRIPT_HOME}
 [ "x" = "x$RABBITMQ_PIDS_FILE" ] && RABBITMQ_PIDS_FILE=${PIDS_FILE}
 [ "x" = "x$RABBITMQ_MULTI_ERL_ARGS" ] && RABBITMQ_MULTI_ERL_ARGS=${MULTI_ERL_ARGS}
 [ "x" = "x$RABBITMQ_MULTI_START_ARGS" ] && RABBITMQ_MULTI_START_ARGS=${MULTI_START_ARGS}
+[ "x" = "x$RABBITMQ_CONFIG_FILE" ] && RABBITMQ_CONFIG_FILE=${CONFIG_FILE}
 
 export \
     RABBITMQ_NODENAME \
     RABBITMQ_NODE_IP_ADDRESS \
     RABBITMQ_NODE_PORT \
     RABBITMQ_SCRIPT_HOME \
-    RABBITMQ_PIDS_FILE
+    RABBITMQ_PIDS_FILE \
+    RABBITMQ_CONFIG_FILE
+
+RABBITMQ_CONFIG_ARG=
+[ -f "${RABBITMQ_CONFIG_FILE}.config" ] && RABBITMQ_CONFIG_ARG="-config ${RABBITMQ_CONFIG_FILE}"
 
 # we need to turn off path expansion because some of the vars, notably
 # RABBITMQ_MULTI_ERL_ARGS, may contain terms that look like globs and
@@ -60,11 +76,12 @@ export \
 set -f
 
 exec erl \
-    -pa "`dirname $0`/../ebin" \
+    -pa "${RABBITMQ_HOME}/ebin" \
     -noinput \
     -hidden \
     ${RABBITMQ_MULTI_ERL_ARGS} \
     -sname rabbitmq_multi$$ \
+    ${RABBITMQ_CONFIG_ARG} \
     -s rabbit_multi \
     ${RABBITMQ_MULTI_START_ARGS} \
     -extra "$@"

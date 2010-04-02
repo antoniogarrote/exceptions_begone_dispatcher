@@ -850,15 +850,13 @@ SC.Record = SC.Object.extend(
     if (value !== attrs[key]) {
       if(!ignoreDidChange) this.beginEditing();
       attrs[key] = value;
-      
-      // If the key is the primaryKey of the record, we need to tell the store
-      // about the change.
-      if (key===this.get('primaryKey')) {
-        SC.Store.replaceIdFor(storeKey, value) ;
-        this.propertyDidChange('id'); // Reset computed value
-      }
-      
       if(!ignoreDidChange) this.endEditing(key);
+    }
+    
+    // if value is primaryKey of record, write it to idsByStoreKey
+    if (key===this.get('primaryKey')) {
+      SC.Store.idsByStoreKey[storeKey] = attrs[key] ;
+      this.propertyDidChange('id'); // Reset computed value
     }
     
     // if any aggregates, propagate the state
@@ -884,9 +882,9 @@ SC.Record = SC.Object.extend(
     
     // if recordType aggregates are not set up yet, make sure to 
     // create the cache first
-    if (!aggregates) {
-      var dataHash = this.get('store').readDataHash(storeKey);
-      aggregates = [];
+    if(!aggregates) {
+      var dataHash = this.get('store').readDataHash(storeKey),
+          aggregates = [];
       for(k in dataHash) {
         if(this[k] && this[k].get && this[k].get('aggregate')===YES) {
           aggregates.push(k);
@@ -897,26 +895,16 @@ SC.Record = SC.Object.extend(
     
     // now loop through all aggregate properties and mark their related
     // record objects as dirty
-    var K = SC.Record;
-    for(idx=0,len=aggregates.length;idx<len;++idx) {
+    for(idx=0,len=aggregates.length;idx<len;idx++) {
       key = aggregates[idx];
       val = this.get(key);
+      
       recs = SC.kindOf(val, SC.ManyArray) ? val : [val];
       recs.forEach(function(rec) {
-        // If the child is dirty, then make sure the parent gets a dirty
-        // status.  (If the child is created or destroyed, there's no need,
-        // because the parent will dirty itself when it modifies that
-        // relationship.)
-        if (rec) { 
-          var childStatus = this.get('status');
-          if (childStatus & K.DIRTY) {
-            var parentStatus = rec.get('status');
-            if (parentStatus === K.READY_CLEAN) {
-              // Note:  storeDidChangeProperties() won't put it in the
-              //        changelog!
-              rec.get('store').recordDidChange(rec.constructor, null, rec.get('storeKey'), null, YES);
-            }
-          }
+        // write the dirty status
+        if(rec) { 
+          rec.get('store').writeStatus(rec.get('storeKey'), this.get('status'));
+          rec.storeDidChangeProperties(YES);
         }
       }, this);
     }
@@ -1006,7 +994,7 @@ SC.Record = SC.Object.extend(
 
             // computed default value
             if (SC.typeOf(defaultVal)===SC.T_FUNCTION) {
-              dataHash[key] = defaultVal(this, key, defaultVal);
+              dataHash[key] = defaultVal();
             
             // plain value
             } else {
@@ -4691,10 +4679,7 @@ SC.RecordAttribute = SC.Object.extend(
     will be substituted instead.  Note that defaultValues are not converted
     so the value should be in the output type expected by the attribute.
     
-    If you use a defaultValue function, the arguments given to it is the
-    record instance and the key.
-    
-    @property {Object|function}
+    @property {Object}
   */
   defaultValue: null,
   
@@ -5107,7 +5092,7 @@ if (SC.DateTime && !SC.RecordAttribute.transforms[SC.guidFor(SC.DateTime)]) {
       Convert a String to a DateTime
     */
     to: function(str, attr) {
-      if (SC.none(str) || SC.instanceOf(str, SC.DateTime)) return str;
+      if (SC.none(str)) return str;
       var format = attr.get('format');
       return SC.DateTime.parse(str, format ? format : SC.DateTime.recordFormat);
     },
@@ -5845,8 +5830,6 @@ SC.ManyArray = SC.Object.extend(SC.Enumerable, SC.Array,
         record.recordDidChange(this.get('propertyName'));
       }
     }
-    
-    return this;
   },
 
   /**
@@ -5877,8 +5860,6 @@ SC.ManyArray = SC.Object.extend(SC.Enumerable, SC.Array,
     if (this.get('isMaster') && (record = this.get('record'))) {
       record.recordDidChange(this.get('propertyName'));
     }
-    
-    return this;
   },
   
   // binary search to find insertion location
@@ -6579,7 +6560,7 @@ SC.Store = SC.Object.extend( /** @scope SC.Store.prototype */ {
       
     }, this);
 
-    if (storeKeys.get('length') > 0) this._notifyRecordArrays(storeKeys, recordTypes);
+    this._notifyRecordArrays(storeKeys, recordTypes);
 
     storeKeys.clear();
     hasDataChanges.clear();
@@ -7210,10 +7191,9 @@ SC.Store = SC.Object.extend( /** @scope SC.Store.prototype */ {
     @param {String} id the record id
     @param {Number} storeKey (optional) if passed, ignores recordType and id
     @param {String} key that changed (optional)
-    @param {Boolean} if the change is to statusOnly (optional)
     @returns {SC.Store} receiver
   */
-  recordDidChange: function(recordType, id, storeKey, key, statusOnly) {
+  recordDidChange: function(recordType, id, storeKey, key) {
     if (storeKey === undefined) storeKey = recordType.storeKeyFor(id);
     var status = this.readStatus(storeKey), changelog, K = SC.Record;
     
@@ -7234,7 +7214,7 @@ SC.Store = SC.Object.extend( /** @scope SC.Store.prototype */ {
     }
     
     // record data hash change
-    this.dataHashDidChange(storeKey, null, statusOnly, key);
+    this.dataHashDidChange(storeKey, null, null, key);
     
     // record in changelog
     changelog = this.changelog ;
@@ -7522,6 +7502,7 @@ SC.Store = SC.Object.extend( /** @scope SC.Store.prototype */ {
           retDestroy.push(storeKey);
         } else if (status==K.DESTROYED_CLEAN) {
           this.dataHashDidChange(storeKey, rev, YES);
+          retDestroy.push(storeKey);
         }
         // ignore K.READY_CLEAN, K.BUSY_LOADING, K.BUSY_CREATING, K.BUSY_COMMITTING, 
         // K.BUSY_REFRESH_CLEAN, K_BUSY_REFRESH_DIRTY, KBUSY_DESTROYING
@@ -7644,52 +7625,6 @@ SC.Store = SC.Object.extend( /** @scope SC.Store.prototype */ {
     array.length = 0 ;
     return this;
   },
-
-  /** 
-    Convenience method can be called by the store or other parts of your 
-    application to load a record into the store.  This method will take a
-    recordType and a data hashes and either add or update the 
-    record in the store. 
-    
-    The loaded records will be in an SC.Record.READY_CLEAN state, indicating
-    they were loaded from the data source and do not need to be committed 
-    back before changing.
-    
-    This method will check the state of the storeKey and call either 
-    pushRetrieve() or dataSourceDidComplete().  The standard state constraints 
-    for these methods apply here.
-    
-    The return value will be the storeKey used for the push.  This is often
-    convenient to pass into loadQuery(), if you are fetching a remote query.
-    
-    If you are upgrading from a pre SproutCore 1.0 application, this method 
-    is the closest to the old updateRecord().
-    
-    @param {SC.Record} recordType the record type
-    @param {Array} dataHash to update
-    @param {Array} id optional.  if not passed lookup on the hash
-    @returns {String} store keys assigned to these id
-  */
-  loadRecord: function(recordType, dataHash, id) {
-    var K       = SC.Record,
-        ret, primaryKey, storeKey;
-        
-    // save lookup info
-    recordType = recordType || SC.Record;
-    primaryKey = recordType.prototype.primaryKey;
-    
-    
-    // push each record
-    id = id || dataHash[primaryKey];
-    ret = storeKey = recordType.storeKeyFor(id); // needed to cache
-      
-    if (this.readStatus(storeKey) & K.BUSY) {
-        this.dataSourceDidComplete(storeKey, dataHash, id);
-      } else this.pushRetrieve(recordType, id, dataHash, storeKey);
-    
-    // return storeKey
-    return ret ;
-  },
   
   /** 
     Convenience method can be called by the store or other parts of your 
@@ -7737,8 +7672,11 @@ SC.Store = SC.Object.extend( /** @scope SC.Store.prototype */ {
         primaryKey = recordType.prototype.primaryKey ;
       }
       id = (ids) ? ids.objectAt(idx) : dataHash[primaryKey];
-      ret[idx] = this.loadRecord(recordType, dataHash, id);
+      ret[idx] = storeKey = recordType.storeKeyFor(id); // needed to cache
       
+      if (this.readStatus(storeKey) & K.BUSY) {
+        this.dataSourceDidComplete(storeKey, dataHash, id);
+      } else this.pushRetrieve(recordType, id, dataHash, storeKey);
     }
     
     // return storeKeys
@@ -7964,8 +7902,8 @@ SC.Store = SC.Object.extend( /** @scope SC.Store.prototype */ {
       storeKey = recordType.storeKeyFor(id);
     }
     status = this.readStatus(storeKey);
-    if(status==K.EMPTY || status==K.ERROR || status==K.READY_CLEAN || status==K.DESTROYED_CLEAN){
-      status = K.DESTROYED_CLEAN;
+    if(status==K.EMPTY || status==K.ERROR || status==K.READY_CLEAN || status==K.DESTROY_CLEAN){
+      status = K.DESTROY_CLEAN;
       this.removeDataHash(storeKey, status) ;
       this.dataHashDidChange(storeKey);
       return YES;
@@ -7990,7 +7928,7 @@ SC.Store = SC.Object.extend( /** @scope SC.Store.prototype */ {
     if(storeKey===undefined) storeKey = recordType.storeKeyFor(id);
     status = this.readStatus(storeKey);
 
-    if(status==K.EMPTY || status==K.ERROR || status==K.READY_CLEAN || status==K.DESTROYED_CLEAN){
+    if(status==K.EMPTY || status==K.ERROR || status==K.READY_CLEAN || status==K.DESTROY_CLEAN){
       status = K.ERROR;
       
       // Add the error to the array of record errors (for lookup later on if necessary).
@@ -9828,7 +9766,7 @@ SC.Query = SC.Object.extend(SC.Copyable, SC.Freezable,
       evaluate:         function (r,w) {
                           var all   = this.leftSide.evaluate(r,w);
                           var start = this.rightSide.evaluate(r,w);
-                          return ( all && all.indexOf(start) === 0 );
+                          return ( all.indexOf(start) === 0 );
                         }
     },
 
@@ -9842,7 +9780,7 @@ SC.Query = SC.Object.extend(SC.Copyable, SC.Freezable,
       evaluate:         function (r,w) {
                           var all = this.leftSide.evaluate(r,w);
                           var end = this.rightSide.evaluate(r,w);
-                          return ( all && all.indexOf(end) === (all.length - end.length) );
+                          return ( all.indexOf(end) === (all.length - end.length) );
                         }
     },
 
@@ -10386,24 +10324,13 @@ SC.Query.mixin( /** @scope SC.Query */ {
     if (storeKeys) {
       
       // Set tmp variable because we can't pass variables to sort function.
-      // Do this instead of generating a temporary closure function for perf.
-      // We'll use a stack-based approach in case our sort routine ends up
-      // calling code that triggers a recursive invocation of orderStoreKeys.
-      var K             = SC.Query;
-          tempStores    = K._TMP_STORES;
-          tempQueryKeys = K._TMP_QUERY_KEYS;
-      if (!tempStores)    tempStores    = K._TMP_STORES = [];
-      if (!tempQueryKeys) tempQueryKeys = K._TMP_QUERY_KEYS = [];
-      
-      tempStores.push(store);
-      tempQueryKeys.push(query);
-        
-      var res = storeKeys.sort(SC.Query.compareStoreKeys);
-      
-      K._TMP_STORES.pop();
-      K._TMP_QUERY_KEYS.pop();
+      // Do this instead of generating a temporary closure function for perf
+      SC.Query._TMP_STORE = store;
+      SC.Query._TMP_QUERY_KEY = query;
+      storeKeys.sort(SC.Query.compareStoreKeys);
+      SC.Query._TMP_STORE = SC.Query._TMP_QUERY_KEY = null;
     }
-
+    
     return storeKeys;
   },
   
@@ -10416,14 +10343,11 @@ SC.Query.mixin( /** @scope SC.Query */ {
     @param {Number} storeKey2 a store key
     @returns {Number} -1 if record1 < record2,  +1 if record1 > record2, 0 if equal
   */
-  compareStoreKeys: function(storeKey1, storeKey2) {    
-    var K             = SC.Query,
-        tempStores    = K._TMP_STORES,
-        tempQueryKeys = K._TMP_QUERY_KEYS;
-        store         = tempStores[tempStores.length - 1],
-        queryKey      = tempQueryKeys[tempQueryKeys.length - 1],
-        record1       = store.materializeRecord(storeKey1),
-        record2       = store.materializeRecord(storeKey2);
+  compareStoreKeys: function(storeKey1, storeKey2) {
+    var store    = SC.Query._TMP_STORE,
+        queryKey = SC.Query._TMP_QUERY_KEY,
+        record1  = store.materializeRecord(storeKey1),
+        record2  = store.materializeRecord(storeKey2);
     return queryKey.compare(record1, record2);
   },
   
@@ -10944,22 +10868,7 @@ SC.RecordArray = SC.Object.extend(SC.Enumerable, SC.Array,
     @returns {SC.RecordArray} receiver
   */
   refresh: function() {
-    this.get('store').refreshQuery(this.get('query'));
-    return this;
-  },
-  
-  /**
-    Will recompute the results based on the SC.Query attached to the record
-    array. Useful if your query is based on computed properties that might 
-    have changed. Use refresh() instead of you want to trigger a fetch on your
-    data source since this will purely look at records already loaded into
-    the store.
-    
-    @returns {SC.RecordArray} receiver
-  */
-  reload: function() {
-    this.flush(YES);
-    return this;
+    this.get('store').refreshQuery(this.get('query'));  
   },
   
   /**
@@ -11079,19 +10988,10 @@ SC.RecordArray = SC.Object.extend(SC.Enumerable, SC.Array,
     SC.Query.LOCAL.  You can call this method on any RecordArray however,
     without an error.
     
-    @param {Boolean} _flush to force it - use reload() to trigger it
     @returns {SC.RecordArray} receiver
   */
-  flush: function(_flush) {
-    // Are we already inside a flush?  If so, then don't do it again, to avoid
-    // never-ending recursive flush calls.  Instead, we'll simply mark
-    // ourselves as needing a flush again when we're done.
-    if (this._insideFlush) {
-      this.set('needsFlush', YES);
-      return this;
-    }
-    
-    if (!this.get('needsFlush') && !_flush) return this; // nothing to do
+  flush: function() {
+    if (!this.get('needsFlush')) return this; // nothing to do
     this.set('needsFlush', NO); // avoid running again.
     
     // fast exit
@@ -11101,8 +11001,6 @@ SC.RecordArray = SC.Object.extend(SC.Enumerable, SC.Array,
       return this;
     }
     
-    this._insideFlush = YES;
-    
     // OK, actually generate some results
     var storeKeys = this.get('storeKeys'),
         changed   = this._scq_changedStoreKeys,
@@ -11111,8 +11009,7 @@ SC.RecordArray = SC.Object.extend(SC.Enumerable, SC.Array,
         rec, status, recordType, sourceKeys, scope, included;
 
     // if we have storeKeys already, just look at the changed keys
-    var oldStoreKeys = storeKeys;
-    if (storeKeys && !_flush) {
+    if (storeKeys) {
       if (changed) {
         changed.forEach(function(storeKey) {
           // get record - do not include EMPTY or DESTROYED records
@@ -11175,19 +11072,10 @@ SC.RecordArray = SC.Object.extend(SC.Enumerable, SC.Array,
     
     // only resort and update if we did change
     if (didChange) {
-      
-      // storeKeys must be a new instance because orderStoreKeys() works on it
-      if (storeKeys && (storeKeys===oldStoreKeys)) {
-        storeKeys = storeKeys.copy();
-      }
-      
       storeKeys = SC.Query.orderStoreKeys(storeKeys, query, store);
-      if (SC.compare(oldStoreKeys, storeKeys) !== 0){
-        this.set('storeKeys', SC.clone(storeKeys)); // replace content
-      }
+      this.set('storeKeys', SC.clone(storeKeys)); // replace content
     }
 
-    this._insideFlush = NO;
     return this;
   },
 
@@ -11251,7 +11139,7 @@ SC.RecordArray = SC.Object.extend(SC.Enumerable, SC.Array,
         f    = this._storeKeysContentDidChange,
         fs   = this._storeKeysStateDidChange;
     
-    if (storeKeys === prev) return; // nothing to do
+    if (storeKeys === prev) return this; // nothing to do
     
     if (prev) prev.removeObserver('[]', this, f);
     this._prevStoreKeys = storeKeys;

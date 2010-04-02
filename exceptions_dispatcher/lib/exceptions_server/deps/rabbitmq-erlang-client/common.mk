@@ -56,6 +56,14 @@ DIST_DIR=dist
 DEPS_DIR=deps
 DOC_DIR=doc
 
+ifeq ("$(ERL_LIBS)", "")
+	ERL_LIBS :=
+else
+	ERL_LIBS := :$(ERL_LIBS)
+endif
+
+ERL_PATH ?=
+
 DEPS=$(shell erl -noshell -eval '{ok,[{_,_,[_,_,{modules, Mods},_,_,_]}]} = \
                                  file:consult("rabbit_common.app"), \
                                  [io:format("~p ",[M]) || M <- Mods], halt().')
@@ -78,8 +86,8 @@ TEST_TARGETS=$(patsubst $(TEST_DIR)/%.erl, $(TEST_DIR)/%.beam, $(TEST_SOURCES))
 BROKER_HEADERS=$(wildcard $(BROKER_DIR)/$(INCLUDE_DIR)/*.hrl)
 BROKER_SOURCES=$(wildcard $(BROKER_DIR)/$(SOURCE_DIR)/*.erl)
 
-LIBS_PATH=ERL_LIBS=$(DEPS_DIR):$(DIST_DIR)
-LOAD_PATH=$(EBIN_DIR) $(BROKER_DIR)/ebin $(TEST_DIR)
+LIBS_PATH=ERL_LIBS=$(DEPS_DIR):$(DIST_DIR)$(ERL_LIBS)
+LOAD_PATH=$(EBIN_DIR) $(BROKER_DIR)/ebin $(TEST_DIR) $(ERL_PATH)
 
 COVER_START := -s cover start -s rabbit_misc enable_cover ../rabbitmq-erlang-client
 COVER_STOP := -s rabbit_misc report_cover ../rabbitmq-erlang-client -s cover stop
@@ -88,10 +96,10 @@ MKTEMP=$$(mktemp $(TMPDIR)/tmp.XXXXXXXXXX)
 
 ifndef USE_SPECS
 # our type specs rely on features / bug fixes in dialyzer that are
-# only available in R12B-3 upwards
+# only available in R13B01 upwards (R13B is eshell 5.7.2)
 #
 # NB: the test assumes that version number will only contain single digits
-export USE_SPECS=$(shell if [ $$(erl -noshell -eval 'io:format(erlang:system_info(version)), halt().') \> "5.6.2" ]; then echo "true"; else echo "false"; fi)
+export USE_SPECS=$(shell if [ $$(erl -noshell -eval 'io:format(erlang:system_info(version)), halt().') \> "5.7.1" ]; then echo "true"; else echo "false"; fi)
 endif
 
 ERLC_OPTS=-I $(INCLUDE_DIR) -o $(EBIN_DIR) -Wall -v +debug_info $(shell [ $(USE_SPECS) = "true" ] && echo "-Duse_specs")
@@ -134,13 +142,13 @@ common_clean:
 
 compile: $(TARGETS)
 
-compile_tests: $(TEST_DIR) $(COMPILE_DEPS)
+compile_tests: $(TEST_DIR) $(COMPILE_DEPS) $(EBIN_DIR)/$(PACKAGE).app
 	$(MAKE) -C $(TEST_DIR)
 
-run: compile
-	erl -pa $(LOAD_PATH)
+run: compile $(EBIN_DIR)/$(PACKAGE).app
+	$(LIBS_PATH) erl -pa $(LOAD_PATH)
 
-run_in_broker: compile $(BROKER_DIR)
+run_in_broker: compile $(BROKER_DIR) $(EBIN_DIR)/$(PACKAGE).app
 	$(MAKE) RABBITMQ_SERVER_START_ARGS='$(PA_LOAD_PATH)' -C $(BROKER_DIR) run
 
 dialyze: $(TARGETS)
@@ -165,11 +173,13 @@ doc: $(DOC_DIR)/index.html
 ##  Packaging
 ###############################################################################
 
-$(DIST_DIR)/$(PACKAGE_NAME): $(TARGETS)
+$(DIST_DIR)/$(PACKAGE_NAME): $(TARGETS) $(EBIN_DIR)/$(PACKAGE).app
 	rm -rf $(DIST_DIR)/$(PACKAGE)
-	mkdir -p $(DIST_DIR)/$(PACKAGE)
-	cp -r $(EBIN_DIR) $(DIST_DIR)/$(PACKAGE)
-	cp -r $(INCLUDE_DIR) $(DIST_DIR)/$(PACKAGE)
+	mkdir -p $(DIST_DIR)/$(PACKAGE)/$(EBIN_DIR)
+	cp -r $(EBIN_DIR)/*.beam $(DIST_DIR)/$(PACKAGE)/$(EBIN_DIR)
+	cp -r $(EBIN_DIR)/*.app $(DIST_DIR)/$(PACKAGE)/$(EBIN_DIR)
+	mkdir -p $(DIST_DIR)/$(PACKAGE)/$(INCLUDE_DIR)
+	cp -r $(INCLUDE_DIR)/* $(DIST_DIR)/$(PACKAGE)/$(INCLUDE_DIR)
 	(cd $(DIST_DIR); zip -r $(PACKAGE_NAME) $(PACKAGE))
 
 package: $(DIST_DIR)/$(PACKAGE_NAME)

@@ -95,8 +95,13 @@
 	border: 1px #333 solid;
 }
 
+.sc-list-item-view .sc-checkbox-view.sel {
+	background-image: url('/static/sproutcore/desktop/en/current/images/icons/mini_454545.png?1259494255'); 
+	background-position: -66px -147px;
+}
 
 .sc-list-item-view .sc-checkbox-view.active {
+	background-image: url('/static/sproutcore/desktop/en/current/images/icons/mini_ffffff.png?1259494255'); 
 	background-color: #333;
 	border-color: black;
 }
@@ -151,6 +156,13 @@
 	right: 1px;
 	top: 50%;
 	margin-top: -8px;
+	background-image: url('/static/sproutcore/desktop/en/current/images/icons/mini_454545.png?1259494255'); 
+	background-position: -32px 0;
+}
+
+.sc-list-item-view.sel .branch,
+.sc-list-item-view.active .branch {
+	background-image: url('/static/sproutcore/desktop/en/current/images/icons/mini_ffffff.png?1259494255'); 
 }
 
 /* @end */

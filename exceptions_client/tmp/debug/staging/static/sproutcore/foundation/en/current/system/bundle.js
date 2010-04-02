@@ -38,8 +38,7 @@ SC.mixin(/** @scope SC */ {
     Execute callback function.
   */
   _scb_bundleDidLoad: function(bundleName, target, method, args) {
-    var m = method, t = target ;
-
+    var m, t;
     if(SC.typeOf(target) === SC.T_STRING) {
       t = SC.objectForPropertyPath(target);
     }

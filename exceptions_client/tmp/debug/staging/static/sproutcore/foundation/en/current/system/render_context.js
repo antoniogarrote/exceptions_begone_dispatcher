@@ -297,8 +297,6 @@ SC.RenderContext = SC.Builder.create(/** SC.RenderContext.fn */ {
     var elem = this._elem, 
         mode = this.updateMode,
         key, value, styles, factory, cur, next, before;
-        
-    this._innerHTMLReplaced = NO;
     
     if (!elem) {
       // throw "Cannot update context because there is no source element";
@@ -311,7 +309,6 @@ SC.RenderContext = SC.Builder.create(/** SC.RenderContext.fn */ {
     
     // replace innerHTML
     if (this.length>0) {
-      this._innerHTMLReplaced = YES;
       if (mode === SC.MODE_REPLACE) {
         elem.innerHTML = this.join();
       } else {
@@ -401,9 +398,9 @@ SC.RenderContext = SC.Builder.create(/** SC.RenderContext.fn */ {
     // generate opening tag.
     
     // get attributes first.  Copy in className + styles...
-    var tag = this._TAG_ARRAY, pair, joined, key ,
-        attrs = this._attrs, className = this._classNames,
-        id = this._id, styles = this._styles;
+    var tag = this._TAG_ARRAY, pair, joined, key ;
+    var attrs = this._attrs, className = this._classNames ;
+    var id = this._id, styles = this._styles;
     
     // add tag to tag array
     tag[0] = '<';  tag[1] = this._tagName ;
@@ -425,7 +422,7 @@ SC.RenderContext = SC.Builder.create(/** SC.RenderContext.fn */ {
           pair[1] = styles[key];
           if (pair[1] === null) continue; // skip empty styles
           
-          if(typeof pair[1] === SC.T_NUMBER) pair[1] = pair[1]+"px";
+          if(typeof pair[1] === SC.T_NUMBER) pair[1] = "%@px".fmt(pair[1]);
           joined.push(pair.join(': '));
         }
         attrs.style = joined.join('; ') ;
@@ -485,7 +482,7 @@ SC.RenderContext = SC.Builder.create(/** SC.RenderContext.fn */ {
   },
   
   /**
-    Generates a tag with the passed options.  Like calling context.begin().end().
+    Generates a with the passed options.  Like calling context.begin().end().
     
     @param {String} tagName optional tag name.  default 'div'
     @param {Hash} opts optional tag options.  defaults to empty options.
@@ -698,7 +695,7 @@ SC.RenderContext = SC.Builder.create(/** SC.RenderContext.fn */ {
   // CSS Styles Support
   // 
     
-  _STYLE_REGEX: /\s*([^:\s]+)\s*:\s*([^;]+)\s*;?/g,
+  _STYLE_REGEX: /\s*([^:\s]+)\s*:\s*([^;\s]+)\s*;?/g,
   
   /**
     Retrieves or sets the current styles for the outer tag.  If you retrieve

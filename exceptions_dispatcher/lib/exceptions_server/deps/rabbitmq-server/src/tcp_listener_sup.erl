@@ -18,11 +18,11 @@
 %%   are Copyright (C) 2007-2008 LShift Ltd, Cohesive Financial
 %%   Technologies LLC, and Rabbit Technologies Ltd.
 %%
-%%   Portions created by LShift Ltd are Copyright (C) 2007-2009 LShift
+%%   Portions created by LShift Ltd are Copyright (C) 2007-2010 LShift
 %%   Ltd. Portions created by Cohesive Financial Technologies LLC are
-%%   Copyright (C) 2007-2009 Cohesive Financial Technologies
+%%   Copyright (C) 2007-2010 Cohesive Financial Technologies
 %%   LLC. Portions created by Rabbit Technologies Ltd are Copyright
-%%   (C) 2007-2009 Rabbit Technologies Ltd.
+%%   (C) 2007-2010 Rabbit Technologies Ltd.
 %%
 %%   All Rights Reserved.
 %%
@@ -33,23 +33,23 @@
 
 -behaviour(supervisor).
 
--export([start_link/6, start_link/7]).
+-export([start_link/7, start_link/8]).
 
 -export([init/1]).
 
 start_link(IPAddress, Port, SocketOpts, OnStartup, OnShutdown,
-           AcceptCallback) ->
+           AcceptCallback, Label) ->
     start_link(IPAddress, Port, SocketOpts, OnStartup, OnShutdown,
-               AcceptCallback, 1).
+               AcceptCallback, 1, Label).
 
 start_link(IPAddress, Port, SocketOpts, OnStartup, OnShutdown,
-           AcceptCallback, ConcurrentAcceptorCount) ->
+           AcceptCallback, ConcurrentAcceptorCount, Label) ->
     supervisor:start_link(
       ?MODULE, {IPAddress, Port, SocketOpts, OnStartup, OnShutdown,
-                AcceptCallback, ConcurrentAcceptorCount}).
+                AcceptCallback, ConcurrentAcceptorCount, Label}).
 
 init({IPAddress, Port, SocketOpts, OnStartup, OnShutdown,
-      AcceptCallback, ConcurrentAcceptorCount}) ->
+      AcceptCallback, ConcurrentAcceptorCount, Label}) ->
     %% This is gross. The tcp_listener needs to know about the
     %% tcp_acceptor_sup, and the only way I can think of accomplishing
     %% that without jumping through hoops is to register the
@@ -62,5 +62,5 @@ init({IPAddress, Port, SocketOpts, OnStartup, OnShutdown,
            {tcp_listener, {tcp_listener, start_link,
                            [IPAddress, Port, SocketOpts,
                             ConcurrentAcceptorCount, Name,
-                            OnStartup, OnShutdown]},
-            transient, 100, worker, [tcp_listener]}]}}.
+                            OnStartup, OnShutdown, Label]},
+            transient, 16#ffffffff, worker, [tcp_listener]}]}}.

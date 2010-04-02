@@ -118,14 +118,6 @@ SC.EMPTY_CHILD_VIEWS_ARRAY.needsClone = YES;
     re-render the view using the render() method.  If you would like to 
     override this behavior with your own custom updating code, you can 
     replace updateLayer() with your own implementation instead.
-    
-  - *didAppendLayerToDocument:* in theory all DOM setup could be done
-    in didCreateLayer() as you already have a DOM element instantiated. 
-    However there is cases where the element has to be first appended to the
-    Document because there is either a bug on the browser or you are using 
-    plugins which objects are not instantiated until you actually append the
-    element to the DOM. This will allow you to do things like registering 
-    DOM events on flash or quicktime objects.
   
   @extends SC.Responder
   @extends SC.DelegateSupport
@@ -256,8 +248,8 @@ SC.View = SC.Responder.extend(SC.DelegateSupport,
     @returns {SC.View} receiver 
   */
   recomputeIsVisibleInWindow: function(parentViewIsVisible) {
-    var last = this.get('isVisibleInWindow'),
-        cur = this.get('isVisible'), parentView ;
+    var last = this.get('isVisibleInWindow') ;
+    var cur = this.get('isVisible'), parentView ;
     
     // isVisibleInWindow = isVisible && parentView.isVisibleInWindow
     // this approach only goes up to the parentView if necessary.
@@ -268,7 +260,7 @@ SC.View = SC.Responder.extend(SC.DelegateSupport,
     }
     
     // if the state has changed, update it and notify children
-    // if (last !== cur) {
+    if (last !== cur) {
       this.set('isVisibleInWindow', cur) ;
       this._needsVisibiltyChange = YES ; // update even if we aren't visible
       
@@ -292,7 +284,7 @@ SC.View = SC.Responder.extend(SC.DelegateSupport,
       // visible.
       if (!cur && this.get('isFirstResponder')) this.resignFirstResponder();
       
-    // }
+    }
     return this ;
   }.observes('isVisible'),
   
@@ -346,10 +338,6 @@ SC.View = SC.Responder.extend(SC.DelegateSupport,
     // The DOM will need some fixing up, note this on the view.
     view.parentViewDidChange() ;
     view.layoutDidChange() ;
-    var pane = view.get('pane');
-    if(pane && pane.get('isPaneAttached')) {
-      view._notifyDidAppendToDocument();
-    }
     
     // notify views
     if (this.didAddChild) this.didAddChild(view, beforeView) ;
@@ -517,9 +505,9 @@ SC.View = SC.Responder.extend(SC.DelegateSupport,
   _invalidatePaneCacheForSelfAndAllChildViews: function () {
     this.notifyPropertyChange('pane');
     
-    var childViews = this.get('childViews'),
-        len = childViews.length, idx ;
-    for (idx=0; idx<len; ++idx) {
+    var childViews = this.get('childViews');
+    var len = childViews.length ;
+    for (var idx=0; idx<len; ++idx) {
       var childView = childViews[idx];
       if (childView._invalidatePaneCacheForSelfAndAllChildViews) childView._invalidatePaneCacheForSelfAndAllChildViews();
     }
@@ -611,8 +599,8 @@ SC.View = SC.Responder.extend(SC.DelegateSupport,
     @returns {DOMElement} the discovered layer
   */
   findLayerInParentLayer: function(parentLayer) {
-    var layerId = this.get('layerId'),
-        node, i, ilen,found, elem;
+    var layerId = this.get('layerId') ;
+    var node, i, ilen,found, elem;
     
     // first, let's try the fast path...
     if(parentLayer.getElementById) elem = parentLayer.getElementById(layerId) ;
@@ -624,7 +612,7 @@ SC.View = SC.Responder.extend(SC.DelegateSupport,
     // if browser supports querySelector use that.
     if (!elem && parentLayer.querySelector) {
       // TODO: make querySelector work on all platforms...
-      elem = parentLayer.querySelector('#' + layerId);
+      // elem = parentLayer.querySelector('#' + layerId)[0];
     }
     
     // if no element was found the fast way, search down the parentLayer for
@@ -742,14 +730,7 @@ SC.View = SC.Responder.extend(SC.DelegateSupport,
     var context = this.renderContext(this.get('layer')) ;
     this.prepareContext(context, NO) ;
     context.update() ;
-    if (context._innerHTMLReplaced) {
-      var pane = this.get('pane');
-      if(pane && pane.get('isPaneAttached')) {
-        this._notifyDidAppendToDocument();
-      }
-    }
     if (this.didUpdateLayer) this.didUpdateLayer(); // call to update DOM
-    if(this.designer && this.designer.viewDidUpdateLayer) this.designer.viewDidUpdateLayer(); //let the designer know
     return this ;
   },
   
@@ -797,13 +778,13 @@ SC.View = SC.Responder.extend(SC.DelegateSupport,
   */
   _notifyDidCreateLayer: function() {
     if (this.didCreateLayer) this.didCreateLayer() ;
-    var mixins = this.didCreateLayerMixin, len, idx,
-        childViews = this.get('childViews');
+    var mixins = this.didCreateLayerMixin, len, idx ;
     if (mixins) {
       len = mixins.length ;
       for (idx=0; idx<len; ++idx) mixins[idx].call(this) ;
     }
     
+    var childViews = this.get('childViews') ;
     len = childViews.length ;
     for (idx=0; idx<len; ++idx) {
       if (!childViews[idx]) continue;
@@ -861,13 +842,13 @@ SC.View = SC.Responder.extend(SC.DelegateSupport,
   */
   _notifyWillDestroyLayer: function() {
     if (this.willDestroyLayer) this.willDestroyLayer() ;
-    var mixins = this.willDestroyLayerMixin, len, idx,
-        childViews = this.get('childViews') ;
+    var mixins = this.willDestroyLayerMixin, len, idx ;
     if (mixins) {
       len = mixins.length ;
       for (idx=0; idx<len; ++idx) mixins[idx].call(this) ;
     }
     
+    var childViews = this.get('childViews') ;
     len = childViews.length ;
     for (idx=0; idx<len; ++idx) childViews[idx]._notifyWillDestroyLayer() ;
     
@@ -968,23 +949,6 @@ SC.View = SC.Responder.extend(SC.DelegateSupport,
   */
   render: function(context, firstTime) {
     if (firstTime) this.renderChildViews(context, firstTime) ;
-  },
-  
-  
-  /** @private - 
-    Invokes the receivers didAppendLayerToDocument() method if it exists and then
-    invokes the same on all child views. 
-  */
-  
-  _notifyDidAppendToDocument: function() {
-    if(this.didAppendToDocument) this.didAppendToDocument();
-    var i=0, child, childLen, children = this.get('childViews');
-    for(i=0, childLen=children.length; i<childLen; i++) {
-      child = children[i];
-      if(child._notifyDidAppendToDocument){
-        child._notifyDidAppendToDocument();
-      }
-    }
   },
   
   // ..........................................................
@@ -1089,9 +1053,9 @@ SC.View = SC.Responder.extend(SC.DelegateSupport,
   updateLayerLocation: function() {
     // collect some useful value
     // if there is no node for some reason, just exit
-    var node = this.get('layer'),
-        parentView = this.get('parentView'),
-        parentNode = parentView ? parentView.get('containerLayer') : null ;
+    var node = this.get('layer') ;
+    var parentView = this.get('parentView') ;
+    var parentNode = parentView ? parentView.get('containerLayer') : null ;
     
     // remove node from current parentNode if the node does not match the new 
     // parent node.
@@ -1138,7 +1102,7 @@ SC.View = SC.Responder.extend(SC.DelegateSupport,
       }
     }
     
-    parentNode = parentView = node = nextNode = null ; // avoid memory leaks
+    parentNode = parentView = node = null ; // avoid memory leaks
     return this ; 
   },
   
@@ -1283,33 +1247,36 @@ SC.View = SC.Responder.extend(SC.DelegateSupport,
     @type SC.View
   */
   nextValidKeyView: function() {
-    var seen = [],
-        rootView = this.pane(), ret; 
-    ret = rootView._computeNextValidKeyView(this, seen);
+    var seen = SC.CoreSet.create(),
+        ret  = this._computeNextValidKeyView(seen);
+    seen.destroy();
     return ret ;
   }.property('nextKeyView'),
   
-  _computeNextValidKeyView: function(currentView, seen) {  
+  _computeNextValidKeyView: function(seen) {  
     var ret = this.get('nextKeyView'),
-        children, i, childLen, child;
-    if(this !== currentView && seen.indexOf(currentView)!=-1 && 
-      this.get('acceptsFirstResponder') && this.get('isVisibleInWindow')){
-      return this;
-    }
-    seen.push(this); // avoid cycles
+        pv, cv, idx;
+
+    seen.add(this); // avoid cycles
     
     // find next sibling
     if (!ret) {
-      children = this.get('childViews');
-      for(i=0, childLen= children.length; i<childLen; i++){
-        child = children[i];
-        if(child.get('isVisibleInWindow') && child.get('isVisible')){
-          ret = child._computeNextValidKeyView(currentView, seen);
-        }
-        if (ret) return ret;
-      }
-      ret = null;
+      pv = this.get('parentView');
+      cv = pv ? pv.get('childViews') : null;
+      idx = cv ? cv.indexOf(this) : -1 ;
+      
+      // get next child if possible
+      if (idx<0) ret = null;
+      else if (idx+1 >= cv.get('length')) ret = cv.objectAt(0);
+      else ret = cv.objectAt(idx+1);
     }
+    
+    // if next view does not accept responder then get nextValidKeyView...
+    if (ret && !ret.get('acceptsFirstResponder')) {
+      if (seen.contains(ret)) ret = null;
+      else ret = ret._computeNextValidKeyView(seen);
+    }
+    
     return ret ;
   },
   
@@ -1328,34 +1295,36 @@ SC.View = SC.Responder.extend(SC.DelegateSupport,
     @type SC.View
   */
   previousValidKeyView: function() {
-    var seen = [],
-        rootView = this.pane(), ret; 
-    ret = rootView._computePreviousValidKeyView(this, seen);
+    var seen = SC.CoreSet.create(),
+        ret  = this._computePreviousValidKeyView(seen);
+    seen.destroy();
     return ret ;
   }.property('previousKeyView'),
   
-  _computePreviousValidKeyView: function(currentView, seen) {  
+  _computePreviousValidKeyView: function(seen) {  
     var ret = this.get('previousKeyView'),
-        children, i, child;
-        
-    if(this !== currentView && seen.indexOf(currentView)!=-1 && 
-      this.get('acceptsFirstResponder') && this.get('isVisibleInWindow')){
-      return this;
-    }
-    seen.push(this); // avoid cycles
+        pv, cv, idx;
+
+    seen.add(this); // avoid cycles
     
-    // find next sibling
+    // find previous sibling
     if (!ret) {
-      children = this.get('childViews');
-      for(i=children.length-1; 0<=i; i--){
-        child = children[i];
-        if(child.get('isVisibleInWindow') && child.get('isVisible')){
-          ret = child._computePreviousValidKeyView(currentView, seen);
-        }
-        if (ret) return ret;
-      }
-      ret = null;
+      pv = this.get('parentView');
+      cv = pv ? pv.get('childViews') : null;
+      idx = cv ? cv.indexOf(this) : -1 ;
+      
+      // get next child if possible
+      if (idx<0) ret = null;
+      else if (idx > 0) ret = cv.objectAt(idx-1);
+      else ret = cv.objectAt(cv.get('length')-1);
     }
+    
+    // if next view does not accept responder then get nextValidKeyView...
+    if (ret && !ret.get('acceptsFirstResponder')) {
+      if (seen.contains(ret)) ret = null;
+      else ret = ret._computePreviousValidKeyView(seen);
+    }
+    
     return ret ;
   },
   
@@ -1711,7 +1680,7 @@ SC.View = SC.Responder.extend(SC.DelegateSupport,
     }
     
     // walk up this side
-    while (view && view.get('frame')) {
+    while (view) {
       f = view.get('frame'); myX += f.x; myY += f.y ;
       view = view.get('parentView') ; 
     }
@@ -1778,9 +1747,9 @@ SC.View = SC.Responder.extend(SC.DelegateSupport,
     @returns {Rect} the computed frame
   */
   computeFrameWithParentFrame: function(pdim) {
-    var layout = this.get('layout'),
-        f = {} , error, layer, AUTO = SC.LAYOUT_AUTO,
-        stLayout = this.get('useStaticLayout') ;
+    var layout = this.get('layout') ;
+    var f = {} , error, layer, AUTO = SC.LAYOUT_AUTO;
+    var stLayout = this.get('useStaticLayout') ;
     
     if (layout.width !== undefined &&
         layout.width === SC.LAYOUT_AUTO &&
@@ -2078,9 +2047,8 @@ SC.View = SC.Responder.extend(SC.DelegateSupport,
     @readOnly
   */
   layoutStyle: function() {
-    var layout = this.get('layout'), ret = {}, pdim = null, error, 
-        AUTO = SC.LAYOUT_AUTO,
-        stLayout = this.get('useStaticLayout');
+    var layout = this.get('layout'), ret = {}, pdim = null, error, AUTO = SC.LAYOUT_AUTO;
+    var stLayout = this.get('useStaticLayout');
     
     if (layout.width !== undefined &&
         layout.width === SC.LAYOUT_AUTO &&
@@ -2335,8 +2303,8 @@ SC.View = SC.Responder.extend(SC.DelegateSupport,
     @returns {void}
   */
   layoutChildViews: function() {
-    var set = this._needLayoutViews, len = set ? set.length : 0, idx,
-        view, context, layer;
+    var set = this._needLayoutViews, len = set ? set.length : 0, idx;
+    var view, context, layer;
     for(idx=0;idx<len;idx++) {
       view = set[idx];
       view.updateLayout();
@@ -2441,122 +2409,6 @@ SC.View.mixin(/** @scope SC.View */ {
   },
   
   /**
-    Convert any layout to a Top, Left, Width, Height layout
-  */
-  convertLayoutToAnchoredLayout: function(layout, parentFrame){
-    var ret = {top: 0, left: 0, width: parentFrame.width, height: parentFrame.height};
-    
-    // X Conversion
-    // handle left aligned and left/right
-    if (!SC.none(layout.left)) {
-      ret.left = Math.floor(layout.left);
-      if (layout.width !== undefined) {
-        if(layout.width === SC.LAYOUT_AUTO) ret.width = SC.LAYOUT_AUTO ;
-        else ret.width = Math.floor(layout.width) ;
-      } else {
-        ret.width = parentFrame.width - ret.left - Math.floor(layout.right || 0);
-      }
-
-    // handle right aligned
-    } else if (!SC.none(layout.right)) {
-      
-      // if no width, calculate it from the parent frame
-      if (SC.none(layout.width)) {
-        ret.left = 0;
-        ret.width = parentFrame.width - Math.floor(layout.right || 0);
-      
-      // If has width, calculate the left anchor from the width and right and parent frame
-      } else {
-        if(layout.width === SC.LAYOUT_AUTO) ret.width = SC.LAYOUT_AUTO ;
-        else { 
-          ret.width = layout.width;
-          ret.left = parentFrame.width - (layout.width + layout.right); 
-        }
-      }
-
-    // handle centered
-    } else if (!SC.none(layout.centerX)) {
-      ret.width = Math.floor(layout.width || 0) ;
-      ret.left = Math.floor((parentFrame.width - ret.width)/2) + layout.centerX;
-    
-    // if width defined, assume left of zero
-    } else if (!SC.none(layout.width)) {
-      ret.left =  0;
-      if(layout.width === SC.LAYOUT_AUTO) ret.width = SC.LAYOUT_AUTO ;
-      else {
-        ret.width = Math.floor(layout.width);
-      }
-
-    // fallback, full width.
-    } else {
-      ret.left = 0;
-      ret.width = 0;
-    }
-
-    // handle min/max
-    if (layout.minWidth !== undefined) ret.minWidth = layout.minWidth ;
-    if (layout.maxWidth !== undefined) ret.maxWidth = layout.maxWidth ; 
-    
-    // Y Conversion
-    // handle left aligned and top/bottom
-    if (!SC.none(layout.top)) {
-      ret.top = Math.floor(layout.top);
-      if (layout.height !== undefined) {
-        if(layout.height === SC.LAYOUT_AUTO) ret.height = SC.LAYOUT_AUTO ;
-        else ret.height = Math.floor(layout.height) ;
-      } else {
-        ret.height = parentFrame.height - ret.top - Math.floor(layout.bottom || 0);
-      }
-
-    // handle bottom aligned
-    } else if (!SC.none(layout.bottom)) {
-      
-      // if no height, calculate it from the parent frame
-      if (SC.none(layout.height)) {
-        ret.top = 0;
-        ret.height = parentFrame.height - Math.floor(layout.bottom || 0);
-      
-      // If has height, calculate the top anchor from the height and bottom and parent frame
-      } else {
-        if(layout.height === SC.LAYOUT_AUTO) ret.height = SC.LAYOUT_AUTO ;
-        else { 
-          ret.height = layout.height;
-          ret.top = parentFrame.height - (layout.height + layout.bottom); 
-        }
-      }
-
-    // handle centered
-    } else if (!SC.none(layout.centerY)) {
-      ret.height = Math.floor(layout.height || 0) ;
-      ret.top = Math.floor((parentFrame.height - ret.height)/2) + layout.centerY;
-    
-    // if height defined, assume top of zero
-    } else if (!SC.none(layout.height)) {
-      ret.top =  0;
-      if(layout.height === SC.LAYOUT_AUTO) ret.height = SC.LAYOUT_AUTO ;
-      else ret.height = Math.floor(layout.height);
-
-    // fallback, full height.
-    } else {
-      ret.top = 0;
-      ret.height = 0;
-    }
-
-    // handle min/max
-    if (layout.minHeight !== undefined) ret.minHeight = layout.minHeight ;
-    if (layout.maxHeight !== undefined) ret.maxHeight = layout.maxHeight ;
-    
-    return ret;
-  },
-  
-  /**
-    For now can only convert Top/Left/Width/Height to a Custom Layout
-  */
-  convertLayoutToCustomLayout: function(layout, layoutParams, parentFrame){
-    // TODO: [EG] Create Top/Left/Width/Height to a Custom Layout conversion
-  },
-  
-  /**
     Helper applies the classNames to the prototype
   */
   classNames: function(sc) {
@@ -2617,7 +2469,7 @@ SC.View.mixin(/** @scope SC.View */ {
   */
   localization: function(attrs, rootElement) { 
     // add rootElement
-    if (rootElement) attrs.rootElement = SC.$(rootElement)[0];
+    if (rootElement) attrs.rootElement = SC.$(rootElement).get(0);
     return attrs; 
   },
   
@@ -2635,7 +2487,7 @@ SC.View.mixin(/** @scope SC.View */ {
     var args = SC.$A(arguments); // prepare to edit
     if (SC.none(element)) {
       args.shift(); // remove if no element passed
-    } else args[0] = { rootElement: SC.$(element)[0] } ;
+    } else args[0] = { rootElement: SC.$(element).get(0) } ;
     var ret = this.create.apply(this, arguments) ;
     args = args[0] = null;
     return ret ;

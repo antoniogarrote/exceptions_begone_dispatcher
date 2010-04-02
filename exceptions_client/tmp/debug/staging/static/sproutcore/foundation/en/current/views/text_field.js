@@ -116,8 +116,8 @@ SC.TextFieldView = SC.FieldView.extend(SC.StaticLayout, SC.Editable,
     @property {SC.TextSelection}
   */
   selection: function(key, value) {
-    var element = this.$input()[0],
-        range, start, end;
+    var element = this.$input().get(0) ;
+    var range, start, end;
 
     // Are we being asked to set the value, or return the current value?
     if (value === undefined) {
@@ -227,23 +227,17 @@ SC.TextFieldView = SC.FieldView.extend(SC.StaticLayout, SC.Editable,
     this.accessoryViewObserver() ;
   },
 
-  acceptsFirstResponder: function() {
-    return this.get('isEnabled');
-  }.property('isEnabled'),
-
 
   accessoryViewObserver: function() {
-    var classNames,
-        viewProperties = ['leftAccessoryView', 'rightAccessoryView'],
-        len = viewProperties.length , i, viewProperty, previousView, 
-        accessoryView;
-        
-    for (i=0; i<len; i++) {
-      viewProperty = viewProperties[i] ;
+    var classNames;
+    var viewProperties = ['leftAccessoryView', 'rightAccessoryView'] ;
+    var len = viewProperties.length ;
+    for (var i=0; i<len; i++) {
+      var viewProperty = viewProperties[i] ;
 
       // Is there an accessory view specified?
-      previousView = this['_'+viewProperty] ;
-      accessoryView = this.get(viewProperty) ;
+      var previousView = this['_'+viewProperty] ;
+      var accessoryView = this.get(viewProperty) ;
 
       // If the view is the same, there's nothing to do.  Otherwise, remove
       // the old one (if any) and add the new one.
@@ -318,15 +312,14 @@ SC.TextFieldView = SC.FieldView.extend(SC.StaticLayout, SC.Editable,
   render: function(context, firstTime) {
     arguments.callee.base.apply(this,arguments) ;
 
-    var disabled = this.get('isEnabled') ? '' : 'disabled="disabled"',
-        name = SC.guidFor(this),
-        type = this.get('isPassword') ? 'password' : 'text',
-        v, accessoryViewWidths, leftAdjustment, rightAdjustment;
+    var disabled = this.get('isEnabled') ? '' : 'disabled="disabled"';
+    var name = SC.guidFor(this);
+    var type = this.get('isPassword') ? 'password' : 'text';
 
     if (this.get('isTextArea')) context.addClass('text-area');
 
     // always have at least an empty string
-    v = this.get('fieldValue');
+    var v = this.get('fieldValue');
     if (SC.none(v)) v = '';
 
     // update layer classes always
@@ -337,9 +330,9 @@ SC.TextFieldView = SC.FieldView.extend(SC.StaticLayout, SC.Editable,
     // if we could add in the original padding, too, but there's no efficient
     // way to do that without first rendering the element somewhere on/off-
     // screen, and we don't want to take the performance hit.)
-    accessoryViewWidths = this._getAccessoryViewWidths() ;
-    leftAdjustment  = accessoryViewWidths['left'] ;
-    rightAdjustment = accessoryViewWidths['right'] ;
+    var accessoryViewWidths = this._getAccessoryViewWidths() ;
+    var leftAdjustment  = accessoryViewWidths['left'] ;
+    var rightAdjustment = accessoryViewWidths['right'] ;
 
     if (leftAdjustment)  leftAdjustment  += 'px' ;
     if (rightAdjustment) rightAdjustment += 'px' ;
@@ -364,19 +357,18 @@ SC.TextFieldView = SC.FieldView.extend(SC.StaticLayout, SC.Editable,
     // TODO:  The cleanest thing might be to create a sub- rendering context
     //        here, but currently SC.RenderContext will render sibling
     //        contexts as parent/child.
-    var hint = this.get('hint'), disabled, name, adjustmentStyle, type, 
-        hintElements, element, paddingElementStyle;
+    var hint = this.get('hint') ;
     
     if (firstTime || this._forceRenderFirstTime) {
       this._forceRenderFirstTime = NO;
-      disabled = this.get('isEnabled') ? '' : 'disabled="disabled"' ;
-      name = this.get('layerId');
+      var disabled = this.get('isEnabled') ? '' : 'disabled="disabled"' ;
+      var name = this.get('layerId');
       
       context.push('<span class="border"></span>');
 
       // Render the padding element, with any necessary positioning
       // adjustments to accommodate accessory views.
-      adjustmentStyle = '' ;
+      var adjustmentStyle = '' ;
       if (leftAdjustment  ||  rightAdjustment) {
         adjustmentStyle = 'style="' ;
         if (leftAdjustment)  adjustmentStyle += 'left: '  + leftAdjustment  + '; ' ;
@@ -390,25 +382,25 @@ SC.TextFieldView = SC.FieldView.extend(SC.StaticLayout, SC.Editable,
       
       // Render the input/textarea field itself, and close off the padding.
       if (this.get('isTextArea')) {
-        context.push('<textarea name="', name, '" ', disabled, '>', value, '</textarea></span>') ;
+        context.push('<textarea name="%@" %@>%@</textarea></span>'.fmt(name, disabled, value)) ;
       }
       else {
-        type = this.get('isPassword') ? 'password' : 'text' ;
-        context.push('<input type="', type,'" name="', name, '" ', disabled, ' value="', value,'"/></span>') ;
+        var type = this.get('isPassword') ? 'password' : 'text' ;
+        context.push('<input type="%@" name="%@" %@ value="%@"/></span>'.fmt(type, name, disabled, value)) ;
       }
 
     }
     else {
       // If this is not first time rendering, update the hint itself since we
       // can't just blow away the text field like we might most other controls
-      hintElements = this.$('.sc-hint') ;
+      var hintElements = this.$('.sc-hint') ;
       if (hint !== this._textField_currentHint) {
         this._textField_currentHint = hint ;
         hintElements.text(hint) ;
       }
       
       // Enable/disable the actual input/textarea as appropriate.
-      element = this.$input()[0];
+      var element = this.$input()[0];
       if (element) {
         if (!this.get('isEnabled')) {
           element.disabled = 'true' ;
@@ -418,46 +410,55 @@ SC.TextFieldView = SC.FieldView.extend(SC.StaticLayout, SC.Editable,
         }
 
         // Adjust the padding element to accommodate any accessory views.
-        paddingElementStyle = element.parentNode.style;
+        var paddingElement = element.parentNode;
         if (leftAdjustment) {
-          if (paddingElementStyle.left !== leftAdjustment) {
-            paddingElementStyle.left = leftAdjustment ;
+          if (paddingElement.style.left !== leftAdjustment) {
+            paddingElement.style.left = leftAdjustment ;
           }
         }
         else {
-          paddingElementStyle.left = null ;
+          paddingElement.style.left = null ;
         }
 
         if (rightAdjustment) {
-          if (paddingElementStyle.right !== rightAdjustment) {
-            paddingElementStyle.right = rightAdjustment ;
+          if (paddingElement.style.right !== rightAdjustment) {
+            paddingElement.style.right = rightAdjustment ;
           }
         }
         else {
-          paddingElementStyle.right = null ;
+          paddingElement.style.right = null ;
         }
+
+
+        // Firefox needs a bit of help to recalculate the width of the text
+        // field, if it has focus.  (Even though it's set to 100% of its
+        // parent, if we adjust the parent it doesn't always adjust in kind.)
+        // if (SC.browser.mozilla) {
+        //           if(paddingElement.clientWidth>0){
+        //             element.style.width = paddingElement.clientWidth + "px";
+        //           }
+        //         }
       }
     }
   },
 
 
   _getAccessoryViewWidths: function() {
-    var widths = {},
-        accessoryViewPositions = ['left', 'right'],
-        numberOfAccessoryViewPositions = accessoryViewPositions.length, i,
-        position, accessoryView, frames, width, layout, offset, frame;
-    for (i = 0;  i < numberOfAccessoryViewPositions;  i++) {
-      position = accessoryViewPositions[i];
-      accessoryView = this.get(position + 'AccessoryView');
+    var widths = {};
+    var accessoryViewPositions = ['left', 'right'] ;
+    var numberOfAccessoryViewPositions = accessoryViewPositions.length ;
+    for (var i = 0;  i < numberOfAccessoryViewPositions;  i++) {
+      var position = accessoryViewPositions[i];
+      var accessoryView = this.get(position + 'AccessoryView');
       if (accessoryView  &&  accessoryView.get) {
-        frame = accessoryView.get('frame');
+        var frame = accessoryView.get('frame');
         if (frame) {
-          width = frame.width;
+          var width = frame.width;
           if (width) {
             // Also account for the accessory view's inset.
-            layout = accessoryView.get('layout');
+            var layout = accessoryView.get('layout');
             if (layout) {
-              offset = layout[position];
+              var offset = layout[position];
               width += offset;
             }
             widths[position] = width;
@@ -474,40 +475,21 @@ SC.TextFieldView = SC.FieldView.extend(SC.StaticLayout, SC.Editable,
   //
 
   didCreateLayer: function() {
-    if(!this.get('isTextArea')){
-      arguments.callee.base.apply(this,arguments); 
-      this._addTextAreaEvents();
-    } 
-  },
-  
-  
-  didAppendToDocument: function() {
-    // Turns out that in safari and firefox you can attach events to a textarea
-    // only if it has been appended to the DOM or if you did did it during
-    // loading time. For input tags is the other way around. I tested in all
-    // browsers and if I add the event for input tag before being visible it works
-    // fine, and if I add the event after the textarea is visible then the 
-    // textarea works. In IE works fine both ways.
-    if(this.get('isTextArea')){
-      arguments.callee.base.apply(this,arguments);
-      this._addTextAreaEvents();
-    }
-  },
-  
-  _addTextAreaEvents: function() {
+    arguments.callee.base.apply(this,arguments);
+
     var input = this.$input();
     SC.Event.add(input, 'focus', this, this._textField_fieldDidFocus);
     SC.Event.add(input, 'blur',  this, this._textField_fieldDidBlur);
-    
+
     // There are certain ways users can select text that we can't identify via
     // our key/mouse down/up handlers (such as the user choosing Select All
     // from a menu).
     SC.Event.add(input, 'select', this, this._textField_selectionDidChange);
-        
+    
     if(SC.browser.mozilla){
       // cache references to layer items to improve firefox hack perf
-      this._cacheInputElement = this.$input();
-      this._cachePaddingElement = this.$('.padding');
+       this._cacheInputElement = this.$input();
+       this._cachePaddingElement = this.$('.padding');
     }
   },
 
@@ -648,11 +630,16 @@ SC.TextFieldView = SC.FieldView.extend(SC.StaticLayout, SC.Editable,
     if (evt.which === 27) return NO ;
 
     // handle tab key
-    if (evt.which === 9) {
+    if (evt.which === 9 && !this.get('isTextArea')) {
       var view = evt.shiftKey ? this.get('previousValidKeyView') : this.get('nextValidKeyView');
-      if(view) view.becomeFirstResponder();
-      else evt.allowDefault();
+      view.becomeFirstResponder();
       return YES ; // handled
+    }
+    
+    // handle delete key, set dontForceDeleteKey to allow the default behavior
+    // of the delete key.
+    if (evt.which === 8){
+      evt.dontForceDeleteKey=YES;
     }
 
     // validate keyDown...
@@ -688,7 +675,6 @@ SC.TextFieldView = SC.FieldView.extend(SC.StaticLayout, SC.Editable,
       evt.stop();
       return YES;
     } else if((this.value && this.value.length===0) || !this.value) {
-      this.$input()[0].focus();
       return YES;
     } else {
       // This fixes the double click issue in firefox
@@ -708,17 +694,9 @@ SC.TextFieldView = SC.FieldView.extend(SC.StaticLayout, SC.Editable,
       evt.stop();
       return YES;
     } else if((this.value && this.value.length===0) || !this.value) {
-      if(SC.browser.msie<8){
-        this.invokeLater(this.focusIE7, 1);
-      }else{
-        this.$input()[0].focus();
-      }
+      this.$input()[0].focus();
       return YES;
     } else return arguments.callee.base.apply(this,arguments);
-  },
-
-  focusIE7: function (){
-    this.$input()[0].focus();
   },
 
   selectStart: function(evt) {

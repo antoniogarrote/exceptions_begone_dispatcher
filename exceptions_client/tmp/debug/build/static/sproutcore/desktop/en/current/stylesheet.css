@@ -72,7 +72,7 @@
 	position: absolute;
 	left: 0px;
 	top: 0px;
-	background-image: url('') ;
+	background-image: url('/static/sproutcore/desktop/en/current/images/icons/mini_222222.png?1259494255') ;
 } 
 
 .sc-button-view.sc-disclosure-view .sc-button-label {
@@ -153,19 +153,19 @@
 .sc-icon-alert-48 {
 	width: 48px;
 	height: 48px;
-	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1269632160') left top;
+	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1259494255') left top;
 }
 
 .sc-icon-info-48 {
 	width: 48px;
 	height: 48px;
-	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1269632160') left -48px;
+	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1259494255') left -48px;
 }
 
 .sc-icon-error-48 {
 	width: 48px;
 	height: 48px;
-	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1269632160') left -96px;
+	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1259494255') left -96px;
 }
 
 
@@ -176,115 +176,115 @@
 .sc-icon-tools-24 {
 	width: 24px;
 	height: 24px;
-	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1269632160') 0px -144px;
+	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1259494255') 0px -144px;
 }
 
 .sc-icon-bookmark-24 {
 	width: 24px;
 	height: 24px;
-	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1269632160') -24px -144px;
+	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1259494255') -24px -144px;
 }
 
 .sc-icon-info-24 {
 	width: 24px;
 	height: 24px;
-	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1269632160') 0px -168px;
+	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1259494255') 0px -168px;
 }
 
 .sc-icon-help-24 {
 	width: 24px;
 	height: 24px;
-	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1269632160') -0px -192px;
+	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1259494255') -0px -192px;
 }
 
 .sc-icon-alert-24 {
 	width: 24px;
 	height: 24px;
-	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1269632160') -24px -192px;
+	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1259494255') -24px -192px;
 }
 
 .sc-icon-left-24 {
 	width: 24px;
 	height: 24px;
-	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1269632160') 0px -216px;
+	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1259494255') 0px -216px;
 }
 
 .sc-icon-right-24 {
 	width: 24px;
 	height: 24px;
-	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1269632160') -24px -216px;
+	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1259494255') -24px -216px;
 }
 
 .sc-icon-up-24 {
 	width: 24px;
 	height: 24px;
-	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1269632160') 0px -240px;
+	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1259494255') 0px -240px;
 }
 
 .sc-icon-down-24 {
 	width: 24px;
 	height: 24px;
-	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1269632160') -24px -240px;
+	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1259494255') -24px -240px;
 }
 
 .sc-icon-undo-24 {
 	width: 24px;
 	height: 24px;
-	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1269632160') 0px -264px;
+	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1259494255') 0px -264px;
 }
 
 .sc-icon-redo-24 {
 	width: 24px;
 	height: 24px;
-	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1269632160') -24px -264px;
+	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1259494255') -24px -264px;
 }
 
 .sc-icon-group-24 {
 	width: 24px;
 	height: 24px;
-	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1269632160') 0px -288px;
+	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1259494255') 0px -288px;
 }
 
 .sc-icon-user-24 {
 	width: 24px;
 	height: 24px;
-	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1269632160') -24px -288px;
+	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1259494255') -24px -288px;
 }
 
 .sc-icon-cancel-24 {
 	width: 24px;
 	height: 24px;
-	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1269632160') 0px -312px;
+	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1259494255') 0px -312px;
 }
 
 .sc-icon-options-24 {
 	width: 24px;
 	height: 24px;
-	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1269632160') -24px -312px;
+	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1259494255') -24px -312px;
 }
 
 .sc-icon-folder-24 {
 	width: 24px;
 	height: 24px;
-	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1269632160') 0px -336px;
+	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1259494255') 0px -336px;
 }
 
 .sc-icon-trash-24 {
 	width: 24px;
 	height: 24px;
-	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1269632160') -24px -336px;
+	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1259494255') -24px -336px;
 }
 
 .sc-icon-document-24 {
 	width: 24px;
 	height: 24px;
-	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1269632160') 0px -360px;
+	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1259494255') 0px -360px;
 }
 
 .sc-icon-favorite-24 {
 	width: 24px;
 	height: 24px;
-	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1269632160') -24px -360px;
+	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1259494255') -24px -360px;
 }
 
 /* @end */
@@ -294,67 +294,67 @@
 .sc-icon-bookmark-16 {
 	width: 16px;
 	height: 16px;
-	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1269632160') -16px -384px;
+	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1259494255') -16px -384px;
 }
 
 .sc-icon-info-16 {
 	width: 16px;
 	height: 16px;
-	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1269632160') -32px -384px;
+	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1259494255') -32px -384px;
 }
 
 .sc-icon-help-16 {
 	width: 16px;
 	height: 16px;
-	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1269632160') -16px -400px;
+	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1259494255') -16px -400px;
 }
 
 .sc-icon-alert-16 {
 	width: 16px;
 	height: 16px;
-	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1269632160') -32px -400px;
+	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1259494255') -32px -400px;
 }
 
 .sc-icon-group-16 {
 	width: 16px;
 	height: 16px;
-	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1269632160') -0px -448px;
+	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1259494255') -0px -448px;
 }
 
 .sc-icon-user-16 {
 	width: 16px;
 	height: 16px;
-	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1269632160') -16px -448px;
+	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1259494255') -16px -448px;
 }
 
 .sc-icon-options-16 {
 	width: 16px;
 	height: 16px;
-	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1269632160') -0px -464px;
+	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1259494255') -0px -464px;
 }
 
 .sc-icon-folder-16 {
 	width: 16px;
 	height: 16px;
-	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1269632160') -16px -464px;
+	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1259494255') -16px -464px;
 }
 
 .sc-icon-trash-16 {
 	width: 16px;
 	height: 16px;
-	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1269632160') -32px -464px;
+	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1259494255') -32px -464px;
 }
 
 .sc-icon-document-16 {
 	width: 16px;
 	height: 16px;
-	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1269632160') -0px -480px;
+	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1259494255') -0px -480px;
 }
 
 .sc-icon-favorite-16 {
 	width: 16px;
 	height: 16px;
-	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1269632160') -16px -480px;
+	background: no-repeat url('/static/sproutcore/desktop/en/current/images/icons/shared.png?1259494255') -16px -480px;
 }
 
 /* @end */
@@ -364,19 +364,19 @@
 .sc-mini-icon { 
 	width: 16px; 
 	height: 16px; 
-	background-image: url(''); 
+	background-image: url('/static/sproutcore/desktop/en/current/images/icons/mini_454545.png?1259494255'); 
 	border: none ;
 }
 
 .active .sc-mini-icon,
 .sel .sc-mini-icon { 
-	background-image: url(''); 
+	background-image: url('/static/sproutcore/desktop/en/current/images/icons/mini_222222.png?1259494255'); 
 }
 
 .active .sc-mini-icon.inverted,
 .sel .sc-mini-icon.inverted,
 .sc-mini-icon.inverted { 
-	background-image: url(''); 
+	background-image: url('/static/sproutcore/desktop/en/current/images/icons/mini_ffffff.png?1259494255'); 
 }
 
 .disabled .sc-mini-icon,
@@ -385,7 +385,7 @@
 .disabled .sc-mini-icon.inverted,
 .active.disabled .sc-mini-icon.inverted,
 .sel.disabled .sc-mini-icon.inverted { 
-	background-image: url(''); 
+	background-image: url('/static/sproutcore/desktop/en/current/images/icons/mini_888888.png?1259494255'); 
 }
 
 .sc-mini-icon.carat-1-n {
@@ -1186,8 +1186,13 @@
 	border: 1px #333 solid;
 }
 
+.sc-list-item-view .sc-checkbox-view.sel {
+	background-image: url('/static/sproutcore/desktop/en/current/images/icons/mini_454545.png?1259494255'); 
+	background-position: -66px -147px;
+}
 
 .sc-list-item-view .sc-checkbox-view.active {
+	background-image: url('/static/sproutcore/desktop/en/current/images/icons/mini_ffffff.png?1259494255'); 
 	background-color: #333;
 	border-color: black;
 }
@@ -1242,6 +1247,13 @@
 	right: 1px;
 	top: 50%;
 	margin-top: -8px;
+	background-image: url('/static/sproutcore/desktop/en/current/images/icons/mini_454545.png?1259494255'); 
+	background-position: -32px 0;
+}
+
+.sc-list-item-view.sel .branch,
+.sc-list-item-view.active .branch {
+	background-image: url('/static/sproutcore/desktop/en/current/images/icons/mini_ffffff.png?1259494255'); 
 }
 
 /* @end */
@@ -1294,6 +1306,7 @@
   left: 0px;
   right: 0px;
   line-height: 22px;
+  text-shadow: #b0b0b0 0px 1px 0px;
   text-decoration: none ;
   text-align: left;
   color: black;
@@ -1305,6 +1318,7 @@
 }
 
 .sc-menu-item.disabled{
+  background-color:#E0E0E0;
   border:none;
   color:#A0A0A0;
 }
@@ -1343,16 +1357,16 @@
 .sc-pane.sc-panel > .sc-view.sc-menu-item.focus, 
 .sc-menu-item a:hover {
   background-color: #5A8EC6;
-  color: #fff;
 }
 
 .sc-menu-item.disabled a:hover {
-  background-color: transparent;
-  color:#A0A0A0;
+  background-color: #E0E0E0;
 }
 /* @end */
 
 .sc-menu-item div.checkbox {
+  background-image: url('/static/sproutcore/desktop/en/current/images/icons/mini_454545.png?1259494255'); 
+  background-position: -66px -147px;
   position: absolute;
   display: block;
   width: 12px;
@@ -1364,13 +1378,14 @@
 }
 
 .sc-menu-item.focus div.checkbox {
+  background-image: url('/static/sproutcore/desktop/en/current/images/icons/mini_ffffff.png?1259494255'); 
 }
 
 
 .sc-menu-item.disabled div.checkbox,
 .sc-menu-item div.checkbox.inactive {
   background-image: url(data:image/gif;base64,R0lGODlhAQABAJAAAP///wAAACH5BAUQAAAALAAAAAABAAEAAAICBAEAOw==) top left no-repeat; 
-  *background-image: url('/static/sproutcore/foundation/en/current/blank.gif?1269632160') top left no-repeat; /* IE < 8 */
+  *background-image: url('/static/sproutcore/foundation/en/current/blank.gif?1259494255') top left no-repeat; /* IE < 8 */
 }
 
 .sc-menu-item span.value {
@@ -1431,6 +1446,7 @@
 }
 
 .sc-pane.sc-panel > .top-right-edge {
+  background: url('/static/sproutcore/desktop/en/current/images/panels/sprite-x.png?1259494255') no-repeat -40px -120px;
   position: absolute;
   width: 40px;
   height: 40px;
@@ -1440,6 +1456,7 @@
 }
 
 .sc-pane.sc-panel > .top-left-edge {
+  background: url('/static/sproutcore/desktop/en/current/images/panels/sprite-x.png?1259494255') no-repeat 0px -120px;
   position: absolute;
   width: 40px;
   height: 40px;
@@ -1449,6 +1466,7 @@
 }
 
 .sc-pane.sc-panel > .bottom-left-edge {
+  background: url('/static/sproutcore/desktop/en/current/images/panels/sprite-x.png?1259494255') no-repeat 0px -160px;
   position: absolute;
   width: 40px;
   height: 40px;
@@ -1458,6 +1476,7 @@
 }
 
 .sc-pane.sc-panel > .bottom-right-edge {
+  background: url('/static/sproutcore/desktop/en/current/images/panels/sprite-x.png?1259494255') no-repeat -40px -160px;
   position: absolute;
   width: 40px;
   height: 40px;
@@ -1467,6 +1486,7 @@
 }
 
 .sc-pane.sc-panel > .top-edge {
+  background: url('/static/sproutcore/desktop/en/current/images/panels/sprite-x.png?1259494255') repeat-x 0px -230px;
   position: absolute;
   height: 20px;
   top: -20px;
@@ -1476,6 +1496,7 @@
 }
 
 .sc-pane.sc-panel > .bottom-edge {
+  background: url('/static/sproutcore/desktop/en/current/images/panels/sprite-x.png?1259494255') repeat-x 0px -210px;
   position: absolute;
   height: 20px;
   bottom: -20px;
@@ -1485,6 +1506,7 @@
 }
 
 .sc-pane.sc-panel > .left-edge {
+  background: url('/static/sproutcore/desktop/en/current/images/panels/sprite-y.png?1259494255') repeat-y 0px 0px;
   position: absolute;
   width: 20px;
   top: 20px;
@@ -1494,6 +1516,7 @@
 }
 
 .sc-pane.sc-panel > .right-edge {
+  background: url('/static/sproutcore/desktop/en/current/images/panels/sprite-y.png?1259494255') repeat-y -20px 0px;
   position: absolute;
   width: 20px;
   top: 20px;
@@ -1505,6 +1528,7 @@
 /** SC.PickerPane Support */
 
 .sc-pane.sc-panel.sc-picker .perfectRight {
+  background: url('/static/sproutcore/desktop/en/current/images/panels/sprite-x.png?1259494255') no-repeat 0px -30px;
   position: absolute;
   width: 25px;
   height: 51px;
@@ -1513,6 +1537,7 @@
 }
 
 .sc-pane.sc-panel.sc-picker .perfectLeft {
+  background: url('/static/sproutcore/desktop/en/current/images/panels/sprite-x.png?1259494255') no-repeat -30px -30px;
   position: absolute;
   width: 25px;
   height: 51px;
@@ -1521,6 +1546,7 @@
 }
 
 .sc-pane.sc-panel.sc-picker .perfectTop {
+  background: url('/static/sproutcore/desktop/en/current/images/panels/sprite-x.png?1259494255') no-repeat 0px -90px;
   position: absolute;
   width: 51px;
   height: 25px;
@@ -1530,6 +1556,7 @@
 }
 
 .sc-pane.sc-panel.sc-picker .perfectBottom {
+  background: url('/static/sproutcore/desktop/en/current/images/panels/sprite-x.png?1259494255') no-repeat 0px 0px;
   position: absolute;
   width: 51px;
   height: 25px;
@@ -1617,7 +1644,6 @@
 
 .sc-segmented-view {
   display: block;
-  text-align: center;
 }
 
 .sc-segmented-view a.sc-segment {
@@ -1935,6 +1961,7 @@ a.sc-segment img.icon {
 /* SC.ToolbarView */
 
 .sc-toolbar-view {
+  border-top: 1px #999 solid;
   background-color: #ddd ;
 }
 
@@ -2009,4 +2036,5 @@ a.sc-segment img.icon {
   bottom: 5px;
   right: 7px;
   left: 7px;
+  z-index:-1;
 }

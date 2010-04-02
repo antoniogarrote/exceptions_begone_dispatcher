@@ -18,11 +18,11 @@
 %%   are Copyright (C) 2007-2008 LShift Ltd, Cohesive Financial
 %%   Technologies LLC, and Rabbit Technologies Ltd.
 %%
-%%   Portions created by LShift Ltd are Copyright (C) 2007-2009 LShift
+%%   Portions created by LShift Ltd are Copyright (C) 2007-2010 LShift
 %%   Ltd. Portions created by Cohesive Financial Technologies LLC are
-%%   Copyright (C) 2007-2009 Cohesive Financial Technologies
+%%   Copyright (C) 2007-2010 Cohesive Financial Technologies
 %%   LLC. Portions created by Rabbit Technologies Ltd are Copyright
-%%   (C) 2007-2009 Rabbit Technologies Ltd.
+%%   (C) 2007-2010 Rabbit Technologies Ltd.
 %%
 %%   All Rights Reserved.
 %%
@@ -42,6 +42,7 @@
 
 -spec(start/0 :: () -> no_return()).
 -spec(stop/0 :: () -> 'ok').
+-spec(usage/0 :: () -> no_return()).
 
 -endif.
 
@@ -51,7 +52,7 @@ start() ->
     RpcTimeout =
         case init:get_argument(maxwait) of
             {ok,[[N1]]} -> 1000 * list_to_integer(N1);
-            _ -> 30000
+            _           -> ?MAX_WAIT
         end,
     case init:get_plain_arguments() of
         [] ->
@@ -86,24 +87,21 @@ stop() ->
     ok.
 
 usage() ->
-    io:format("Usage: rabbitmq-multi <command>
-
-Available commands:
-
-  start_all <NodeCount> - start a local cluster of RabbitMQ nodes.
-  status                - print status of all running nodes
-  stop_all              - stops all local RabbitMQ nodes.
-  rotate_logs [Suffix]  - rotate logs for all local and running RabbitMQ nodes.
-"),
-    halt(3).
+    io:format("~s", [rabbit_multi_usage:usage()]),
+    halt(1).
 
 action(start_all, [NodeCount], RpcTimeout) ->
     io:format("Starting all nodes...~n", []),
-    N = list_to_integer(NodeCount),
-    {NodePids, Running} = start_nodes(N, N, [], true,
-                                      getenv("RABBITMQ_NODENAME"),
-                                      getenv("RABBITMQ_NODE_PORT"),
-                                      RpcTimeout),
+    application:load(rabbit),
+    NodeName = rabbit_misc:nodeparts(getenv("RABBITMQ_NODENAME")),
+    {NodePids, Running} =
+        case list_to_integer(NodeCount) of
+            1 -> {NodePid, Started} = start_node(rabbit_misc:makenode(NodeName),
+                                                 RpcTimeout),
+                 {[NodePid], Started};
+            N -> start_nodes(N, N, [], true, NodeName,
+                             get_node_tcp_listener(), RpcTimeout)
+        end,
     write_pids_file(NodePids),
     case Running of
         true  -> ok;
@@ -114,12 +112,13 @@ action(status, [], RpcTimeout) ->
     io:format("Status of all running nodes...~n", []),
     call_all_nodes(
       fun({Node, Pid}) ->
-              Status = rpc:call(Node, rabbit, status, [], RpcTimeout),
+              RabbitRunning =
+                  case is_rabbit_running(Node, RpcTimeout) of
+                      false -> not_running;
+                      true  -> running
+                  end,
               io:format("Node '~p' with Pid ~p: ~p~n",
-                        [Node, Pid, case parse_status(Status) of
-                                        false -> not_running;
-                                        true  -> running
-                                    end])
+                        [Node, Pid, RabbitRunning])
       end);
 
 action(stop_all, [], RpcTimeout) ->
@@ -155,30 +154,33 @@ action(rotate_logs, [Suffix], RpcTimeout) ->
 %% Running is a boolean exhibiting success at some moment
 start_nodes(0, _, PNodePid, Running, _, _, _) -> {PNodePid, Running};
 
-start_nodes(N, Total, PNodePid, Running,
-            NodeNameBase, NodePortBase, RpcTimeout) ->
+start_nodes(N, Total, PNodePid, Running, NodeNameBase, Listener, RpcTimeout) ->
+    {NodePre, NodeSuff} = NodeNameBase,
     NodeNumber = Total - N,
-    NodeName = if NodeNumber == 0 ->
-                       %% For compatibility with running a single node
-                       NodeNameBase;
-                  true ->           
-                       NodeNameBase ++ "_" ++ integer_to_list(NodeNumber)
+    NodePre1 = case NodeNumber of
+                   %% For compatibility with running a single node
+                   0 -> NodePre;
+                   _ -> NodePre ++ "_" ++ integer_to_list(NodeNumber)
                end,
-    {NodePid, Started} = start_node(NodeName,
-                                    list_to_integer(NodePortBase) + NodeNumber,
-                                    RpcTimeout),
+    Node = rabbit_misc:makenode({NodePre1, NodeSuff}),
+    os:putenv("RABBITMQ_NODENAME", atom_to_list(Node)),
+    case Listener of
+        {NodeIpAddress, NodePortBase} ->
+            NodePort = NodePortBase + NodeNumber,
+            os:putenv("RABBITMQ_NODE_PORT", integer_to_list(NodePort)),
+            os:putenv("RABBITMQ_NODE_IP_ADDRESS", NodeIpAddress);
+        undefined ->
+            ok
+    end,
+    {NodePid, Started} = start_node(Node, RpcTimeout),
     start_nodes(N - 1, Total, [NodePid | PNodePid],
-                Started and Running,
-                NodeNameBase, NodePortBase, RpcTimeout).
+                Started and Running, NodeNameBase, Listener, RpcTimeout).
 
-start_node(NodeName, NodePort, RpcTimeout) ->
-    os:putenv("RABBITMQ_NODENAME", NodeName),
-    os:putenv("RABBITMQ_NODE_PORT", integer_to_list(NodePort)),
-    Node = rabbit_misc:localnode(list_to_atom(NodeName)),
+start_node(Node, RpcTimeout) ->
     io:format("Starting node ~s...~n", [Node]),
     case rpc:call(Node, os, getpid, []) of
         {badrpc, _} ->
-            Port = run_cmd(script_filename()),
+            Port = run_rabbitmq_server(),
             Started = wait_for_rabbit_to_start(Node, RpcTimeout, Port),
             Pid = case rpc:call(Node, os, getpid, []) of
                       {badrpc, _} -> throw(cannot_get_pid);
@@ -197,7 +199,7 @@ start_node(NodeName, NodePort, RpcTimeout) ->
 wait_for_rabbit_to_start(_ , RpcTimeout, _) when RpcTimeout < 0 ->
     false;
 wait_for_rabbit_to_start(Node, RpcTimeout, Port) ->
-    case parse_status(rpc:call(Node, rabbit, status, [])) of
+    case is_rabbit_running(Node, RpcTimeout) of
         true  -> true;
         false -> receive
                      {'EXIT', Port, PosixCode} ->
@@ -208,33 +210,37 @@ wait_for_rabbit_to_start(Node, RpcTimeout, Port) ->
                  end
     end.
 
-run_cmd(FullPath) ->
-    erlang:open_port({spawn, FullPath}, [nouse_stdio]).
+run_rabbitmq_server() ->
+    with_os([{unix, fun run_rabbitmq_server_unix/0},
+             {win32, fun run_rabbitmq_server_win32/0}]).
 
-parse_status({badrpc, _}) ->
-    false;
+run_rabbitmq_server_unix() ->
+    CmdLine = getenv("RABBITMQ_SCRIPT_HOME") ++ "/rabbitmq-server -noinput",
+    erlang:open_port({spawn, CmdLine}, [nouse_stdio]).
 
-parse_status(Status) ->
-    case lists:keysearch(running_applications, 1, Status) of
-        {value, {running_applications, Apps}} ->
-            lists:keymember(rabbit, 1, Apps);
-        _ ->
-            false
+run_rabbitmq_server_win32() ->
+    Cmd = filename:nativename(os:find_executable("cmd")),
+    CmdLine = "\"" ++ getenv("RABBITMQ_SCRIPT_HOME")
+                                         ++ "\\rabbitmq-server.bat\" -noinput",
+    erlang:open_port({spawn_executable, Cmd},
+                     [{arg0, Cmd}, {args, ["/q", "/s", "/c", CmdLine]},
+                      nouse_stdio, hide]).
+
+is_rabbit_running(Node, RpcTimeout) ->
+    case rpc:call(Node, rabbit, status, [], RpcTimeout) of
+        {badrpc, _} -> false;
+        Status      -> case proplists:get_value(running_applications, Status) of
+                           undefined -> false;
+                           Apps      -> lists:keymember(rabbit, 1, Apps)
+                       end
     end.
 
 with_os(Handlers) ->
     {OsFamily, _} = os:type(),
-    case lists:keysearch(OsFamily, 1, Handlers) of
-        {value, {_, Handler}} -> Handler();
-        false -> throw({unsupported_os, OsFamily})
+    case proplists:get_value(OsFamily, Handlers) of
+        undefined -> throw({unsupported_os, OsFamily});
+        Handler   -> Handler()
     end.
-
-script_filename() ->
-    ScriptHome = getenv("RABBITMQ_SCRIPT_HOME"),
-    ScriptName = with_os(
-                   [{unix , fun () -> "rabbitmq-server" end},
-                    {win32, fun () -> "rabbitmq-server.bat" end}]),
-    ScriptHome ++ "/" ++ ScriptName ++ " -noinput".
 
 pids_file() -> getenv("RABBITMQ_PIDS_FILE").
 
@@ -292,7 +298,7 @@ kill_wait(Pid, TimeLeft, Forceful) ->
     io:format(".", []),
     is_dead(Pid) orelse kill_wait(Pid, TimeLeft - ?RPC_SLEEP, Forceful).
 
-% Test using some OS clunkiness since we shouldn't trust 
+% Test using some OS clunkiness since we shouldn't trust
 % rpc:call(os, getpid, []) at this point
 is_dead(Pid) ->
     PidS = integer_to_list(Pid),
@@ -319,4 +325,22 @@ getenv(Var) ->
     case os:getenv(Var) of
         false -> throw({missing_env_var, Var});
         Value -> Value
+    end.
+
+get_node_tcp_listener() ->
+    try
+        {getenv("RABBITMQ_NODE_IP_ADDRESS"),
+         list_to_integer(getenv("RABBITMQ_NODE_PORT"))}
+    catch _ ->
+            case application:get_env(rabbit, tcp_listeners) of
+                {ok, [{_IpAddy, _Port} = Listener]} ->
+                    Listener;
+                {ok, []} ->
+                    undefined;
+                {ok, Other} ->
+                    throw({cannot_start_multiple_nodes, multiple_tcp_listeners,
+                           Other});
+                undefined ->
+                    throw({missing_configuration, tcp_listeners})
+            end
     end.

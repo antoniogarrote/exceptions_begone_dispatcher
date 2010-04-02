@@ -53,7 +53,7 @@
   top: -2px;
   left: -4px;
   height: 8px;
-	background: url('/static/sproutcore/standard_theme/en/current/images/sc-theme-repeat-x.png?1269632161') no-repeat -32px -1630px;
+	background: url('/static/sproutcore/standard_theme/en/current/images/sc-theme-repeat-x.png?1259494255') no-repeat -32px -1630px;
 }
 
 /* @end */
@@ -80,7 +80,7 @@
 }
 
 .sc-theme.focus .sc-list-view.sc-source-list .sc-collection-item.sel {
- 	background: transparent url('/static/sproutcore/standard_theme/en/current/images/sc-theme-repeat-x.png?1269632161') repeat-x 0px -16px;
+ 	background: transparent url('/static/sproutcore/standard_theme/en/current/images/sc-theme-repeat-x.png?1259494255') repeat-x 0px -16px;
 	color: white ;
 	border-top: 1px solid #1f4f9b;
 	border-bottom: 1px solid #1f4f9b;

@@ -117,38 +117,14 @@ SC.Pane = SC.View.extend( /** @scope SC.Pane.prototype */ {
     
     @returns {Rect} current window size 
   */
-  computeParentDimensions: function(frame) {
-    var wframe = this.get('currentWindowSize');
-    var wDim = {x: 0, y: 0, width: 1000, height: 1000};
-    if (wframe){
-      wDim.width = wframe.width;
-      wDim.height = wframe.height;
-    }
-    // Call the RootResponder instance...
-    else if (SC.RootResponder.responder) {
-      var wSize = SC.RootResponder.responder.get('currentWindowSize');
-      if (wSize){
-        wDim.width = wSize.width;
-        wDim.height = wSize.height;
-      }
-    }
-    // If all else fails then we need to Calculate it from the window size and DOM
-    else {
-      if (window.innerHeight) {
-        wDim.width = window.innerWidth;
-        wDim.height = window.innerHeight;
-      } else if (document.documentElement && document.documentElement.clientHeight) {
-        wDim.width = document.documentElement.clientWidth;
-        wDim.height = document.documentElement.clientHeight; 
-      } else if (document.body) {
-        wDim.width = document.body.clientWidth;
-        wDim.height = document.body.clientHeight;
-      }
-      this.windowSizeDidChange(null, wDim);
-    }    
-    return wDim;
+  computeParentDimensions: function() {
+    var pframe = this.get('currentWindowSize');
+    return {
+      width: (pframe) ? pframe.width : 1000,
+      height: (pframe) ? pframe.height : 1000
+    } ;
   },
-    
+  
   /** @private Disable caching due to an known bug in SC. */
   frame: function() {
     return this.computeFrameWithParentFrame(null) ;
@@ -206,27 +182,6 @@ SC.Pane = SC.View.extend( /** @scope SC.Pane.prototype */ {
     }
         
     return evt.mouseHandler || target ;
-  },
-
-  performKeyEquivalent: function(keystring, evt) {
-    var ret = arguments.callee.base.apply(this,arguments) ; // try normal view behavior first
-    if (!ret) {
-      var defaultResponder = this.get('defaultResponder') ;
-      if (defaultResponder) {
-        // try default responder's own performKeyEquivalent method,
-        // if it has one...
-        if (defaultResponder.performKeyEquivalent) {
-          ret = defaultResponder.performKeyEquivalent(keystring, evt) ;
-        }
-        
-        // even if it does have one, if it doesn't handle the event, give
-        // methodName-style key equivalent handling a try
-        if (!ret) {
-          ret = defaultResponder.tryToPerform(keystring, evt) ;
-        }
-      }
-    }
-    return ret ;
   },
 
   // .......................................................
@@ -502,7 +457,6 @@ SC.Pane = SC.View.extend( /** @scope SC.Pane.prototype */ {
     if (!this.get('isPaneAttached')) return this ; // nothing to do
     
     // remove layer...
-    this.set('isVisibleInWindow', NO);
     var dom = this.get('layer') ;
     if (dom.parentNode) dom.parentNode.removeChild(dom) ;
     dom = null ;
@@ -518,6 +472,7 @@ SC.Pane = SC.View.extend( /** @scope SC.Pane.prototype */ {
     
     // clean up some of my own properties
     this.set('isPaneAttached', NO) ;
+    this.parentViewDidChange() ;
     return this ;
   },
   
@@ -641,9 +596,6 @@ SC.Pane = SC.View.extend( /** @scope SC.Pane.prototype */ {
     this.set('isPaneAttached', YES) ;
     this.parentViewDidChange() ;
     
-    //notify that the layers have been appended to the document
-    this._notifyDidAppendToDocument();
-    
     return this ;
   },
   
@@ -664,13 +616,12 @@ SC.Pane = SC.View.extend( /** @scope SC.Pane.prototype */ {
     @returns {SC.Pane} receiver
   */
   recomputeIsVisibleInWindow: function(parentViewIsVisible) {
-    var last = this.get('isVisibleInWindow'),
-        cur = this.get('isVisible') ;
+    var last = this.get('isVisibleInWindow') ;
+    var cur = this.get('isPaneAttached') && this.get('isVisible') ;
 
     // if the state has changed, update it and notify children
-    // if (last !== cur) {
+    if (last !== cur) {
       this.set('isVisibleInWindow', cur) ;
-      this._needsVisibiltyChange = YES ; // update even if we aren't visible      
       
       // if we just became visible, update layer + layout if needed...
       if (cur && this.get('layerNeedsUpdate')) this.updateLayerIfNeeded();
@@ -684,7 +635,7 @@ SC.Pane = SC.View.extend( /** @scope SC.Pane.prototype */ {
       // if we were firstResponder, resign firstResponder also if no longer
       // visible.
       if (!cur && this.get('isFirstResponder')) this.resignFirstResponder();
-    // }
+    }
     
     // if we just became visible, update layer + layout if needed...
     if (cur) {

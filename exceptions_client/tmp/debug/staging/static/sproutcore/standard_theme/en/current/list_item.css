@@ -38,7 +38,7 @@
 	margin-top: -6px;
 	width: 14px;
 	height: 14px;
-	background-image: url('/static/sproutcore/standard_theme/en/current/images/sc-theme-repeat-x.png?1269632161') ;
+	background-image: url('/static/sproutcore/standard_theme/en/current/images/sc-theme-repeat-x.png?1259494255') ;
 	background-position: -16px -1614px ;
 }
 
@@ -64,19 +64,5 @@
 	background-position: 0px -1613px ;
 }
 
-
-/* @end */
-
-/* @group Branch */
-
-.sc-list-item-view .branch {
-	background-image: url('/static/sproutcore/standard_theme/en/current/images/icons/mini_454545.png?1269632161'); 
-	background-position: -32px 0;
-}
-
-.sc-list-item-view.sel .branch,
-.sc-list-item-view.active .branch {
-	background-image: url('/static/sproutcore/standard_theme/en/current/images/icons/mini_ffffff.png?1269632161'); 
-}
 
 /* @end */

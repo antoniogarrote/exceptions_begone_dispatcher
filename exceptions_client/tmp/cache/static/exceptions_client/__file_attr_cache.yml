@@ -1,206 +1,202 @@
 --- 
-/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/core.js: 
+/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/resources/login_page.css: 
   scan_source: 
+    mtime: 1270151091
     value: []
 
-    mtime: 1269632202
-  digest: 
-    value: a9773b0f5e4f90519f3e830393ceed6bfb3f119b
-    mtime: 1269632202
-/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/main.js: 
-  scan_source: 
-    value: 
-    - - sc_require
-      - "'"
-      - json
-    mtime: 1269797363
-  digest: 
-    value: d00f4178550add2a5cf02a99c48091cda3ec376a
-    mtime: 1269797363
-/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/resources/main_page.js: 
-  scan_source: 
-    value: []
-
-    mtime: 1269806987
-  digest: 
-    value: 8adafda7db1085330b4953f71bef699871f2c6e8
-    mtime: 1269804544
-/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/resources/loading.rhtml: 
-  scan_source: 
-    value: []
-
-    mtime: 1269632202
-  digest: 
-    value: c8488b64489eb29c126a81d31c51156786172399
-    mtime: 1269632202
-/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/fixtures/exception.js: 
-  scan_source: 
-    value: 
-    - - sc_require
-      - "'"
-      - models/exception
-    mtime: 1269796948
-  digest: 
-    value: 5dda3342d0a7a917fa6fce69955992d41d5a6075
-    mtime: 1269796948
-/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/models/exception.js: 
-  scan_source: 
-    value: []
-
-    mtime: 1269806537
-  digest: 
-    value: 491975df53044ab49f2261617465af3a189e9c95
-    mtime: 1269798330
-/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/resources/details_page.js: 
-  scan_source: 
-    value: []
-
-    mtime: 1269639115
-  digest: 
-    value: 1245a3ab13f5d76f621302ca5e4ffaf894c6a15f
-    mtime: 1269639115
-/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/resources/flow_page.js: 
-  scan_source: 
-    value: []
-
-    mtime: 1269639098
-  digest: 
-    value: f7553ca5c51b5568bc387880c127f50e9daef0c8
-    mtime: 1269639098
-/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/controllers/exceptions.js: 
-  scan_source: 
-    value: []
-
-    mtime: 1269797683
-  digest: 
-    value: 175ff043da253bff32bc593be0f9cc6ec7d01aa8
-    mtime: 1269797683
 /Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/json.js: 
   scan_source: 
+    mtime: 1270151091
     value: []
 
-    mtime: 1269690726
-  digest: 
-    value: 15f780e91aa086a5e626dbd878e5381f78de5566
-    mtime: 1269690726
-/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/resources/login_page.js: 
+/Users/antonio.garrote/Development/tmp/hola/apps/exceptions_client/resources/loading.rhtml: 
   scan_source: 
+    mtime: 1270151091
     value: []
 
-    mtime: 1269807850
-  digest: 
-    value: 551e5954a2941a49d1faf2b726cf303150bcc734
-    mtime: 1269777567
+/Users/antonio.garrote/Development/tmp/hola/apps/exceptions_client/resources/login_page.js: 
+  scan_source: 
+    mtime: 1270151091
+    value: []
+
+/Users/antonio.garrote/Development/tmp/hola/apps/exceptions_client/resources/flow_page.js: 
+  scan_source: 
+    mtime: 1270151091
+    value: []
+
 /Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/controllers/exception_routes.js: 
   scan_source: 
+    mtime: 1270151091
     value: []
 
-    mtime: 1269778395
-  digest: 
-    value: f8d77e018ce761c1ed4349021731ca99dc360136
-    mtime: 1269778395
+/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/views/exception_list.js: 
+  scan_source: 
+    mtime: 1270155412
+    value: []
+
+/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/controllers/exceptions.js: 
+  scan_source: 
+    mtime: 1270152002
+    value: []
+
+/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/resources/loading_page.js: 
+  scan_source: 
+    mtime: 1270151091
+    value: []
+
+/Users/antonio.garrote/Development/tmp/hola/apps/exceptions_client/resources/main_page.js: 
+  scan_source: 
+    mtime: 1270151091
+    value: []
+
 /Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/controllers/login.js: 
   scan_source: 
+    mtime: 1270151091
     value: 
     - - sc_require
       - "'"
       - configuration
-    mtime: 1269806041
-  digest: 
-    value: cf0d1fe48a523b1c94b4923b796da5de7147dd79
-    mtime: 1269783397
-/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/fixtures/exception_route.js: 
+/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/main.js: 
   scan_source: 
+    mtime: 1270151831
+    value: 
+    - - sc_require
+      - "'"
+      - json
+/Users/antonio.garrote/Development/tmp/hola/apps/exceptions_client/fixtures/exception.js: 
+  scan_source: 
+    mtime: 1270151091
+    value: 
+    - - sc_require
+      - "'"
+      - models/exception
+/Users/antonio.garrote/Development/tmp/hola/apps/exceptions_client/resources/login_page.css: 
+  scan_source: 
+    mtime: 1270151091
+    value: []
+
+/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/resources/login_page.js: 
+  scan_source: 
+    mtime: 1270151091
+    value: []
+
+/Users/antonio.garrote/Development/tmp/hola/apps/exceptions_client/resources/details_page.js: 
+  scan_source: 
+    mtime: 1270151091
+    value: []
+
+/Users/antonio.garrote/Development/tmp/hola/apps/exceptions_client/fixtures/exception_route.js: 
+  scan_source: 
+    mtime: 1270151091
     value: 
     - - sc_require
       - "'"
       - models/exception_route
-    mtime: 1269768930
-  digest: 
-    value: b35767a62b4b811420252529c838b6ab8c6fd6c8
-    mtime: 1269768930
+/Users/antonio.garrote/Development/tmp/hola/apps/exceptions_client/configuration.js: 
+  scan_source: 
+    mtime: 1270151091
+    value: []
+
+/Users/antonio.garrote/Development/tmp/hola/apps/exceptions_client/core.js: 
+  scan_source: 
+    mtime: 1270151091
+    value: []
+
+/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/resources/details_page.js: 
+  scan_source: 
+    mtime: 1270151091
+    value: []
+
+/Users/antonio.garrote/Development/tmp/hola/apps/exceptions_client/resources/loading_page.js: 
+  scan_source: 
+    mtime: 1270151091
+    value: []
+
+/Users/antonio.garrote/Development/tmp/hola/apps/exceptions_client/models/exception_route.js: 
+  scan_source: 
+    mtime: 1270151091
+    value: []
+
+/Users/antonio.garrote/Development/tmp/hola/apps/exceptions_client/controllers/exceptions.js: 
+  scan_source: 
+    mtime: 1270151091
+    value: []
+
+/Users/antonio.garrote/Development/tmp/hola/apps/exceptions_client/models/exception.js: 
+  scan_source: 
+    mtime: 1270151091
+    value: []
+
+/Users/antonio.garrote/Development/tmp/hola/apps/exceptions_client/json.js: 
+  scan_source: 
+    mtime: 1270151091
+    value: []
+
+/Users/antonio.garrote/Development/tmp/hola/apps/exceptions_client/controllers/login.js: 
+  scan_source: 
+    mtime: 1270151091
+    value: 
+    - - sc_require
+      - "'"
+      - configuration
 /Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/models/exception_route.js: 
   scan_source: 
+    mtime: 1270151091
     value: []
 
-    mtime: 1269788547
-  digest: 
-    value: 7948e590a341aafdb7e3934d3a38fd6753a39676
-    mtime: 1269788547
-/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/resources/loading_page.js: 
+/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/resources/loading.rhtml: 
   scan_source: 
+    mtime: 1270151091
     value: []
 
-    mtime: 1269777942
-  digest: 
-    value: f6ba63d167a7303818b69fa498eabf554600078a
-    mtime: 1269777942
+/Users/antonio.garrote/Development/tmp/hola/apps/exceptions_client/controllers/exception_routes.js: 
+  scan_source: 
+    mtime: 1270151091
+    value: []
+
+/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/core.js: 
+  scan_source: 
+    mtime: 1270151091
+    value: []
+
+/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/fixtures/exception.js: 
+  scan_source: 
+    mtime: 1270151091
+    value: 
+    - - sc_require
+      - "'"
+      - models/exception
+/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/models/exception.js: 
+  scan_source: 
+    mtime: 1270155950
+    value: []
+
+/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/resources/main_page.js: 
+  scan_source: 
+    mtime: 1270155937
+    value: []
+
+/Users/antonio.garrote/Development/tmp/hola/apps/exceptions_client/main.js: 
+  scan_source: 
+    mtime: 1270151091
+    value: 
+    - - sc_require
+      - "'"
+      - json
 /Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/configuration.js: 
   scan_source: 
+    mtime: 1270151091
     value: []
 
-    mtime: 1269796915
-  digest: 
-    value: 3e15a82d5c1a779679aa899ec37dc1ba84e1db4a
-    mtime: 1269796915
-/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/controllers: 
-  digest: 
-    value: 
-    mtime: 1269797683
-/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/fixtures: 
-  digest: 
-    value: 
-    mtime: 1269796948
-/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/images: 
-  digest: 
-    value: 
-    mtime: 1269804668
-/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/images/logo.png: 
-  digest: 
-    value: 93f11435b88ee5d2cc6363c46af247abe8a3610b
-    mtime: 1269804108
-/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/models: 
-  digest: 
-    value: 
-    mtime: 1269798330
-/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/resources: 
-  digest: 
-    value: 
-    mtime: 1269804544
-/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/tests: 
-  digest: 
-    value: 
-    mtime: 1269640841
-/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/tests/controllers: 
-  digest: 
-    value: 
-    mtime: 1269769098
-/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/tests/controllers/exception_routes.js: 
-  digest: 
-    value: 29abb866bc7e95c1455965a229dc6aeef673f5b9
-    mtime: 1269768964
-/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/tests/controllers/exceptions.js: 
-  digest: 
-    value: 5ee7425486d6b4429dd70211c2483c84ecc8e042
-    mtime: 1269640841
-/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/tests/controllers/login.js: 
-  digest: 
-    value: 01e68638021238286efc520cb9126136271b2e4e
-    mtime: 1269769098
-/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/tests/models: 
-  digest: 
-    value: 
-    mtime: 1269768930
-/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/tests/models/exception.js: 
-  digest: 
-    value: 1ffd7bb03c0ba52b3c63802857a39e14a4bcaa5c
-    mtime: 1269632456
-/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/tests/models/exception_route.js: 
-  digest: 
-    value: bd9a2273242bacf181117d292f68422c910f83ce
-    mtime: 1269768930
-/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/resources/login_page.css: 
+/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/fixtures/exception_route.js: 
   scan_source: 
+    mtime: 1270151091
+    value: 
+    - - sc_require
+      - "'"
+      - models/exception_route
+/Users/antonio.garrote/Development/exceptions_dispatcher/exceptions_client/apps/exceptions_client/resources/flow_page.js: 
+  scan_source: 
+    mtime: 1270151091
     value: []
 
-    mtime: 1269807963

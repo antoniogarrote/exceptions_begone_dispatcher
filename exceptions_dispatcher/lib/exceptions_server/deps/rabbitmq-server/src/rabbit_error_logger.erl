@@ -18,11 +18,11 @@
 %%   are Copyright (C) 2007-2008 LShift Ltd, Cohesive Financial
 %%   Technologies LLC, and Rabbit Technologies Ltd.
 %%
-%%   Portions created by LShift Ltd are Copyright (C) 2007-2009 LShift
+%%   Portions created by LShift Ltd are Copyright (C) 2007-2010 LShift
 %%   Ltd. Portions created by Cohesive Financial Technologies LLC are
-%%   Copyright (C) 2007-2009 Cohesive Financial Technologies
+%%   Copyright (C) 2007-2010 Cohesive Financial Technologies
 %%   LLC. Portions created by Rabbit Technologies Ltd are Copyright
-%%   (C) 2007-2009 Rabbit Technologies Ltd.
+%%   (C) 2007-2010 Rabbit Technologies Ltd.
 %%
 %%   All Rights Reserved.
 %%
@@ -31,12 +31,19 @@
 
 -module(rabbit_error_logger).
 -include("rabbit.hrl").
+-include("rabbit_framing.hrl").
 
 -define(LOG_EXCH_NAME, <<"amq.rabbitmq.log">>).
 
 -behaviour(gen_event).
 
+-export([boot/0]).
+
 -export([init/1, terminate/2, code_change/3, handle_call/2, handle_event/2, handle_info/2]).
+
+boot() ->
+    {ok, DefaultVHost} = application:get_env(default_vhost),
+    ok = error_logger:add_report_handler(?MODULE, [DefaultVHost]).
 
 init([DefaultVHost]) ->
     #exchange{} = rabbit_exchange:declare(
@@ -75,10 +82,7 @@ publish(_Other, _Format, _Data, _State) ->
 
 publish1(RoutingKey, Format, Data, LogExch) ->
     {ok, _RoutingRes, _DeliveredQPids} =
-        rabbit_basic:publish(
-          rabbit_basic:delivery(
-            false, false, none,
-            rabbit_basic:message(
-              LogExch, RoutingKey, <<"text/plain">>,
-              list_to_binary(io_lib:format(Format, Data))))),
+        rabbit_basic:publish(LogExch, RoutingKey, false, false, none,
+                             #'P_basic'{content_type = <<"text/plain">>},
+                             list_to_binary(io_lib:format(Format, Data))),
     ok.

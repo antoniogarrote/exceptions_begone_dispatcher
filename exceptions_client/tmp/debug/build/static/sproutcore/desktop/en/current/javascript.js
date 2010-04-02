@@ -375,7 +375,7 @@ SC.Drag = SC.Object.extend(
   mouseDragged: function(evt) {
     var scrolled = this._autoscroll(evt) ;
     var loc = this.get('location') ;
-    if (!scrolled && (evt.pageX === loc.x) && (evt.pageY === loc.y)) {
+    if (!scrolled && (evt.pageX == loc.x) && (evt.pageY == loc.y)) {
       return ; // quickly ignore duplicate calls
     } 
     
@@ -392,7 +392,7 @@ SC.Drag = SC.Object.extend(
     var target = this._findDropTarget(evt) ; // deepest drop target
     var op = SC.DRAG_NONE ;
     
-    while (target && (target !== last) && (op === SC.DRAG_NONE)) {
+    while (target && (target != last) && (op == SC.DRAG_NONE)) {
       // make sure the drag source will permit a drop operation on the named 
       // target
       if (target && source && source.dragSourceOperationMaskFor) {
@@ -400,18 +400,18 @@ SC.Drag = SC.Object.extend(
       } else op = SC.DRAG_ANY ; // assume drops are allowed
       
       // now, let's see if the target will accept the drag
-      if ((op !== SC.DRAG_NONE) && target && target.computeDragOperations) {
+      if ((op != SC.DRAG_NONE) && target && target.computeDragOperations) {
         op = op & target.computeDragOperations(this, evt, op) ;
       } else op = SC.DRAG_NONE ; // assume drops AREN'T allowed
       
       this.allowedDragOperations = op ;
       
       // if DRAG_NONE, then look for the next parent that is a drop zone
-      if (op === SC.DRAG_NONE) target = this._findNextDropTarget(target) ;
+      if (op == SC.DRAG_NONE) target = this._findNextDropTarget(target) ;
     }
     
     // STEP 2: Refocus the drop target if needed
-    if (target !== last) {
+    if (target != last) {
       if (last && last.dragExited) last.dragExited(this, evt) ;
       
       if (target) {
@@ -995,7 +995,7 @@ SC.Border = {
     if (style) {
       if (this._BORDER_REGEXP.exec(style)) {
         context.addClass(style);
-      } else context.addStyle('border', '1px %@ solid'.fmt(style));
+      } else content.addStyle('border', '1px %@ solid'.fmt(style));
     }
   }
   
@@ -1882,7 +1882,11 @@ SC.PanelPane = SC.Pane.extend({
     var ret = arguments.callee.base.apply(this,arguments);
     this.becomeKeyPane();
     return ret ;
-  }
+  },
+
+  /** @private - suppress all mouse events on panel itself. */
+  mouseDown: function(evt) { return YES; }
+  
 });
 /* >>>>>>>>>> BEGIN source/views/button.js */
 // ==========================================================================
@@ -1898,8 +1902,7 @@ SC.PanelPane = SC.Pane.extend({
 SC.TOGGLE_BEHAVIOR = 'toggle';
 SC.PUSH_BEHAVIOR =   'push';
 SC.TOGGLE_ON_BEHAVIOR = "on";
-SC.TOGGLE_OFF_BEHAVIOR = "off" ;
-SC.HOLD_BEHAVIOR = 'hold' ;
+SC.TOGGLE_OFF_BEHAVIOR = "off" ;  
 
 /** @class
 
@@ -1943,13 +1946,6 @@ SC.ButtonView = SC.View.extend(SC.Control, SC.Button, SC.StaticLayout,
   
   */  
   buttonBehavior: SC.PUSH_BEHAVIOR,
-
-  /*
-    If buttonBehavior is SC.HOLD_BEHAVIOR, this specifies, in miliseconds, how often to trigger the action.
-    Ignored for other behaviors.
-  */
-
-  holdInterval: 100,
 
   /**
     If YES, then this button will be triggered when you hit return.
@@ -2017,7 +2013,7 @@ SC.ButtonView = SC.View.extend(SC.Control, SC.Button, SC.StaticLayout,
   triggerAction: function(evt) {  
     if (!this.get('isEnabled')) return NO;
     this.set('isActive', YES);
-    this._action(evt, YES);
+    this._action(evt);
     this.didTriggerAction();
     this.invokeLater('set', 200, 'isActive', NO);
     return true;
@@ -2123,15 +2119,11 @@ SC.ButtonView = SC.View.extend(SC.Control, SC.Button, SC.StaticLayout,
     On mouse down, set active only if enabled.
   */    
   mouseDown: function(evt) {
-    var buttonBehavior = this.get('buttonBehavior');
-
     if (!this.get('isEnabled')) return YES ; // handled event, but do nothing
     this.set('isActive', YES);
     this._isMouseDown = YES;
 
-    if (buttonBehavior === SC.HOLD_BEHAVIOR) {
-      this._action(evt);
-    } else if (!this._isFocused && (buttonBehavior!==SC.PUSH_BEHAVIOR)) {
+    if (!this._isFocused && (this.get('buttonBehavior')!==SC.PUSH_BEHAVIOR)) {
       this._isFocused = YES ;
       this.becomeFirstResponder();
       if (this.get('isVisibleInWindow')) {
@@ -2164,13 +2156,9 @@ SC.ButtonView = SC.View.extend(SC.Control, SC.Button, SC.StaticLayout,
   mouseUp: function(evt) {
     if (this._isMouseDown) this.set('isActive', NO); // track independently in case isEnabled has changed
     this._isMouseDown = false;
-
-    if (this.get('buttonBehavior') !== SC.HOLD_BEHAVIOR) {
-      var inside = this.$().within(evt.target) ;
-      if (inside && this.get('isEnabled')) this._action(evt) ;
-    }
-
-    return YES ;
+    var inside = this.$().within(evt.target) ;
+    if (inside && this.get('isEnabled')) this._action(evt) ;
+    return true ;
   },
   
   
@@ -2178,8 +2166,7 @@ SC.ButtonView = SC.View.extend(SC.Control, SC.Button, SC.StaticLayout,
     // handle tab key
     if (evt.which === 9) {
       var view = evt.shiftKey ? this.get('previousValidKeyView') : this.get('nextValidKeyView');
-      if(view) view.becomeFirstResponder();
-      else evt.allowDefault();
+      view.becomeFirstResponder();
       return YES ; // handled
     }    
     if (evt.which === 13) {
@@ -2196,7 +2183,7 @@ SC.ButtonView = SC.View.extend(SC.Control, SC.Button, SC.StaticLayout,
    - off behavior: turn off.
    - otherwise: invoke target/action
   */
-  _action: function(evt, skipHoldRepeat) {
+  _action: function(evt) {
     switch(this.get('buttonBehavior')) {
       
     // When toggling, try to invert like values. i.e. 1 => 0, etc.
@@ -2218,42 +2205,20 @@ SC.ButtonView = SC.View.extend(SC.Control, SC.Button, SC.StaticLayout,
     case SC.TOGGLE_OFF_BEHAVIOR:
       this.set('value', this.get('toggleOffValue')) ;
       break ;
-
-    case SC.HOLD_BEHAVIOR:
-      this._runHoldAction(evt, skipHoldRepeat);
-      break ;
-
+      
     // otherwise, just trigger an action if there is one.
     default:
       //if (this.action) this.action(evt);
-      this._runAction(evt);
-    }
-  },
-
-  _runAction: function(evt) {
-    var action = this.get('action'),
-        target = this.get('target') || null;
-
-    if (action) {
-      if (this._hasLegacyActionHandler()) {
-        // old school... 
-        this._triggerLegacyActionHandler(evt);
-      } else {
-        // newer action method + optional target syntax...
-        this.getPath('pane.rootResponder').sendAction(action, target, this, this.get('pane'));
-      }
-    }
-  },
-
-  _runHoldAction: function(evt, skipRepeat) {
-    if (this.get('isActive')) {
-      this._runAction();
-
-      if (!skipRepeat) {
-        // This run loop appears to only be necessary for testing
-        SC.RunLoop.begin();
-        this.invokeLater('_runHoldAction', this.get('holdInterval'), evt);
-        SC.RunLoop.end();
+      var action = this.get('action'),
+          target = this.get('target') || null;
+      if (action) {
+        if (this._hasLegacyActionHandler()) {
+          // old school... 
+          this._triggerLegacyActionHandler(evt);
+        } else {
+          // newer action method + optional target syntax...
+          this.getPath('pane.rootResponder').sendAction(action, target, this, this.get('pane'));
+        }
       }
     }
   },
@@ -2262,8 +2227,8 @@ SC.ButtonView = SC.View.extend(SC.Control, SC.Button, SC.StaticLayout,
   _hasLegacyActionHandler: function()
   {
     var action = this.get('action');
-    if (action && (SC.typeOf(action) === SC.T_FUNCTION)) return true;
-    if (action && (SC.typeOf(action) === SC.T_STRING) && (action.indexOf('.') != -1)) return true;
+    if (action && (SC.typeOf(action) == SC.T_FUNCTION)) return true;
+    if (action && (SC.typeOf(action) == SC.T_STRING) && (action.indexOf('.') != -1)) return true;
     return false;
   },
 
@@ -2273,8 +2238,8 @@ SC.ButtonView = SC.View.extend(SC.Control, SC.Button, SC.StaticLayout,
     if (!this._hasLegacyActionHandler()) return false;
     
     var action = this.get('action');
-    if (SC.typeOf(action) === SC.T_FUNCTION) this.action(evt);
-    if (SC.typeOf(action) === SC.T_STRING) {
+    if (SC.typeOf(action) == SC.T_FUNCTION) this.action(evt);
+    if (SC.typeOf(action) == SC.T_STRING) {
       eval("this.action = function(e) { return "+ action +"(this, e); };");
       this.action(evt);
     }
@@ -2282,9 +2247,8 @@ SC.ButtonView = SC.View.extend(SC.Control, SC.Button, SC.StaticLayout,
   
   /** tied to the isEnabled state */
   acceptsFirstResponder: function() {
-    if(!SC.SAFARI_FOCUS_BEHAVIOR) return this.get('isEnabled');
-    else return NO;
-  }.property('isEnabled'),
+        return this.get('isEnabled');
+      }.property('isEnabled'),
   
   willBecomeKeyResponderFrom: function(keyView) {
     // focus the text field.
@@ -2299,6 +2263,17 @@ SC.ButtonView = SC.View.extend(SC.Control, SC.Button, SC.StaticLayout,
   
   willLoseKeyResponderTo: function(responder) {
     if (this._isFocused) this._isFocused = NO ;
+  },
+  
+  didCreateLayer: function() {
+    //Fix for IE7 min-with bug
+    if(SC.browser.msie<8) {
+      var buttonInner = this.$('.sc-button-inner')[0];
+      if (buttonInner){
+        var mL = buttonInner.style.marginLeft;
+        this.$('.sc-button-label')[0].style.minWidth=this.get('titleMinWidth')-mL;
+      }
+    }
   }
   
 }) ;
@@ -2536,7 +2511,7 @@ SC.AlertPane = SC.PanelPane.extend({
       SC.View.extend({
         layout: { bottom: 13, height: 24, right: 18, width: 466 },
         childViews: ['cancelButton', 'okButton'],
-        classNames: ['text-align-right'],
+        classNames: ['textAlignRight'],
         cancelButton : SC.ButtonView.extend({
             useStaticLayout: YES,
             actionKey: SC.BUTTON2_STATUS,
@@ -2657,7 +2632,6 @@ SC.AlertPane.show = function(message, description, caption, button1Title, button
     title = args[idx + 3];
     if (title) {
       button.set('title', title).set('isVisible', YES);
-      if(title=='?') button.set('titleMinWidth', 0);
       if (idx==2) {
         var button_wrapper = ret.get('buttonThreeWrapper');
         button_wrapper.set('isVisible', YES);
@@ -2768,7 +2742,6 @@ SC.PalettePane = SC.PanelPane.extend({
     var f=this.get('frame');
     this._mouseOffsetX = f ? (f.x - evt.pageX) : 0;
     this._mouseOffsetY = f ? (f.y - evt.pageY) : 0;
-    return YES;
   },
 
   mouseDragged: function(evt) {
@@ -2776,7 +2749,6 @@ SC.PalettePane = SC.PanelPane.extend({
       this.set('layout', { width: this.layout.width, height: this.layout.height, left: this._mouseOffsetX + evt.pageX, top: this._mouseOffsetY + evt.pageY });
       this.updateLayout();
     }
-    return YES;
   }
   
  
@@ -2964,7 +2936,7 @@ SC.PickerPane = SC.PalettePane.extend({
         switch (preferType) {
           case SC.PICKER_MENU:
           case SC.PICKER_FIXED:
-            if(!preferMatrix || preferMatrix.length !== 3) {
+            if(!preferMatrix || preferMatrix.length != 3) {
               // default below the anchor with fine tunned visual alignment 
               // for Menu to appear just below the anchorElement.
               this.set('preferMatrix', [1, 4, 3]) ;
@@ -3108,20 +3080,20 @@ SC.PickerPane = SC.PalettePane.extend({
 
     var prefP1    =[[a.x+a.width+(7+overlapTunningX), a.y+parseInt(a.height/2,0)-40], 
                     [a.x-f.width-(7+overlapTunningX),  a.y+parseInt(a.height/2,0)-40], 
-                    [a.x+parseInt((a.width/2)-(f.width/2),0), a.y-f.height-(17+overlapTunningY)],
-                    [a.x+parseInt((a.width/2)-(f.width/2),0), a.y+a.height+(17+overlapTunningY)]];
+                    [a.x+parseInt(a.width/2,0)-parseInt(f.width/2,0), a.y-f.height-(17+overlapTunningY)],
+                    [a.x+parseInt(a.width/2,0)-parseInt(f.width/2,0), a.y+a.height+(17+overlapTunningY)]];
     // bottom-right corner of 4 perfect positioned f  (4x2)
     var prefP2    =[[a.x+a.width+f.width+(7+overlapTunningX), a.y+parseInt(a.height/2,0)+f.height-24], 
                     [a.x-(7+overlapTunningX),                  a.y+parseInt(a.height/2,0)+f.height-24], 
-                    [a.x+parseInt((a.width/2)-(f.width/2),0)+f.width, a.y-(17+overlapTunningY)],
-                    [a.x+parseInt((a.width/2)-(f.width/2),0)+f.width, a.y+a.height+f.height+(17+overlapTunningY)]];
+                    [a.x+parseInt(a.width/2,0)-parseInt(f.width/2,0)+f.width, a.y-(17+overlapTunningY)],
+                    [a.x+parseInt(a.width/2,0)-parseInt(f.width/2,0)+f.width, a.y+a.height+f.height+(17+overlapTunningY)]];
     // cutoff of 4 perfect positioned f: top, right, bottom, left  (4x4)
     var cutoffPrefP =[[prefP1[0][1]>0 ? 0 : 0-prefP1[0][1], prefP2[0][0]<w.width ? 0 : prefP2[0][0]-w.width, prefP2[0][1]<w.height ? 0 : prefP2[0][1]-w.height, prefP1[0][0]>0 ? 0 : 0-prefP1[0][0]], 
                       [prefP1[1][1]>0 ? 0 : 0-prefP1[1][1], prefP2[1][0]<w.width ? 0 : prefP2[1][0]-w.width, prefP2[1][1]<w.height ? 0 : prefP2[1][1]-w.height, prefP1[1][0]>0 ? 0 : 0-prefP1[1][0]],
                       [prefP1[2][1]>0 ? 0 : 0-prefP1[2][1], prefP2[2][0]<w.width ? 0 : prefP2[2][0]-w.width, prefP2[2][1]<w.height ? 0 : prefP2[2][1]-w.height, prefP1[2][0]>0 ? 0 : 0-prefP1[2][0]],
                       [prefP1[3][1]>0 ? 0 : 0-prefP1[3][1], prefP2[3][0]<w.width ? 0 : prefP2[3][0]-w.width, prefP2[3][1]<w.height ? 0 : prefP2[3][1]-w.height, prefP1[3][0]>0 ? 0 : 0-prefP1[3][0]]];
 
-    if(!this.preferMatrix || this.preferMatrix.length !== 5) {
+    if(!this.preferMatrix || this.preferMatrix.length != 5) {
       // default re-position rule : perfect right (0) > perfect left (1) > perfect top (2) > perfect bottom (3)
       // fallback to perfect top (2)
       this.set('preferMatrix', [0,1,2,3,2]) ;
@@ -3145,32 +3117,31 @@ SC.PickerPane = SC.PalettePane.extend({
     }
     this.set('pointerPosX', 0);
 
-    for(var i=0, cM, pointerLen=SC.POINTER_LAYOUT.length; i<pointerLen; i++) {
-      cM = m[i];
-      if (cutoffPrefP[cM][0]===0 && cutoffPrefP[cM][1]===0 && cutoffPrefP[cM][2]===0 && cutoffPrefP[cM][3]===0) {
+    for(var i=0; i<SC.POINTER_LAYOUT.length; i++) {
+      if (cutoffPrefP[m[i]][0]===0 && cutoffPrefP[m[i]][1]===0 && cutoffPrefP[m[i]][2]===0 && cutoffPrefP[m[i]][3]===0) {
         // alternative i in preferMatrix by priority
-        if (m[4] !== cM) {
-          f.x = prefP1[cM][0] ;
-          f.y = prefP1[cM][1] ;
+        if (m[4] != m[i]) {
+          f.x = prefP1[m[i]][0] ;
+          f.y = prefP1[m[i]][1] ;
           this.set('pointerPosY', 0);
-          this.set('pointerPos', SC.POINTER_LAYOUT[cM]);
+          this.set('pointerPos', SC.POINTER_LAYOUT[m[i]]);
         }
         i = SC.POINTER_LAYOUT.length;
-      } else if ((cM === 0 || cM === 1) && cutoffPrefP[cM][0]===0 && cutoffPrefP[cM][1]===0 && cutoffPrefP[cM][2] < f.height-91 && cutoffPrefP[cM][3]===0) {
-        if (m[4] !== cM) {
-          f.x = prefP1[cM][0] ;
-          this.set('pointerPos', SC.POINTER_LAYOUT[cM]);
+      } else if ((m[i] === 0 || m[i] === 1) && cutoffPrefP[m[i]][0]===0 && cutoffPrefP[m[i]][1]===0 && cutoffPrefP[m[i]][2] < f.height-91 && cutoffPrefP[m[i]][3]===0) {
+        if (m[4] != m[i]) {
+          f.x = prefP1[m[i]][0] ;
+          this.set('pointerPos', SC.POINTER_LAYOUT[m[i]]);
         }
-        f.y = prefP1[cM][1] - cutoffPrefP[cM][2];
-        this.set('pointerPosY', cutoffPrefP[cM][2]);
+        f.y = prefP1[m[i]][1] - cutoffPrefP[m[i]][2];
+        this.set('pointerPosY', cutoffPrefP[m[i]][2]);
         i = SC.POINTER_LAYOUT.length;
-      } else if ((cM === 0 || cM === 1) && cutoffPrefP[cM][0]===0 && cutoffPrefP[cM][1]===0 && cutoffPrefP[cM][2] <= f.height-57 && cutoffPrefP[cM][3]===0) {
-        if (m[4] !== cM) {
-          f.x = prefP1[cM][0] ;
+      } else if ((m[i] === 0 || m[i] === 1) && cutoffPrefP[m[i]][0]===0 && cutoffPrefP[m[i]][1]===0 && cutoffPrefP[m[i]][2] <= f.height-57 && cutoffPrefP[m[i]][3]===0) {
+        if (m[4] != m[i]) {
+          f.x = prefP1[m[i]][0] ;
         }
-        f.y = prefP1[cM][1] - (f.height-57) ;
+        f.y = prefP1[m[i]][1] - (f.height-57) ;
         this.set('pointerPosY', (f.height-59));
-        this.set('pointerPos', SC.POINTER_LAYOUT[cM]+' extra-low');
+        this.set('pointerPos', SC.POINTER_LAYOUT[m[i]]+' extra-low');
         i = SC.POINTER_LAYOUT.length;
       }
     }
@@ -3749,11 +3720,7 @@ SC.MenuItemView = SC.ButtonView.extend( SC.ContentDisplay,
         }
       }
     }
-    if (!this.get('isEnabled') && !this.isSeparator()) {
-      if (parentMenu) parentMenu.set('currentSelectedMenuItem', null);
-      return YES ;
-    }
-
+    if (!this.get('isEnabled') && !this.isSeparator()) return YES ;
     var key = this.get('contentIsBranchKey') ;
     if(key) {
       var content = this.get('content') ;
@@ -4380,10 +4347,6 @@ SC.MenuPane = SC.PickerPane.extend(
         action, isEnabled, target, idx;
     if(!this.get('isEnabled')) return NO ;
     this.displayItems() ;
-
-    // Make sure we redraw the menu items if they've changed
-    SC.RunLoop.begin().end();
-
     items = this.get('displayItemsArray') ;
     if (!items) return NO;
 
@@ -4461,15 +4424,12 @@ SC.MenuPane = SC.PickerPane.extend(
     @returns MenuItemView
   */
   getPreviousEnabledMenuItem : function(menuItem) {
-    var content, itemView, len, idx, menuIdx, isEnabled, isSeparator, 
-      menuItemViews = this.get('menuItemViews') ;
+    var content, itemView, menuItemViews = this.get('menuItemViews') ;
     if(menuItemViews) {
-      len = menuItemViews.length ;
-      idx = (menuItemViews.indexOf(menuItem) === -1) ? 
+      var len = menuItemViews.length ;
+      var idx = (menuItemViews.indexOf(menuItem) === -1) ? 
               len : menuItemViews.indexOf(menuItem) ;
-      menuIdx = idx;
-      isEnabled = NO;
-      isSeparator = NO ;
+      var menuIdx = idx, isEnabled = NO, isSeparator = NO ;
       while((!isEnabled || isSeparator) && --idx !== menuIdx) {
         if(idx === -1) idx = len - 1;
         itemView = menuItemViews[idx];
@@ -4820,16 +4780,6 @@ SC.SelectButtonView = SC.ButtonView.extend(
     customView used to draw the menu
   */
   customView: null,
-  
-  /**
-    css classes applied to customView
-  */
-  customViewClassName: null,
-  
-  /**
-    customView menu offset width
-  */
-  customViewMenuOffsetWidth: 0,
 
   /**
     This is a property for enabling/disabling ellipsis
@@ -4854,7 +4804,8 @@ SC.SelectButtonView = SC.ButtonView.extend(
     @private
   */
   leftAlign: function() {
-    var val = 0, controlSize = this.get('controlSize') ;
+    var val = 0 ;
+    var controlSize = this.get('controlSize') ;
     if(controlSize === SC.SMALL_CONTROL_SIZE) val = -14 ;
     if(controlSize === SC.REGULAR_CONTROL_SIZE) val = -16 ;
     return val;
@@ -4888,60 +4839,57 @@ SC.SelectButtonView = SC.ButtonView.extend(
   */
   render: function(context,firstTime) {
     arguments.callee.base.apply(this,arguments);
-    var layoutWidth, objects, len, nameKey, iconKey, valueKey, checkboxEnabled,
-      currentSelectedVal, shouldLocalize, separatorPostion, itemList, isChecked,
-      idx, name, icon, value, item;
-    layoutWidth = this.layout.width ;
+    var layoutWidth = this.layout.width ;
     if(firstTime && layoutWidth) {
       this.adjust({ width: layoutWidth - this.SELECT_BUTTON_SPRITE_WIDTH }) ;
     }
 
-    objects = this.get('objects') ;
+    var objects = this.get('objects') ;
     objects = this.sortObjects(objects) ;
-    len = objects.length ;
+    var len = objects.length ;
 
     //Get the namekey, iconKey and valueKey set by the user
-    nameKey = this.get('nameKey') ;
-    iconKey = this.get('iconKey') ;
-    valueKey = this.get('valueKey') ;
-    checkboxEnabled = this.get('checkboxEnabled') ;
+    var nameKey = this.get('nameKey') ;
+    var iconKey = this.get('iconKey') ;
+    var valueKey = this.get('valueKey') ;
+    var checkboxEnabled = this.get('checkboxEnabled') ;
 
     //get the current selected value
-    currentSelectedVal = this.get('value') ;
+    var currentSelectedVal = this.get('value') ;
 
     // get the localization flag.
-    shouldLocalize = this.get('localize') ;
+    var shouldLocalize = this.get('localize') ;
 
     //get the separatorPostion
-    separatorPostion = this.get('separatorPostion') ;
+    var separatorPostion = this.get('separatorPostion') ;
 
     //itemList array to set the menu items
-    itemList = [] ;
+    var itemList = [] ;
 
     //to set the 'checkbox' property of menu items
-    isChecked = YES ;
+    var isChecked = YES ;
 
     //index for finding the first item in the list
-    idx = 0 ;
+    var idx = 0 ;
 
     objects.forEach(function(object) {
     if (object) {
 
       //Get the name value. If value key is not specified convert obj
       //to string
-      name = nameKey ? (object.get ?
+      var name = nameKey ? (object.get ?
         object.get(nameKey) : object[nameKey]) : object.toString() ;
 
       // localize name if specified.
       name = shouldLocalize? name.loc() : name ;
 
       //Get the icon value
-      icon = iconKey ? (object.get ? 
+      var icon = iconKey ? (object.get ?
         object.get(iconKey) : object[iconKey]) : null ;
       if (SC.none(object[iconKey])) icon = null ;
 
       // get the value using the valueKey or the object
-        value = (valueKey) ? (object.get ?
+      var value = (valueKey) ? (object.get ?
         object.get(valueKey) : object[valueKey]) : object ;
 
       if (!SC.none(currentSelectedVal) && !SC.none(value)){
@@ -4997,14 +4945,12 @@ SC.SelectButtonView = SC.ButtonView.extend(
     }, this ) ;
 
     if(firstTime) {
-      this.invokeLast(function() {
-        var value = this.get('value') ;
-        if(SC.none(value)) {
-          this.set('value', this._defaultVal) ;
-          this.set('title', this._defaultTitle) ;
-          this.set('icon', this._defaultIcon) ;
-        }
-      });
+      var value = this.get('value') ;
+      if(SC.none(value)) {
+        this.set('value', this._defaultVal) ;
+        this.set('title', this._defaultTitle) ;
+        this.set('icon', this._defaultIcon) ;
+      }
     }
 
     //Set the preference matrix for the menu pane
@@ -5020,19 +4966,14 @@ SC.SelectButtonView = SC.ButtonView.extend(
   */
   _action: function( evt )
   {
-    var buttonLabel, menuWidth, scrollWidth, lastMenuWidth, offsetWidth,
-      items, elementOffsetWidth, largestMenuWidth, item, element, idx,
-      currSel, itemList, menuControlSize, menuHeightPadding, customView,
-      customMenuView, menu, itemsLength;
-      
-    buttonLabel = this.$('.sc-button-label')[0] ;
+    var buttonLabel = this.$('.sc-button-label')[0] ;
     // Get the length of the text on the button in pixels
-    menuWidth = this.get('layer').offsetWidth ;
-    scrollWidth = buttonLabel.scrollWidth ;
-    lastMenuWidth = this.get('lastMenuWidth') ;
+    var menuWidth = this.get('layer').offsetWidth ;
+    var scrollWidth = buttonLabel.scrollWidth ;
+    var lastMenuWidth = this.get('lastMenuWidth') ;
     if(scrollWidth) {
        // Get the original width of the label in the button
-       offsetWidth = buttonLabel.offsetWidth ;
+       var offsetWidth = buttonLabel.offsetWidth ;
        if(scrollWidth && offsetWidth) {
           menuWidth = menuWidth + scrollWidth - offsetWidth ;
        }
@@ -5041,22 +4982,18 @@ SC.SelectButtonView = SC.ButtonView.extend(
       lastMenuWidth = menuWidth ;
     }
 
-    items = this.get('itemList') ;
+    var items = this.get('itemList') ;
+    var elementOffsetWidth, largestMenuWidth ;
 
-    var customViewClassName = this.get('customViewClassName') ;
-    var customViewMenuOffsetWidth = this.get('customViewMenuOffsetWidth') ;
-    var className = 'sc-view sc-pane sc-panel sc-palette sc-picker sc-menu select-button sc-scroll-view sc-menu-scroll-view sc-container-view menuContainer sc-button-view sc-menu-item sc-regular-size' ;
-    className = customViewClassName ? (className + ' ' + customViewClassName) : className ;
-
-    for (idx = 0, itemsLength = items.length; idx < itemsLength; ++idx) {
+    for (var idx = 0; idx < items.length; ++idx) {
       //getting the width of largest menu item
-      item = items.objectAt(idx) ;
-      element = document.createElement('div') ;
+      var item = items.objectAt(idx) ;
+      var element = document.createElement('div') ;
       element.style.cssText = 'top:-10000px; left: -10000px;  position: absolute;' ;
-      element.className = className ;
+      element.className = 'sc-view sc-pane sc-panel sc-palette sc-picker sc-menu select-button sc-scroll-view sc-menu-scroll-view sc-container-view menuContainer sc-button-view sc-menu-item sc-regular-size' ;
       element.innerHTML = item.title ;
       document.body.appendChild(element) ;
-      elementOffsetWidth = element.offsetWidth + customViewMenuOffsetWidth;
+      elementOffsetWidth = element.offsetWidth ;
 
       if (!largestMenuWidth || (elementOffsetWidth > largestMenuWidth)) {
         largestMenuWidth = elementOffsetWidth ;
@@ -5067,25 +5004,17 @@ SC.SelectButtonView = SC.ButtonView.extend(
     lastMenuWidth = (largestMenuWidth > lastMenuWidth) ?
                       largestMenuWidth: lastMenuWidth ;
 
-    // Get the window size width and compare with the lastMenuWidth.
-    // If it is greater than windows width then reduce the maxwidth by 25px
-    // so that the ellipsis property is enabled by default
-    var maxWidth = SC.RootResponder.responder.get('currentWindowSize').width;
-    if(lastMenuWidth > maxWidth) {
-      lastMenuWidth = (maxWidth - 25) ;
-    }
-
     this.set('lastMenuWidth',lastMenuWidth) ;
-    currSel = this.get('currentSelItem') ;
-    itemList = this.get('itemList') ;
-    menuControlSize = this.get('controlSize') ;
-    menuHeightPadding = this.get('menuPaneHeightPadding') ;
+    var currSel = this.get('currentSelItem') ;
+    var itemList = this.get('itemList') ;
+    var menuControlSize = this.get('controlSize') ;
+    var menuHeightPadding = this.get('menuPaneHeightPadding') ;
 
     // get the user defined custom view
-    customView = this.get('customView') ;
-    customMenuView = customView ? customView : SC.MenuItemView ;
+    var customView = this.get('customView') ;
+    var customMenuView = customView ? customView : SC.MenuItemView ;
 
-    menu  = SC.MenuPane.create({
+    var menu  = SC.MenuPane.create({
 
       /**
         Class name - select-button-item
@@ -5137,32 +5066,30 @@ SC.SelectButtonView = SC.ButtonView.extend(
 
   */
   displaySelectedItem: function() {
-    var menuView, currSel, itemViews, title, val, itemIdx = 0, button, object,
-      len, found = null, objTmp;
-    
     //Get MenuPane, currentSelectedMenuItem & menuItemView
     // Get the main parent view to show the menus
-      
-    menuView = this.parentMenu() ;
-    currSel = menuView.get('currentSelectedMenuItem') ;
-    itemViews = menuView.menuItemViews ;
-    
+    var menuView = this.parentMenu() ;
+    var currSel = menuView.get('currentSelectedMenuItem') ;
+    var itemViews = menuView.menuItemViews ;
+    var title,val ;
+
     //  Fetch the index of the current selected item
+    var itemIdx = 0 ;
     if (currSel && itemViews) {
       itemIdx = itemViews.indexOf(currSel) ;
     }
 
     // Get the select button View
-    button = menuView.get('anchor') ;
+    var button = menuView.get('anchor') ;
 
     // set the value and title
-    object = menuView.get('items') ;
-    len = object.length ;
+    var object = menuView.get('items') ;
+    var len = object.length ;
+    var found = null ;
 
     while (!found && (--len >= 0)) {
-      objTmp = object[len];
-      title = !SC.none(objTmp.title) ? objTmp.title: object.toString() ;
-      val =  !SC.none(objTmp.value) ? objTmp.value: title ;
+      title = !SC.none(object[len].title) ? object[len].title: object.toString() ;
+      val =  !SC.none(object[len].value) ? object[len].value: title ;
 
       if (title === this.get('value') && (itemIdx === len)) {
         found = object ;
@@ -5182,9 +5109,11 @@ SC.SelectButtonView = SC.ButtonView.extend(
      place aligned to the item on the button when menu is opened.
   */
   changeSelectButtonPreferMatrix: function() {
-    var preferMatrixAttributeTop = 0 ,
-      itemIdx = this.get('itemIdx') ,
-      leftAlign = this.get('leftAlign'), defPreferMatrix, tempPreferMatrix ;
+    var preferMatrixAttributeTop = 0 ;
+    var itemIdx = this.get('itemIdx') ;
+    var leftAlign = this.get('leftAlign') ;
+    var defPreferMatrix ;
+    var tempPreferMatrix ;
 
     if(this.get('isDefaultPosition')) {
       defPreferMatrix = [leftAlign, 4, 3] ;
@@ -5258,10 +5187,10 @@ SC.SelectButtonView = SC.ButtonView.extend(
 sc_require('panes/panel');
 
 /**
-  Displays a modal sheet pane that animates from the top of the viewport.
+  Displays a modal sheet pane animated drop down from top.
 
   The default way to use the sheet pane is to simply add it to your page like this:
-
+  
   {{{
     SC.SheetPane.create({
       layout: { width: 400, height: 200, centerX: 0 },
@@ -5269,138 +5198,38 @@ sc_require('panes/panel');
       })
     }).append();
   }}}
-
-  This will cause your sheet panel to display.  The default layout for a Sheet
-  is to cover the entire document window with a semi-opaque background, and to
+  
+  This will cause your sheet panel to display.  The default layout for a Sheet 
+  is to cover the entire document window with a semi-opaque background, and to 
   resize with the window.
-
+  
   @extends SC.PanelPane
   @since SproutCore 1.0
-  @author Evin Grano
-  @author Tom Dale
 */
 SC.SheetPane = SC.PanelPane.extend({
+  
   classNames: 'sc-sheet',
 
   /**
-    Speed of transition.  Should be expressed in msec.
-
-    @property {Number}
+    The modal pane to place behind this pane if this pane is modal.  This 
+    must be a subclass or an instance of SC.ModalPane.
   */
-  transitionDuration: 200,
+  modalPane: SC.ModalPane.extend({
+    classNames: 'for-sc-panel for-sc-sheet'
+  }),
 
-  // states for view animation
-  NO_VIEW: 'NO_VIEW',
-  ANIMATING: 'ANIMATING',
-  READY: 'READY',
+  init: function() {
+    arguments.callee.base.apply(this,arguments) ;
 
-  SLIDE_DOWN: 'SLIDEDOWN',
-  SLIDE_UP: 'SLIDEUP',
+/** TODO: Implement Animation   
+    this.visibleAnimation = {
+      visible: 'top: 0px',
+      hidden: 'top: -500px',
+      duration: 300
+    } ;
+*/
+  }    
 
-  _state: 'NO_VIEW', // no view
-
-  /**
-    Displays the pane.  SheetPane will calculate the height of your pane, draw it offscreen, then
-    animate it down so that it is attached to the top of the viewport.
-
-    @returns {SC.SheetPane} receiver
-  */
-  append: function() {
-    var layout = this.get('layout');
-    if (!layout.height || !layout.top) {
-      layout = SC.View.convertLayoutToAnchoredLayout(layout, this.computeParentDimensions());
-    }
-
-    // Gently rest the pane atop the viewport
-    layout.top = -1*layout.height;
-    this.adjust(layout);
-    return arguments.callee.base.apply(this,arguments);
-  },
-
-  /**
-    Animates the sheet up, then removes it from the DOM once it is hidden from view.
-
-    @returns {SC.SheetPane} receiver
-  */
-  remove: function() {
-    // We want the functionality of SC.PanelPane.remove(), but we only want it once the animation is complete.
-    // Store the reference to the superclass function, and it call it after the transition is complete.
-    var that = this, args = arguments;
-    this.invokeLater(function() { args.callee.base.apply(that, args) ;}, this.transitionDuration);
-    this.slideUp();
-
-    return this;
-  },
-
-  /**
-    Once the pane has been rendered out to the DOM, begin the animation.
-  */
-  paneDidAttach: function() {
-    var ret = arguments.callee.base.apply(this,arguments);
-    // this.invokeLast(this.slideDown, this);
-    this.slideDown();
-
-    return ret;
-  },
-
-  slideDown: function(){
-    // setup other general state
-    this._start   = Date.now();
-    this._end     = this._start + this.get('transitionDuration');
-    this._state   = this.ANIMATING;
-    this._direction = this.SLIDE_DOWN;
-    this.tick();
-  },
-
-  slideUp: function(){
-    // setup other general state
-    this._start   = Date.now();
-    this._end     = this._start + this.get('transitionDuration');
-    this._state   = this.ANIMATING;
-    this._direction = this.SLIDE_UP;
-    this.tick();
-  },
-
-  // Needed because of the runLoop and that it is animated...must lose focus because will break if selection is change on text fields that don't move.
-  blurTo: function(pane) { this.setFirstResponder(''); },
-
-  /** @private - called while the animation runs.  Will move the content view down until it is in position and then set the layout to the content layout
-   */
-  tick: function() {
-    this._timer = null ; // clear out
-
-    var now = Date.now();
-    var target = this;
-    var pct = (now-this._start)/(this._end-this._start);
-    var dir = this._direction, layout = this.get('layout'), newLayout, adjust;
-    if (pct<0) pct = 0;
-
-    // If we are done...
-    if (pct>=1) {
-      if (dir === this.SLIDE_DOWN){
-        target.adjust('top', 0);
-      } else {
-        target.adjust('top', -1*layout.height);
-      }
-      this._state = SC.SheetPane.READY;
-      this.updateLayout();
-      return this;
-    }
-
-    // ok, now let's compute the new layouts for the two views and set them
-    adjust = Math.floor(layout.height * pct);
-
-    // set the layout for the views, depending on the direction
-    if (dir == this.SLIDE_DOWN) {
-      target.adjust('top', 0-(layout.height-adjust));
-    } else if (dir == this.SLIDE_UP) {
-      target.adjust('top', 0-adjust);
-    }
-
-    this._timer = this.invokeLater(this.tick, 20);
-    target.updateLayout();
-    return this;
-  }
 });
 /* >>>>>>>>>> BEGIN source/protocols/drag_data_source.js */
 // ========================================================================
@@ -6267,17 +6096,12 @@ SC.RootResponder = SC.RootResponder.extend(
     var keyPane  = this.get('keyPane'), mainPane = this.get('mainPane'), 
         mainMenu = this.get('mainMenu');
 
-    // Try the keyPane.  If it's modal, then try the equivalent there but on
-    // nobody else.
-    if (keyPane) {
-      ret = keyPane.performKeyEquivalent(keystring, evt) ;
-      if (ret || keyPane.get('isModal')) return ret ;
-    }
+    // try the keyPane
+    if (keyPane) ret = keyPane.performKeyEquivalent(keystring, evt) ;
     
     // if not, then try the main pane
     if (!ret && mainPane && (mainPane!==keyPane)) {
       ret = mainPane.performKeyEquivalent(keystring, evt);
-      if (ret || mainPane.get('isModal')) return ret ;
     }
 
     // if not, then try the main menu
@@ -6437,8 +6261,10 @@ SC.RootResponder = SC.RootResponder.extend(
     the keypress event.
   */
   keydown: function(evt) {
-    if (SC.none(evt)) return YES;
-    
+    // This code is to check for the simulated keypressed event
+    if(!evt.kindOf) this._ffevt=null;
+    else evt=this._ffevt;
+    if (SC.none(evt)) return YES;    
     // Firefox does NOT handle delete here...
     if (SC.browser.mozilla && (evt.which === 8)) return true ;
     
@@ -6456,13 +6282,18 @@ SC.RootResponder = SC.RootResponder.extend(
     // responder can do something useful with the event.
     ret = YES ;
     if (this._isFunctionOrNonPrintableKey(evt)) {
+      // Simulate keydown events for firefox since keypress only triggers once
+      // We don't do it in keypress as it doesn't work in certain cases, ie.
+      // Caret is at last position and you press down arrow key.
+      if (SC.browser.mozilla && evt.keyCode>=37 && evt.keyCode<=40){
+        this._ffevt=evt;
+        SC.RunLoop.begin();
+        this.invokeLater(this.keydown, 100);
+        SC.RunLoop.end();
+      }
       // otherwise, send as keyDown event.  If no one was interested in this
       // keyDown event (probably the case), just let the browser do its own
       // processing.
-      
-      // Arrow keys are handled in keypress for firefox
-      if (evt.keyCode>=37 && evt.keyCode<=40 && SC.browser.mozilla) return YES;
-      
       ret = this.sendEvent('keyDown', evt) ;
       
       // attempt key equivalent if key not handled
@@ -6490,17 +6321,12 @@ SC.RootResponder = SC.RootResponder.extend(
     
     // delete is handled in keydown() for most browsers
     if (SC.browser.mozilla && (evt.which === 8)) {
-      //get the keycode and set it for which.
-      evt.which=evt.keyCode;
       ret = this.sendEvent('keyDown', evt);
       return ret ? (SC.allowsBackspaceToPreviousPage || evt.hasCustomEventHandling) : YES ;
 
-    // normal processing.  send keyDown for printable keys... 
-    //there is a special case for arrow key repeating of events in FF.
+    // normal processing.  send keyDown for printable keys...
     } else {
-      var isFirefoxArrowKeys = (evt.keyCode>=37 && evt.keyCode<=40 && SC.browser.mozilla);
-      if ((evt.charCode !== undefined && evt.charCode === 0) && !isFirefoxArrowKeys) return YES;
-      if (isFirefoxArrowKeys) evt.which=evt.keyCode;
+      if (evt.charCode !== undefined && evt.charCode === 0) return YES;
       return this.sendEvent('keyDown', evt) ? evt.hasCustomEventHandling:YES;
     }
   },
@@ -6518,10 +6344,7 @@ SC.RootResponder = SC.RootResponder.extend(
   mousedown: function(evt) {
     try {
       // make sure the window gets focus no matter what.  FF is inconsistant 
-      // about this. You have to regain focus on the window for the key events
-      // to get triggered. This happens when we don't let the browser trigger
-      // the default action and we have something in the app like an iframe.
-      window.focus();
+      // about this.
       this.focus();
       if(SC.browser.msie) {
         this._lastMouseDownX = evt.clientX;
@@ -6540,7 +6363,6 @@ SC.RootResponder = SC.RootResponder.extend(
       // the view. This is a special case as textfields are not supposed to loose 
       // focus unless you click on a list, another textfield or an special
       // view/control.
-      
       if(view) fr=view.get('pane').get('firstResponder');
       
       if(fr && fr.kindOf(SC.InlineTextFieldView) && fr!==view){
@@ -6651,15 +6473,14 @@ SC.RootResponder = SC.RootResponder.extend(
    trigger calls to mouseDragged.
   */
   mousemove: function(evt) {
-    if (SC.browser.msie) {
-      if (this._lastMoveX === evt.clientX && this._lastMoveY === evt.clientY) return;
+    if(SC.browser.msie){
+      if(this._lastMoveX === evt.clientX && this._lastMoveY === evt.clientY) return;
+      else {
+        this._lastMoveX = evt.clientX;
+        this._lastMoveY = evt.clientY;
+      }
     }
-
-    // We'll record the last positions in all browsers, in case a special pane
-    // or some such UI absolutely needs this information.
-    this._lastMoveX = evt.clientX;
-    this._lastMoveY = evt.clientY;
-
+    
     SC.RunLoop.begin();
     try {
       // make sure the view gets focus no matter what.  FF is inconsistant 
@@ -7303,7 +7124,7 @@ SC.ListItemView = SC.View.extend(
       this.renderCount(working, value) ;
       var digits = ['zero', 'one', 'two', 'three', 'four', 'five'];
       var digit = (value.toString().length < digits.length) ? digits[value.toString().length] : digits[digits.length-1];
-      context.addClass('has-count '+digit+'-digit');
+      context.addClass('has-count %@-digit'.fmt(digit));
     }
     
     // handle action 
@@ -7343,7 +7164,7 @@ SC.ListItemView = SC.View.extend(
     html = cache[key];
 
     if (!html) {
-      html = cache[key] = '<img src="'+SC.BLANK_IMAGE_URL+'" class="disclosure button '+key+'" />';
+      html = cache[key] = '<img src="%@" class="disclosure button %@" />'.fmt(SC.BLANK_IMAGE_URL, key);
     }
     
     context.push(html);
@@ -7515,7 +7336,7 @@ SC.ListItemView = SC.View.extend(
     
     var el = SC.$(evt.target) ;
     var ret = NO, classNames ;
-    while(!ret && el.length>0 && (el[0] !== layer)) {
+    while(!ret && el.length>0 && (el.get(0) !== layer)) {
       if (el.hasClass(className)) ret = YES ;
       el = el.parent() ;
     }
@@ -7542,15 +7363,6 @@ SC.ListItemView = SC.View.extend(
     return this._isInsideElementWithClassName('disclosure', evt);
   },
   
-  /** @private 
-    Returns YES if the list item has a right icon and the event 
-    occurred inside of it.
-  */
-  _isInsideRightIcon: function(evt) {
-    var del = this.displayDelegate ;
-    var rightIconKey = this.getDelegateProperty('hasContentRightIcon', del) ;
-    return rightIconKey && this._isInsideElementWithClassName('right-icon', evt);
-  },
   
   /** @private 
   mouseDown is handled only for clicks on the checkbox view or or action
@@ -7574,11 +7386,7 @@ SC.ListItemView = SC.View.extend(
       this._isMouseDownOnDisclosure = YES;
       this._isMouseInsideDisclosure = YES ;
       return YES;
-    } else if (this._isInsideRightIcon(evt)) {
-      this._addRightIconActiveState();
-      this._isMouseDownOnRightIcon = YES;
-      this._isMouseInsideRightIcon = YES ;
-      return YES;
+
     }
     
     return NO ; // let the collection view handle this event
@@ -7630,17 +7438,11 @@ SC.ListItemView = SC.View.extend(
      
       this._removeDisclosureActiveState();
       ret = YES ;
-    // if mouse was down in right icon -- then handle mouse up, otherwise 
-    // allow parent view to handle event.
-    } else if (this._isMouseDownOnRightIcon) {
-      this._removeRightIconActiveState() ;
-      ret = YES ;
     } 
    
     // clear cached info
     this._isMouseInsideCheckbox = this._isMouseDownOnCheckbox = NO ;
     this._isMouseDownOnDisclosure = this._isMouseInsideDisclosure = NO ;
-    this._isMouseInsideRightIcon = this._isMouseDownOnRightIcon = NO ;
     return ret ;
   },
   
@@ -7652,9 +7454,6 @@ SC.ListItemView = SC.View.extend(
    } else if (this._isMouseDownOnDisclosure) {
      this._removeDisclosureActiveState();
      this._isMouseInsideDisclosure = NO ;
-   } else if (this._isMouseDownOnRightIcon) {
-     this._removeRightIconActiveState();
-     this._isMouseInsideRightIcon = NO ;
    }
    return NO ;
   },
@@ -7667,9 +7466,6 @@ SC.ListItemView = SC.View.extend(
    } else if (this._isMouseDownOnDisclosure) {
      this._addDisclosureActiveState();
      this._isMouseInsideDisclosure = YES;
-   } else if (this._isMouseDownOnRightIcon) {
-     this._addRightIconActiveState();
-     this._isMouseInsideRightIcon = YES;
    }
    return NO ;
   },
@@ -7691,14 +7487,6 @@ SC.ListItemView = SC.View.extend(
   _removeDisclosureActiveState: function() {
    this.$('img.disclosure').removeClass('active');
   },
-
-  _addRightIconActiveState: function() {
-   this.$('img.right-icon').setClass('active', YES);
-  },
-  
-  _removeRightIconActiveState: function() {
-   this.$('img.right-icon').removeClass('active');
-  },
   
   /**
     Returns true if a click is on the label text itself to enable editing.
@@ -7717,7 +7505,7 @@ SC.ListItemView = SC.View.extend(
    if (!labelKey) return NO ;
    
    // get the element to check for.
-   var el = this.$label()[0] ;
+   var el = this.$label().get(0) ;
    if (!el) return NO ; // no label to check for.
    
    var cur = evt.target, layer = this.get('layer') ;
@@ -8664,7 +8452,7 @@ SC.CollectionView = SC.View.extend(
         nowShowing = this.get('nowShowing'),
         itemViews  = this._sc_itemViews,
         containerView = this.get('containerView') || this,
-        views, idx, view, layer ;
+        views, idx, cvlen, view, childViews, layer ;
 
     // if the set is defined but it contains the entire nowShowing range, just
     // replace
@@ -8673,12 +8461,15 @@ SC.CollectionView = SC.View.extend(
 
     // if an index set, just update indexes
     if (invalid.isIndexSet) {
+      childViews = containerView.get('childViews');
+      cvlen = childViews.get('length');
       
       if (bench) {
         SC.Benchmark.start(bench="%@#reloadIfNeeded (Partial)".fmt(this),YES);
       }
       
       invalid.forEach(function(idx) {
+        
         // get the existing item view, if there is one
         var existing = itemViews ? itemViews[idx] : null;
         
@@ -8762,7 +8553,7 @@ SC.CollectionView = SC.View.extend(
     child views still need to be added, go ahead and add them.
   */
   render: function(context, firstTime) {
-    if (firstTime && this._needsReload) this.reloadIfNeeded() ;
+    if (firstTime && this._needsReload) this.reloadIfNeeded ;
     
     // add classes for other state.
     context.setClass('focus', this.get('isFirstResponder'));
@@ -9082,8 +8873,8 @@ SC.CollectionView = SC.View.extend(
   reloadSelectionIndexes: function(indexes) {
     var invalid = this._invalidSelection ;
     if (indexes && (invalid !== YES)) {
-      if (invalid) { invalid.add(indexes) ; }
-      else { invalid = this._invalidSelection = indexes.copy(); }
+      if (invalid) invalid.add(indexes)
+      else invalid = this._invalidSelection = indexes.copy();
 
     } else this._invalidSelection = YES ; // force a total reload
     
@@ -10701,15 +10492,11 @@ SC.DisclosureView = SC.ButtonView.extend(
   
   /** @private */
   render: function(context, firstTime) {
-    if(firstTime){
-      context.push('<img src="', SC.BLANK_IMAGE_URL, '" class="button" alt="" />');
-      if(this.get('needsEllipsis')){
-        context.push('<label class="ellipsis">',this.get('displayTitle'),'</label>');
-      }else{
-        context.push('<label>',this.get('displayTitle'),'</label>');  
-      }
+    context.push('<img src="', SC.BLANK_IMAGE_URL, '" class="button" alt="" />');
+    if(this.get('needsEllipsis')){
+      context.push('<label class="ellipsis">',this.get('displayTitle'),'</label>');
     }else{
-      this.$('label')[0].text = this.get('displayTitle');
+        context.push('<label>',this.get('displayTitle'),'</label>');  
     }
   },
   
@@ -11038,7 +10825,7 @@ SC.ListView = SC.CollectionView.extend(
     var ret = this._sclv_layout;
     if (!ret) ret = this._sclv_layout = {};
     ret.minHeight = this.rowOffsetForContentIndex(this.get('length'))+4;
-    this.set('calculatedHeight',ret.minHeight);
+    this.calculatedHeight = ret.minHeight;
     return ret ;
   },
   
@@ -12477,12 +12264,13 @@ SC.ScrollView = SC.View.extend(SC.Border, {
     // This forces to recalculate the height of the frame when is at the bottom
     // of the scroll and the content dimension are smaller that the previous one
     
+    
     var mxVOffSet = this.get('maximumVerticalScrollOffset'),
         vOffSet = this.get('verticalScrollOffset'),
         mxHOffSet = this.get('maximumHorizontalScrollOffset'),
         hOffSet = this.get('horizontalScrollOffset');
-    var forceHeight = mxVOffSet<vOffSet;
-    var forceWidth = mxHOffSet<hOffSet;
+    var forceHeight = mxVOffSet && this.get('hasVerticalScroller') && mxVOffSet<vOffSet;
+    var forceWidth = mxHOffSet && this.get('hasHorizontalScroller') && mxHOffSet<hOffSet;
     if(forceHeight || forceWidth){
       this.forceDimensionsRecalculation(forceWidth, forceHeight, vOffSet, hOffSet);
     }
@@ -13147,10 +12935,7 @@ SC.PopupButtonView = SC.ButtonView.extend({
   preferMatrix: null,
     
   /**private */
-  acceptsFirstResponder: function() {
-    if(!SC.SAFARI_FOCUS_BEHAVIOR) return this.get('isEnabled');
-    else return NO;
-  }.property('isEnabled'),
+  acceptsFirstResponder: YES,
   /**
     Overriding the default SC.ButtonView#performKeyEquivalent method to pass 
     it onto the menu
@@ -13358,22 +13143,23 @@ SC.ProgressView = SC.View.extend(SC.Control, {
     if (delay===0) delay = 1000/30;
     if (this.get('isRunning') && this.get('isVisibleInWindow')) {
       this.displayDidChange();
-      this.invokeLater(this._animateProgressBar, delay, 10);
+      this.invokeLater(this._animateProgressBar, delay, 0);
     }
   },
   
   displayProperties: 'value minimum maximum isIndeterminate'.w(),
   
   render: function(context, firstTime) {
-    var inner, animatedBackground, value, cssString, backPosition,
-        isIndeterminate = this.get('isIndeterminate'),
-        isRunning = this.get('isRunning'),
-        isEnabled = this.get('isEnabled'),
-        offsetRange = this.get('offsetRange'),
-        offset = (isIndeterminate && isRunning) ? 
-                (Math.floor(Date.now()/75)%offsetRange-offsetRange) : 0;
+    var inner, animatedBackground;
+    var isIndeterminate = this.get('isIndeterminate');
+    var isRunning = this.get('isRunning');
+    var isEnabled = this.get('isEnabled');
+    var offsetRange = this.get('offsetRange');
+  
+    var offset = (isIndeterminate && isRunning) ? (Math.floor(Date.now()/75)%offsetRange-offsetRange) : 0;
   
     // compute value for setting the width of the inner progress
+    var value;
     if (!isEnabled) {
       value = "0%" ;
     } else if (isIndeterminate) {
@@ -13408,23 +13194,16 @@ SC.ProgressView = SC.View.extend(SC.Control, {
       context.setClass(classNames);
       inner = this.$('.sc-inner');
       animatedBackground = this.get('animatedBackgroundMatrix');
-      cssString = "width: "+value+"; ";
-      cssString = cssString + "left: "+offset+"; ";
+      inner.css('width', value).css('left',offset);
       if (animatedBackground.length === 3 ) {
-        backPosition = '0px -'+ 
-                      (animatedBackground[0] + 
-                      animatedBackground[1]*this._currentBackground)+'px';
+        inner.css('backgroundPosition', '0px -'+ 
+        (animatedBackground[0] + 
+        animatedBackground[1]*this._currentBackground)+'px');
         if(this._currentBackground===animatedBackground[2]-1
            || this._currentBackground===0){
           this._nextBackground *= -1;
         }
         this._currentBackground += this._nextBackground;
-        
-        cssString = cssString + "backgroundPosition: "+backPosition+"; ";
-        //Instead of using css() set attr for faster perf.
-        inner.attr('style', cssString);
-      }else{
-        inner.attr('style', cssString);
       }
     }
     
@@ -13800,38 +13579,10 @@ SC.RadioView = SC.FieldView.extend(
    
   },
   
-  /**
-    If the user clicks inside one of the radio elements, mark it as active.
-
-    Save the element that was clicked on so we can remove the active state on
-    mouseUp.
-  */
-  mouseDown: function(evt) {
-    var target = evt.target;
-    while (target) {
-      if (target.className && target.className.indexOf('sc-radio-button') > -1) break;
-      target = target.parentNode;
-    }
-    if (!target) return NO;
-
-    target = this.$(target);
-    target.addClass('active');
-    this._activeRadioButton = target;
-
+  mouseDown: function(evt) {  
+    this.set('isActive', YES);
     this._field_isMouseDown = YES;
     return YES;
-  },
-
-  /**
-    If we have a radio element that was clicked on previously, make sure we
-    remove the active state.
-  */
-  mouseUp: function(evt) {
-    var active = this._activeRadioButton;
-    if (active) {
-      active.removeClass('active');
-      this._activeRadioButton = null;
-    }
   }
 
 });
@@ -14224,9 +13975,11 @@ SC.SegmentedView = SC.View.extend(SC.Control,
     @property {Array}
   */
   displayItems: function() {
-    var items = this.get('items'), loc = this.get('localize'),
-      keys=null, itemType, cur, ret = [], max = items.get('length'), idx, 
-      item, fetchKeys = SC._segmented_fetchKeys, fetchItem = SC._segmented_fetchItem;
+    var items = this.get('items'), loc = this.get('localize') ;
+    var keys=null, itemType, cur ;
+    var ret = [], max = items.get('length'), idx, item ;
+    var fetchKeys = SC._segmented_fetchKeys;
+    var fetchItem = SC._segmented_fetchItem;
     
     // loop through items and collect data
     for(idx=0;idx<max;idx++) {
@@ -14240,6 +13993,7 @@ SC.SegmentedView = SC.View.extend(SC.Control,
         
       // if the item is not an array, try to use the itemKeys.
       } else if (itemType !== SC.T_ARRAY) {
+        
         // get the itemKeys the first time
         if (keys===null) {
           keys = this.itemKeys.map(fetchKeys,this);
@@ -14250,7 +14004,7 @@ SC.SegmentedView = SC.View.extend(SC.Control,
         cur[cur.length] = idx; // save current index
         
         // special case 1...if title key is null, try to make into string
-        if (!keys[0] && item.toString) cur[0] = item.toString(); 
+        if (!keys[0] && item.toString) cur[0] = item.toString();
         
         // special case 2...if value key is null, use item itself
         if (!keys[1]) cur[1] = item;
@@ -14271,7 +14025,7 @@ SC.SegmentedView = SC.View.extend(SC.Control,
     
     // all done, return!
     return ret ;
-  }.property('items', 'itemTitleKey', 'itemValueKey', 'itemIsEnabledKey', 'localize', 'itemIconKey', 'itemWidthKey', 'itemToolTipKey'),
+  }.property('items', 'itemTitleKey', 'itemValueKey', 'itemIsEnabledKey', 'localize', 'itemIconKey', 'itemWidthKey', 'itemToolTipKey').cacheable(),
   
   /** If the items array itself changes, add/remove observer on item... */
   itemsDidChange: function() { 
@@ -14316,6 +14070,7 @@ SC.SegmentedView = SC.View.extend(SC.Control,
     if (firstTime || (items !== last)) {
       this._seg_displayItems = items; // save for future
       this.renderDisplayItems(context, items) ;
+      context.addStyle('text-align', 'center');
     }else{
     // update selection and active state
       var activeIndex = this.get('activeIndex');
@@ -14325,13 +14080,13 @@ SC.SegmentedView = SC.View.extend(SC.Control,
         value = value.objectAt(0); isArray = NO ;
       }
       var names = {}; // reuse
+    
       var loc = items.length, cq = this.$('a.sc-segment'), item;
       while(--loc>=0) {
         item = items[loc];
         names.sel = isArray ? (value.indexOf(item[1])>=0) : (item[1]===value);
         names.active = (activeIndex === loc);
-        names.disabled = !item[2];
-        SC.$(cq[loc]).setClass(names);
+        SC.$(cq.get(loc)).setClass(names);
       }
       names = items = value = items = null; // cleanup
     }
@@ -14392,8 +14147,9 @@ SC.SegmentedView = SC.View.extend(SC.Control,
       } else {
         icon = '';
       }
-      ic.push('<span class="sc-button-inner"><label class="sc-button-label">',
-              icon+title, '</label></span>');
+      ic.push('<span class="sc-button-inner"><label class="sc-button-label">');
+      ic.push(icon+title);
+      ic.push('</label></span>');
       ic.end();
     }   
   },  
@@ -14413,7 +14169,7 @@ SC.SegmentedView = SC.View.extend(SC.Control,
     // start at the target event and go upwards until we reach either the 
     // root responder or find an anchor.sc-segment.
     var root = this.$(), match = null ;
-    while(!match && (elem.length>0) && (elem[0]!==root[0])) {
+    while(!match && (elem.length>0) && (elem.get(0)!==root.get(0))) {
       if (elem.hasClass('sc-segment') && elem.attr('tagName')==='A') {
         match = elem;
       } else elem = elem.parent();
@@ -14430,8 +14186,7 @@ SC.SegmentedView = SC.View.extend(SC.Control,
     var i, item, items, len, value, isArray;
     if (evt.which === 9) {
       var view = evt.shiftKey ? this.get('previousValidKeyView') : this.get('nextValidKeyView');
-      if(view) view.becomeFirstResponder();
-      else evt.allowDefault();
+      view.becomeFirstResponder();
       return YES ; // handled
     }    
     if (!this.get('allowsMultipleSelection') && !this.get('allowsEmptySelection')){
@@ -14588,8 +14343,7 @@ SC.SegmentedView = SC.View.extend(SC.Control,
   
   /** tied to the isEnabled state */
    acceptsFirstResponder: function() {
-     if(!SC.SAFARI_FOCUS_BEHAVIOR) return this.get('isEnabled');
-     else return NO;
+     return this.get('isEnabled');
    }.property('isEnabled'),
 
    willBecomeKeyResponderFrom: function(keyView) {
@@ -14860,7 +14614,7 @@ SC.SelectFieldView = SC.FieldView.extend(
     var value = arguments.callee.base.apply(this,arguments); // get raw value... 
     var valueKey = this.get('valueKey') ;
     var objects = this.get('objects') ;
-    var found, object;
+    var found;
     
     // Handle empty selection.
     if (value == '***') {
@@ -14870,12 +14624,10 @@ SC.SelectFieldView = SC.FieldView.extend(
     // object.
     } else if (value && objects) {
       // objects = Array.from(objects) ;
-      
-      var loc = (SC.typeOf(objects.length) === SC.T_FUNCTION) ? objects.length() : objects.length;
-      
+      var loc = objects.length ;
       found = null ; // matching object goes here.
       while(!found && (--loc >= 0)) {
-        object = objects.objectAt? objects.objectAt(loc) : objects[loc] ;
+        var object = objects[loc] ;
       
         // get value using valueKey if there is one or use object
         // map to _guid or toString.
@@ -15105,8 +14857,7 @@ SC.SliderView = SC.View.extend(SC.Control,
   
   /** tied to the isEnabled state */
   acceptsFirstResponder: function() {
-    if(!SC.SAFARI_FOCUS_BEHAVIOR) return this.get('isEnabled');
-    else return NO;
+    return this.get('isEnabled');
   }.property('isEnabled'),
   
   willBecomeKeyResponderFrom: function(keyView) {
@@ -15129,8 +14880,7 @@ SC.SliderView = SC.View.extend(SC.Control,
      // handle tab key
      if (evt.which === 9) {
        var view = evt.shiftKey ? this.get('previousValidKeyView') : this.get('nextValidKeyView');
-       if(view) view.becomeFirstResponder();
-       else evt.allowDefault(); 
+       view.becomeFirstResponder();
        return YES ; // handled
      }
      
@@ -15642,16 +15392,16 @@ SC.SplitView = SC.View.extend(
   */
   thicknessForView: function(view) {
     // console.log('%@.thicknessForView(%@)'.fmt(this, view));
-    var direction = this.get('layoutDirection') ,
-        ret = view.get('frame') ;
+    var direction = this.get('layoutDirection') ;
+    var ret = view.get('frame') ;
     return (direction === SC.LAYOUT_HORIZONTAL) ? ret.width : ret.height ;
   },
   
   createChildViews: function() {
     // console.log('%@.createChildViews()'.fmt(this));
-    var childViews = [] ,
-        viewAry = ['topLeftView', 'dividerView', 'bottomRightView'] ,
-        view, idx, len ;
+    var childViews = [] ;
+    var viewAry = ['topLeftView', 'dividerView', 'bottomRightView'] ;
+    var view, idx, len ;
     
     for (idx=0, len=viewAry.length; idx<len; ++idx) {
       if (view = this.get(viewAry[idx])) {
@@ -15676,17 +15426,17 @@ SC.SplitView = SC.View.extend(
   */
   updateChildLayout: function() {
     // console.log('%@.updateChildLayout()'.fmt(this));
-    var topLeftView = this.get('topLeftView') ,
-        bottomRightView = this.get('bottomRightView') ,
-        dividerView = this.get('dividerView') ,
-        direction = this.get('layoutDirection') ,
-        topLeftThickness = this._desiredTopLeftThickness ;
-    var dividerThickness = this.get('dividerThickness') ;
-        dividerThickness = (!SC.none(dividerThickness)) ? dividerThickness : 7 ;
-    var splitViewThickness = (direction === SC.LAYOUT_HORIZONTAL) ? this.get('frame').width : this.get('frame').height ,
-        bottomRightThickness = splitViewThickness - dividerThickness - topLeftThickness ,
-        autoresizeBehavior = this.get('autoresizeBehavior') ,
-        layout , isCollapsed ;
+    var topLeftView = this.get('topLeftView') ;
+    var bottomRightView = this.get('bottomRightView') ;
+    var dividerView = this.get('dividerView') ;
+    var direction = this.get('layoutDirection') ;
+    var topLeftThickness = this._desiredTopLeftThickness ;
+    var dividerThickness = this.get('dividerThickness') || 7 ;
+    var splitViewThickness = (direction == SC.LAYOUT_HORIZONTAL) ? this.get('frame').width : this.get('frame').height ;
+    var bottomRightThickness = splitViewThickness - dividerThickness - topLeftThickness ;
+    var autoresizeBehavior = this.get('autoresizeBehavior') ;
+    var layout ;
+    var isCollapsed ;
     
     // console.log('topLeftThickness == %@'.fmt(topLeftThickness));
     // console.log('dividerThickness == %@'.fmt(dividerThickness));
@@ -15697,7 +15447,7 @@ SC.SplitView = SC.View.extend(
     isCollapsed = topLeftView.get('isCollapsed') || NO ;
     topLeftView.setIfChanged('isVisible', !isCollapsed) ;
     layout = SC.clone(topLeftView.get('layout'));
-    if (direction === SC.LAYOUT_HORIZONTAL) {
+    if (direction == SC.LAYOUT_HORIZONTAL) {
       layout.top = 0 ;
       layout.left = 0 ;
       layout.bottom = 0 ;
@@ -15739,7 +15489,7 @@ SC.SplitView = SC.View.extend(
     // split divider view
     if (dividerView) {
       layout = SC.clone(dividerView.get('layout'));
-      if (direction === SC.LAYOUT_HORIZONTAL) {
+      if (direction == SC.LAYOUT_HORIZONTAL) {
         layout.width = dividerThickness;
         delete layout.height ;
         layout.top = 0 ;
@@ -15803,7 +15553,7 @@ SC.SplitView = SC.View.extend(
     isCollapsed = bottomRightView.get('isCollapsed') || NO ;
     bottomRightView.setIfChanged('isVisible', !isCollapsed) ;
     layout = SC.clone(bottomRightView.get('layout'));
-    if (direction === SC.LAYOUT_HORIZONTAL) {
+    if (direction == SC.LAYOUT_HORIZONTAL) {
       layout.top = 0 ;
       layout.bottom = 0 ;
       layout.right = 0 ;
@@ -15858,13 +15608,12 @@ SC.SplitView = SC.View.extend(
         this.set('thumbViewCursor', SC.Cursor.create()) ;
       }
       
-      var layoutDirection = this.get('layoutDirection') ,
-          fr = this.get('frame'),
-          splitViewThickness, elemRendered = this.$(),
-          desiredThickness = this.get('defaultThickness') ,
-          autoResizeBehavior = this.get('autoresizeBehavior') ;
-      var dividerThickness = this.get('dividerThickness') ;
-      dividerThickness = (!SC.none(dividerThickness)) ? dividerThickness : 7 ;
+      var layoutDirection = this.get('layoutDirection') ;
+      var fr = this.get('frame');
+      var splitViewThickness, elemRendered = this.$();
+      var dividerThickness = this.get('dividerThickness') || 7 ;
+      var desiredThickness = this.get('defaultThickness') ;
+      var autoResizeBehavior = this.get('autoresizeBehavior') ;
       // Turn a flag on to recalculate the spliting if the desired thickness
       // is a percentage
       // debugger;
@@ -15875,10 +15624,10 @@ SC.SplitView = SC.View.extend(
       
       
       if(elemRendered[0]) {
-        splitViewThickness = (layoutDirection === SC.LAYOUT_HORIZONTAL) ? 
+        splitViewThickness = (layoutDirection == SC.LAYOUT_HORIZONTAL) ? 
               elemRendered[0].offsetWidth : elemRendered[0].offsetHeight ;
       }else{
-        splitViewThickness = (layoutDirection === SC.LAYOUT_HORIZONTAL) ? 
+        splitViewThickness = (layoutDirection == SC.LAYOUT_HORIZONTAL) ? 
               fr.width : fr.height ;
       }
       // if default thickness is < 1, convert from percentage to absolute
@@ -15976,7 +15725,7 @@ SC.SplitView = SC.View.extend(
   mouseDragged: function(evt) {
     // console.log('%@.mouseDragged(%@)'.fmt(this, evt));
     // console.log(evt.originalEvent);
-    var offset = (this._layoutDirection === SC.LAYOUT_HORIZONTAL) ? evt.pageX - this._mouseDownX : evt.pageY - this._mouseDownY ;
+    var offset = (this._layoutDirection == SC.LAYOUT_HORIZONTAL) ? evt.pageX - this._mouseDownX : evt.pageY - this._mouseDownY ;
     this._updateTopLeftThickness(offset) ;
     return YES;
   },
@@ -15997,8 +15746,8 @@ SC.SplitView = SC.View.extend(
   doubleClickInThumbView: function(evt, thumbView) {
     // console.log('%@.mouseDragged(%@, %@)'.fmt(this, evt, thumbView));
     // console.log(evt.originalEvent);
-    var view = this._topLeftView,
-        isCollapsed = view.get('isCollapsed') || NO ;
+    var view = this._topLeftView ;
+    var isCollapsed = view.get('isCollapsed') || NO ;
     if (!isCollapsed && !this.canCollapseView(view)) {
       view = this._bottomRightView ;
       isCollapsed = view.get('isCollapsed') || NO ;
@@ -16037,23 +15786,25 @@ SC.SplitView = SC.View.extend(
   _updateTopLeftThickness: function(offset) {
     // console.log('%@._updateTopLeftThickness(%@)'.fmt(this, offset));
     // console.log('%@.frame = %@'.fmt(this, SC.inspect(this.get('frame'))));
-    var topLeftView = this._topLeftView ,
-        bottomRightView = this._bottomRightView,
-        topLeftViewThickness = this.thicknessForView(topLeftView), // the current thickness, not the original thickness
-        bottomRightViewThickness = this.thicknessForView(bottomRightView),
-        minAvailable = this._dividerThickness ,
-        maxAvailable = 0,
-        proposedThickness = this._topLeftViewThickness + offset,
-        direction = this._layoutDirection,
-        bottomRightCanCollapse = this.canCollapseView(bottomRightView),
-        thickness = proposedThickness,
-        // constrain to thickness set on top/left
-        max = this.get('topLeftMaxThickness'),
-        min = this.get('topLeftMinThickness'),
-        bottomRightThickness, tlCollapseAtThickness, brCollapseAtThickness;
+    var topLeftView = this._topLeftView ;
+    var bottomRightView = this._bottomRightView ;
+    var topLeftViewThickness = this.thicknessForView(topLeftView); // the current thickness, not the original thickness
+    var bottomRightViewThickness = this.thicknessForView(bottomRightView);
     
+    var minAvailable = this._dividerThickness ;
+    var maxAvailable = 0;
     if (!topLeftView.get("isCollapsed")) maxAvailable += topLeftViewThickness ;
     if (!bottomRightView.get("isCollapsed")) maxAvailable += bottomRightViewThickness ;
+    
+    var proposedThickness = this._topLeftViewThickness + offset;
+    var direction = this._layoutDirection ;
+    var bottomRightCanCollapse = this.canCollapseView(bottomRightView);
+    
+    var thickness = proposedThickness;
+    
+    // constrain to thickness set on top/left
+    var max = this.get('topLeftMaxThickness') ;
+    var min = this.get('topLeftMinThickness') ;
     
     if (!SC.none(max)) thickness = Math.min(max, thickness) ;
     if (!SC.none(min)) thickness = Math.max(min, thickness) ;
@@ -16061,7 +15812,7 @@ SC.SplitView = SC.View.extend(
     // constrain to thickness set on bottom/right
     max = this.get('bottomRightMaxThickness') ;
     min = this.get('bottomRightMinThickness') ;
-    bottomRightThickness = maxAvailable - thickness ;
+    var bottomRightThickness = maxAvailable - thickness ;
     if (!SC.none(max)) bottomRightThickness = Math.min(max, bottomRightThickness) ;
     if (!SC.none(min)) bottomRightThickness = Math.max(min, bottomRightThickness) ;
     thickness = maxAvailable - bottomRightThickness ;
@@ -16075,9 +15826,9 @@ SC.SplitView = SC.View.extend(
     // cannot be less than zero
     thickness = Math.max(0, thickness) ;
     
-    tlCollapseAtThickness = topLeftView.get('collapseAtThickness') ;
+    var tlCollapseAtThickness = topLeftView.get('collapseAtThickness') ;
     if (!tlCollapseAtThickness) tlCollapseAtThickness = 0 ;
-    brCollapseAtThickness = bottomRightView.get('collapseAtThickness') ;
+    var brCollapseAtThickness = bottomRightView.get('collapseAtThickness') ;
     brCollapseAtThickness = SC.none(brCollapseAtThickness) ? maxAvailable : (maxAvailable - brCollapseAtThickness);
     
     if ((proposedThickness <= tlCollapseAtThickness) && this.canCollapseView(topLeftView)) {
@@ -16120,18 +15871,18 @@ SC.SplitView = SC.View.extend(
   _setCursorStyle: function() {
     // console.log('%@._setCursorStyle()'.fmt(this));
     var topLeftView = this._topLeftView ;
-        bottomRightView = this._bottomRightView,
-        thumbViewCursor = this.get('thumbViewCursor'),
-        // updates the cursor of the thumb view that called mouseDownInThumbView() to reflect the status of the drag
-        tlThickness = this.thicknessForView(topLeftView),
-        brThickness = this.thicknessForView(bottomRightView);
+    var bottomRightView = this._bottomRightView ;
+    var thumbViewCursor = this.get('thumbViewCursor') ;
     this._layoutDirection = this.get('layoutDirection') ;
-    if (topLeftView.get('isCollapsed') || tlThickness === this.get("topLeftMinThickness") || brThickness == this.get("bottomRightMaxThickness")) {
-      thumbViewCursor.set('cursorStyle', this._layoutDirection === SC.LAYOUT_HORIZONTAL ? "e-resize" : "s-resize") ;
-    } else if (bottomRightView.get('isCollapsed') || tlThickness === this.get("topLeftMaxThickness") || brThickness == this.get("bottomRightMinThickness")) {
-      thumbViewCursor.set('cursorStyle', this._layoutDirection === SC.LAYOUT_HORIZONTAL ? "w-resize" : "n-resize") ;
+    // updates the cursor of the thumb view that called mouseDownInThumbView() to reflect the status of the drag
+    var tlThickness = this.thicknessForView(topLeftView) ;
+    var brThickness = this.thicknessForView(bottomRightView) ;
+    if (topLeftView.get('isCollapsed') || tlThickness == this.get("topLeftMinThickness") || brThickness == this.get("bottomRightMaxThickness")) {
+      thumbViewCursor.set('cursorStyle', this._layoutDirection == SC.LAYOUT_HORIZONTAL ? "e-resize" : "s-resize") ;
+    } else if (bottomRightView.get('isCollapsed') || tlThickness == this.get("topLeftMaxThickness") || brThickness == this.get("bottomRightMinThickness")) {
+      thumbViewCursor.set('cursorStyle', this._layoutDirection == SC.LAYOUT_HORIZONTAL ? "w-resize" : "n-resize") ;
     } else {
-      thumbViewCursor.set('cursorStyle', this._layoutDirection === SC.LAYOUT_HORIZONTAL ? "ew-resize" : "ns-resize") ;
+      thumbViewCursor.set('cursorStyle', this._layoutDirection == SC.LAYOUT_HORIZONTAL ? "ew-resize" : "ns-resize") ;
     }
   }.observes('layoutDirection'),
   
@@ -16334,7 +16085,6 @@ SC.TabView = SC.View.extend(
   itemIsEnabledKey: null,
   itemIconKey: null,
   itemWidthKey: null,
-  itemToolTipKey: null,
   
   tabLocation: SC.TOP_LOCATION,
   
@@ -16477,7 +16227,7 @@ SC.TabView = SC.View.extend(
   
 }) ;
 
-SC._TAB_ITEM_KEYS = 'itemTitleKey itemValueKey itemIsEnabledKey itemIconKey itemWidthKey itemToolTipKey'.w();
+SC._TAB_ITEM_KEYS = 'itemTitleKey itemValueKey itemIsEnabledKey itemIconKey itemWidthKey'.w();
 
 /* >>>>>>>>>> BEGIN source/views/thumb.js */
 // ==========================================================================
@@ -16723,6 +16473,7 @@ SC.WellView = SC.ContainerView.extend(
    */
   
   render: function(context, firstTime) {
+    arguments.callee.base.apply(this,arguments);
     if(firstTime){
      context.push("<div class='top-left-edge'></div>",
        "<div class='top-edge'></div>",
@@ -16734,7 +16485,6 @@ SC.WellView = SC.ContainerView.extend(
        "<div class='left-edge'></div>",
        "<div class='content-background'></div>");
      }    
-     arguments.callee.base.apply(this,arguments);
   },
   
   /**

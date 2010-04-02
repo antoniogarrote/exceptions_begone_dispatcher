@@ -11,8 +11,7 @@
 SC.TOGGLE_BEHAVIOR = 'toggle';
 SC.PUSH_BEHAVIOR =   'push';
 SC.TOGGLE_ON_BEHAVIOR = "on";
-SC.TOGGLE_OFF_BEHAVIOR = "off" ;
-SC.HOLD_BEHAVIOR = 'hold' ;
+SC.TOGGLE_OFF_BEHAVIOR = "off" ;  
 
 /** @class
 
@@ -56,13 +55,6 @@ SC.ButtonView = SC.View.extend(SC.Control, SC.Button, SC.StaticLayout,
   
   */  
   buttonBehavior: SC.PUSH_BEHAVIOR,
-
-  /*
-    If buttonBehavior is SC.HOLD_BEHAVIOR, this specifies, in miliseconds, how often to trigger the action.
-    Ignored for other behaviors.
-  */
-
-  holdInterval: 100,
 
   /**
     If YES, then this button will be triggered when you hit return.
@@ -130,7 +122,7 @@ SC.ButtonView = SC.View.extend(SC.Control, SC.Button, SC.StaticLayout,
   triggerAction: function(evt) {  
     if (!this.get('isEnabled')) return NO;
     this.set('isActive', YES);
-    this._action(evt, YES);
+    this._action(evt);
     this.didTriggerAction();
     this.invokeLater('set', 200, 'isActive', NO);
     return true;
@@ -236,15 +228,11 @@ SC.ButtonView = SC.View.extend(SC.Control, SC.Button, SC.StaticLayout,
     On mouse down, set active only if enabled.
   */    
   mouseDown: function(evt) {
-    var buttonBehavior = this.get('buttonBehavior');
-
     if (!this.get('isEnabled')) return YES ; // handled event, but do nothing
     this.set('isActive', YES);
     this._isMouseDown = YES;
 
-    if (buttonBehavior === SC.HOLD_BEHAVIOR) {
-      this._action(evt);
-    } else if (!this._isFocused && (buttonBehavior!==SC.PUSH_BEHAVIOR)) {
+    if (!this._isFocused && (this.get('buttonBehavior')!==SC.PUSH_BEHAVIOR)) {
       this._isFocused = YES ;
       this.becomeFirstResponder();
       if (this.get('isVisibleInWindow')) {
@@ -277,13 +265,9 @@ SC.ButtonView = SC.View.extend(SC.Control, SC.Button, SC.StaticLayout,
   mouseUp: function(evt) {
     if (this._isMouseDown) this.set('isActive', NO); // track independently in case isEnabled has changed
     this._isMouseDown = false;
-
-    if (this.get('buttonBehavior') !== SC.HOLD_BEHAVIOR) {
-      var inside = this.$().within(evt.target) ;
-      if (inside && this.get('isEnabled')) this._action(evt) ;
-    }
-
-    return YES ;
+    var inside = this.$().within(evt.target) ;
+    if (inside && this.get('isEnabled')) this._action(evt) ;
+    return true ;
   },
   
   
@@ -291,8 +275,7 @@ SC.ButtonView = SC.View.extend(SC.Control, SC.Button, SC.StaticLayout,
     // handle tab key
     if (evt.which === 9) {
       var view = evt.shiftKey ? this.get('previousValidKeyView') : this.get('nextValidKeyView');
-      if(view) view.becomeFirstResponder();
-      else evt.allowDefault();
+      view.becomeFirstResponder();
       return YES ; // handled
     }    
     if (evt.which === 13) {
@@ -309,7 +292,7 @@ SC.ButtonView = SC.View.extend(SC.Control, SC.Button, SC.StaticLayout,
    - off behavior: turn off.
    - otherwise: invoke target/action
   */
-  _action: function(evt, skipHoldRepeat) {
+  _action: function(evt) {
     switch(this.get('buttonBehavior')) {
       
     // When toggling, try to invert like values. i.e. 1 => 0, etc.
@@ -331,42 +314,20 @@ SC.ButtonView = SC.View.extend(SC.Control, SC.Button, SC.StaticLayout,
     case SC.TOGGLE_OFF_BEHAVIOR:
       this.set('value', this.get('toggleOffValue')) ;
       break ;
-
-    case SC.HOLD_BEHAVIOR:
-      this._runHoldAction(evt, skipHoldRepeat);
-      break ;
-
+      
     // otherwise, just trigger an action if there is one.
     default:
       //if (this.action) this.action(evt);
-      this._runAction(evt);
-    }
-  },
-
-  _runAction: function(evt) {
-    var action = this.get('action'),
-        target = this.get('target') || null;
-
-    if (action) {
-      if (this._hasLegacyActionHandler()) {
-        // old school... 
-        this._triggerLegacyActionHandler(evt);
-      } else {
-        // newer action method + optional target syntax...
-        this.getPath('pane.rootResponder').sendAction(action, target, this, this.get('pane'));
-      }
-    }
-  },
-
-  _runHoldAction: function(evt, skipRepeat) {
-    if (this.get('isActive')) {
-      this._runAction();
-
-      if (!skipRepeat) {
-        // This run loop appears to only be necessary for testing
-        SC.RunLoop.begin();
-        this.invokeLater('_runHoldAction', this.get('holdInterval'), evt);
-        SC.RunLoop.end();
+      var action = this.get('action'),
+          target = this.get('target') || null;
+      if (action) {
+        if (this._hasLegacyActionHandler()) {
+          // old school... 
+          this._triggerLegacyActionHandler(evt);
+        } else {
+          // newer action method + optional target syntax...
+          this.getPath('pane.rootResponder').sendAction(action, target, this, this.get('pane'));
+        }
       }
     }
   },
@@ -375,8 +336,8 @@ SC.ButtonView = SC.View.extend(SC.Control, SC.Button, SC.StaticLayout,
   _hasLegacyActionHandler: function()
   {
     var action = this.get('action');
-    if (action && (SC.typeOf(action) === SC.T_FUNCTION)) return true;
-    if (action && (SC.typeOf(action) === SC.T_STRING) && (action.indexOf('.') != -1)) return true;
+    if (action && (SC.typeOf(action) == SC.T_FUNCTION)) return true;
+    if (action && (SC.typeOf(action) == SC.T_STRING) && (action.indexOf('.') != -1)) return true;
     return false;
   },
 
@@ -386,8 +347,8 @@ SC.ButtonView = SC.View.extend(SC.Control, SC.Button, SC.StaticLayout,
     if (!this._hasLegacyActionHandler()) return false;
     
     var action = this.get('action');
-    if (SC.typeOf(action) === SC.T_FUNCTION) this.action(evt);
-    if (SC.typeOf(action) === SC.T_STRING) {
+    if (SC.typeOf(action) == SC.T_FUNCTION) this.action(evt);
+    if (SC.typeOf(action) == SC.T_STRING) {
       eval("this.action = function(e) { return "+ action +"(this, e); };");
       this.action(evt);
     }
@@ -395,9 +356,8 @@ SC.ButtonView = SC.View.extend(SC.Control, SC.Button, SC.StaticLayout,
   
   /** tied to the isEnabled state */
   acceptsFirstResponder: function() {
-    if(!SC.SAFARI_FOCUS_BEHAVIOR) return this.get('isEnabled');
-    else return NO;
-  }.property('isEnabled'),
+        return this.get('isEnabled');
+      }.property('isEnabled'),
   
   willBecomeKeyResponderFrom: function(keyView) {
     // focus the text field.
@@ -412,6 +372,17 @@ SC.ButtonView = SC.View.extend(SC.Control, SC.Button, SC.StaticLayout,
   
   willLoseKeyResponderTo: function(responder) {
     if (this._isFocused) this._isFocused = NO ;
+  },
+  
+  didCreateLayer: function() {
+    //Fix for IE7 min-with bug
+    if(SC.browser.msie<8) {
+      var buttonInner = this.$('.sc-button-inner')[0];
+      if (buttonInner){
+        var mL = buttonInner.style.marginLeft;
+        this.$('.sc-button-label')[0].style.minWidth=this.get('titleMinWidth')-mL;
+      }
+    }
   }
   
 }) ;

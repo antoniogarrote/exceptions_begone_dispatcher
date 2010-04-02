@@ -22,6 +22,7 @@ ExceptionsClient.exceptionsController = SC.ArrayController.create(
     // CRUD operations
 
     addException: function(data) {
+
         var json = data.notification.payload;
         json['identifier'] = data.notification.identifier;
 
@@ -50,7 +51,6 @@ ExceptionsClient.exceptionsController = SC.ArrayController.create(
 
             var newException = ExceptionsClient.store.createRecord(ExceptionsClient.Exception, json);
             newException.set('timestamp', date);
-            ExceptionsClient.store.commitRecords();
         }
 
         return YES;

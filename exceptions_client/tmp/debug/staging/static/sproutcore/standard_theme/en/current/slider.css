@@ -21,7 +21,7 @@
 	right: 12px;
 	height: 8px;
 	top: 5px;
-  background: url('/static/sproutcore/standard_theme/en/current/images/sc-theme-repeat-x.png?1269632161') no-repeat left -170px;
+  background: url('/static/sproutcore/standard_theme/en/current/images/sc-theme-repeat-x.png?1259494255') no-repeat left -170px;
   border: none;
 }
 
@@ -32,7 +32,7 @@
   right: 1px;
   top: 0;
   bottom: 0;
-  background: url('/static/sproutcore/standard_theme/en/current/images/sc-theme-repeat-x.png?1269632161') repeat-x left -179px;
+  background: url('/static/sproutcore/standard_theme/en/current/images/sc-theme-repeat-x.png?1259494255') repeat-x left -179px;
 }
 
 .sc-theme .sc-slider-view .sc-inner .sc-rightcap {
@@ -43,7 +43,7 @@
   width: 7px;
   top: 0;
   bottom: 0;
-  background: url('/static/sproutcore/standard_theme/en/current/images/sc-theme-repeat-x.png?1269632161') no-repeat right -188px;
+  background: url('/static/sproutcore/standard_theme/en/current/images/sc-theme-repeat-x.png?1259494255') no-repeat right -188px;
 }
 
 /* @end */
@@ -51,18 +51,18 @@
 /* sc-inner is the slider bar */
 .sc-theme.focus .sc-slider-view.disabled .sc-inner,
 .sc-theme.blur .sc-slider-view .sc-inner {
-  background: url('/static/sproutcore/standard_theme/en/current/images/sc-theme-repeat-x.png?1269632161') no-repeat left -251px;
+  background: url('/static/sproutcore/standard_theme/en/current/images/sc-theme-repeat-x.png?1259494255') no-repeat left -251px;
   border: none;
 }
 
 .sc-theme.focus .sc-slider-view.disabled .sc-inner .sc-leftcap,
 .sc-theme.blur .sc-slider-view .sc-inner .sc-leftcap {
-  background: url('/static/sproutcore/standard_theme/en/current/images/sc-theme-repeat-x.png?1269632161') repeat-x left -260px;
+  background: url('/static/sproutcore/standard_theme/en/current/images/sc-theme-repeat-x.png?1259494255') repeat-x left -260px;
 }
 
 .sc-theme.focus .sc-slider-view.disabled .sc-inner .sc-rightcap,
 .sc-theme.blur .sc-slider-view .sc-inner .sc-rightcap {
-  background: url('/static/sproutcore/standard_theme/en/current/images/sc-theme-repeat-x.png?1269632161') no-repeat right -269px;
+  background: url('/static/sproutcore/standard_theme/en/current/images/sc-theme-repeat-x.png?1259494255') no-repeat right -269px;
 }
 
 /* @end */
@@ -75,7 +75,7 @@
 	margin-left: -6px;
 	top: -5px;
 	position: absolute ;
-  background: url('/static/sproutcore/standard_theme/en/current/images/sc-theme-repeat-x.png?1269632161') no-repeat -25px -333px
+  background: url('/static/sproutcore/standard_theme/en/current/images/sc-theme-repeat-x.png?1259494255') no-repeat -25px -333px
 }
 
 .sc-theme .sc-slider-view.active .sc-handle {

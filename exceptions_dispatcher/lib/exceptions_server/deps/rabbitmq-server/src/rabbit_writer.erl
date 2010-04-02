@@ -18,11 +18,11 @@
 %%   are Copyright (C) 2007-2008 LShift Ltd, Cohesive Financial
 %%   Technologies LLC, and Rabbit Technologies Ltd.
 %%
-%%   Portions created by LShift Ltd are Copyright (C) 2007-2009 LShift
+%%   Portions created by LShift Ltd are Copyright (C) 2007-2010 LShift
 %%   Ltd. Portions created by Cohesive Financial Technologies LLC are
-%%   Copyright (C) 2007-2009 Cohesive Financial Technologies
+%%   Copyright (C) 2007-2010 Cohesive Financial Technologies
 %%   LLC. Portions created by Rabbit Technologies Ltd are Copyright
-%%   (C) 2007-2009 Rabbit Technologies Ltd.
+%%   (C) 2007-2010 Rabbit Technologies Ltd.
 %%
 %%   All Rights Reserved.
 %%
@@ -33,9 +33,9 @@
 -include("rabbit.hrl").
 -include("rabbit_framing.hrl").
 
--export([start/3, shutdown/1, mainloop/1]).
--export([send_command/2, send_command/3,
-         send_command_and_notify/5]).
+-export([start/3, start_link/3, shutdown/1, mainloop/1]).
+-export([send_command/2, send_command/3, send_command_and_signal_back/3,
+         send_command_and_signal_back/4, send_command_and_notify/5]).
 -export([internal_send_command/3, internal_send_command/5]).
 
 -import(gen_tcp).
@@ -49,13 +49,17 @@
 -ifdef(use_specs).
 
 -spec(start/3 :: (socket(), channel_number(), non_neg_integer()) -> pid()).
+-spec(start_link/3 :: (socket(), channel_number(), non_neg_integer()) -> pid()).
 -spec(send_command/2 :: (pid(), amqp_method()) -> 'ok').
 -spec(send_command/3 :: (pid(), amqp_method(), content()) -> 'ok').
+-spec(send_command_and_signal_back/3 :: (pid(), amqp_method(), pid()) -> 'ok').
+-spec(send_command_and_signal_back/4 ::
+      (pid(), amqp_method(), content(), pid()) -> 'ok').
 -spec(send_command_and_notify/5 ::
       (pid(), pid(), pid(), amqp_method(), content()) -> 'ok').
 -spec(internal_send_command/3 ::
       (socket(), channel_number(), amqp_method()) -> 'ok').
--spec(internal_send_command/5 :: 
+-spec(internal_send_command/5 ::
       (socket(), channel_number(), amqp_method(),
        content(), non_neg_integer()) -> 'ok').
 
@@ -67,6 +71,11 @@ start(Sock, Channel, FrameMax) ->
     spawn(?MODULE, mainloop, [#wstate{sock = Sock,
                                       channel = Channel,
                                       frame_max = FrameMax}]).
+
+start_link(Sock, Channel, FrameMax) ->
+    spawn_link(?MODULE, mainloop, [#wstate{sock = Sock,
+                                           channel = Channel,
+                                           frame_max = FrameMax}]).
 
 mainloop(State) ->
     receive
@@ -85,6 +94,19 @@ handle_message({send_command, MethodRecord, Content},
                                frame_max = FrameMax}) ->
     ok = internal_send_command_async(Sock, Channel, MethodRecord,
                                      Content, FrameMax),
+    State;
+handle_message({send_command_and_signal_back, MethodRecord, Parent},
+               State = #wstate{sock = Sock, channel = Channel}) ->
+    ok = internal_send_command_async(Sock, Channel, MethodRecord),
+    Parent ! rabbit_writer_send_command_signal,
+    State;
+handle_message({send_command_and_signal_back, MethodRecord, Content, Parent},
+               State = #wstate{sock = Sock,
+                               channel = Channel,
+                               frame_max = FrameMax}) ->
+    ok = internal_send_command_async(Sock, Channel, MethodRecord,
+                                     Content, FrameMax),
+    Parent ! rabbit_writer_send_command_signal,
     State;
 handle_message({send_command_and_notify, QPid, ChPid, MethodRecord, Content},
                State = #wstate{sock = Sock,
@@ -113,6 +135,14 @@ send_command(W, MethodRecord, Content) ->
     W ! {send_command, MethodRecord, Content},
     ok.
 
+send_command_and_signal_back(W, MethodRecord, Parent) ->
+    W ! {send_command_and_signal_back, MethodRecord, Parent},
+    ok.
+
+send_command_and_signal_back(W, MethodRecord, Content, Parent) ->
+    W ! {send_command_and_signal_back, MethodRecord, Content, Parent},
+    ok.
+
 send_command_and_notify(W, Q, ChPid, MethodRecord, Content) ->
     W ! {send_command_and_notify, Q, ChPid, MethodRecord, Content},
     ok.
@@ -139,7 +169,7 @@ assemble_frames(Channel, MethodRecord, Content, FrameMax) ->
 
 tcp_send(Sock, Data) ->
     rabbit_misc:throw_on_error(inet_error,
-                               fun () -> gen_tcp:send(Sock, Data) end).
+                               fun () -> rabbit_net:send(Sock, Data) end).
 
 internal_send_command(Sock, Channel, MethodRecord) ->
     ok = tcp_send(Sock, assemble_frames(Channel, MethodRecord)).
@@ -176,6 +206,6 @@ internal_send_command_async(Sock, Channel, MethodRecord, Content, FrameMax) ->
     ok.
 
 port_cmd(Sock, Data) ->
-    try erlang:port_command(Sock, Data)
+    try rabbit_net:port_command(Sock, Data)
     catch error:Error -> exit({writer, send_failed, Error})
     end.

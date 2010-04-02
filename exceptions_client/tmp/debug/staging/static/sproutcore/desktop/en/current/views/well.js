@@ -50,6 +50,7 @@ SC.WellView = SC.ContainerView.extend(
    */
   
   render: function(context, firstTime) {
+    arguments.callee.base.apply(this,arguments);
     if(firstTime){
      context.push("<div class='top-left-edge'></div>",
        "<div class='top-edge'></div>",
@@ -61,7 +62,6 @@ SC.WellView = SC.ContainerView.extend(
        "<div class='left-edge'></div>",
        "<div class='content-background'></div>");
      }    
-     arguments.callee.base.apply(this,arguments);
   },
   
   /**

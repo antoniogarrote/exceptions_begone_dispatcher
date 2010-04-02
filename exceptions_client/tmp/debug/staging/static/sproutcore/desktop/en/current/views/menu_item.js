@@ -483,11 +483,7 @@ SC.MenuItemView = SC.ButtonView.extend( SC.ContentDisplay,
         }
       }
     }
-    if (!this.get('isEnabled') && !this.isSeparator()) {
-      if (parentMenu) parentMenu.set('currentSelectedMenuItem', null);
-      return YES ;
-    }
-
+    if (!this.get('isEnabled') && !this.isSeparator()) return YES ;
     var key = this.get('contentIsBranchKey') ;
     if(key) {
       var content = this.get('content') ;

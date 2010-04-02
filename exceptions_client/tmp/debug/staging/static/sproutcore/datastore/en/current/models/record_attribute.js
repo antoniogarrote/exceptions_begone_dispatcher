@@ -54,10 +54,7 @@ SC.RecordAttribute = SC.Object.extend(
     will be substituted instead.  Note that defaultValues are not converted
     so the value should be in the output type expected by the attribute.
     
-    If you use a defaultValue function, the arguments given to it is the
-    record instance and the key.
-    
-    @property {Object|function}
+    @property {Object}
   */
   defaultValue: null,
   
@@ -470,7 +467,7 @@ if (SC.DateTime && !SC.RecordAttribute.transforms[SC.guidFor(SC.DateTime)]) {
       Convert a String to a DateTime
     */
     to: function(str, attr) {
-      if (SC.none(str) || SC.instanceOf(str, SC.DateTime)) return str;
+      if (SC.none(str)) return str;
       var format = attr.get('format');
       return SC.DateTime.parse(str, format ? format : SC.DateTime.recordFormat);
     },

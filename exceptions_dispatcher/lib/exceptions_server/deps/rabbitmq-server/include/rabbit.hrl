@@ -18,11 +18,11 @@
 %%   are Copyright (C) 2007-2008 LShift Ltd, Cohesive Financial
 %%   Technologies LLC, and Rabbit Technologies Ltd.
 %%
-%%   Portions created by LShift Ltd are Copyright (C) 2007-2009 LShift
+%%   Portions created by LShift Ltd are Copyright (C) 2007-2010 LShift
 %%   Ltd. Portions created by Cohesive Financial Technologies LLC are
-%%   Copyright (C) 2007-2009 Cohesive Financial Technologies
+%%   Copyright (C) 2007-2010 Cohesive Financial Technologies
 %%   LLC. Portions created by Rabbit Technologies Ltd are Copyright
-%%   (C) 2007-2009 Rabbit Technologies Ltd.
+%%   (C) 2007-2010 Rabbit Technologies Ltd.
 %%
 %%   All Rights Reserved.
 %%
@@ -36,7 +36,7 @@
 
 -record(vhost, {virtual_host, dummy}).
 
--record(connection, {user, timeout_sec, frame_max, vhost}).
+-record(connection, {user, timeout_sec, frame_max, vhost, client_properties}).
 
 -record(content,
         {class_id,
@@ -64,7 +64,10 @@
 
 -record(basic_message, {exchange_name, routing_key, content, persistent_key}).
 
+-record(ssl_socket, {tcp, ssl}).
 -record(delivery, {mandatory, immediate, txn, sender, message}).
+
+-record(amqp_error, {name, explanation, method = none}).
 
 %%----------------------------------------------------------------------------
 
@@ -74,7 +77,8 @@
 
 -type(maybe(T) :: T | 'none').
 -type(erlang_node() :: atom()).
--type(socket() :: port()).
+-type(ssl_socket() :: #ssl_socket{}).
+-type(socket() :: port() | ssl_socket()).
 -type(thunk(T) :: fun(() -> T)).
 -type(info_key() :: atom()).
 -type(info() :: {info_key(), any()}).
@@ -99,15 +103,15 @@
                   read      :: regexp()}).
 -type(amqqueue() ::
       #amqqueue{name          :: queue_name(),
-                durable       :: bool(),
-                auto_delete   :: bool(),
+                durable       :: boolean(),
+                auto_delete   :: boolean(),
                 arguments     :: amqp_table(),
                 pid           :: maybe(pid())}).
 -type(exchange() ::
       #exchange{name        :: exchange_name(),
                 type        :: exchange_type(),
-                durable     :: bool(),
-                auto_delete :: bool(),
+                durable     :: boolean(),
+                auto_delete :: boolean(),
                 arguments   :: amqp_table()}).
 -type(binding() ::
       #binding{exchange_name    :: exchange_name(),
@@ -124,10 +128,16 @@
                properties            :: amqp_properties(),
                properties_bin        :: 'none',
                payload_fragments_rev :: [binary()]}).
+-type(unencoded_content() :: undecoded_content()).
 -type(decoded_content() ::
       #content{class_id              :: amqp_class_id(),
                properties            :: amqp_properties(),
                properties_bin        :: maybe(binary()),
+               payload_fragments_rev :: [binary()]}).
+-type(encoded_content() ::
+      #content{class_id              :: amqp_class_id(),
+               properties            :: maybe(amqp_properties()),
+               properties_bin        :: binary(),
                payload_fragments_rev :: [binary()]}).
 -type(content() :: undecoded_content() | decoded_content()).
 -type(basic_message() ::
@@ -137,14 +147,14 @@
                      persistent_key :: maybe(pkey())}).
 -type(message() :: basic_message()).
 -type(delivery() ::
-      #delivery{mandatory :: bool(),
-                immediate :: bool(),
+      #delivery{mandatory :: boolean(),
+                immediate :: boolean(),
                 txn       :: maybe(txn()),
                 sender    :: pid(),
                 message   :: message()}).
 %% this really should be an abstract type
 -type(msg_id() :: non_neg_integer()).
--type(msg() :: {queue_name(), pid(), msg_id(), bool(), message()}).
+-type(msg() :: {queue_name(), pid(), msg_id(), boolean(), message()}).
 -type(listener() ::
       #listener{node     :: erlang_node(),
                 protocol :: atom(),
@@ -152,13 +162,18 @@
                 port     :: non_neg_integer()}).
 -type(not_found() :: {'error', 'not_found'}).
 -type(routing_result() :: 'routed' | 'unroutable' | 'not_delivered').
-
+-type(amqp_error() ::
+      #amqp_error{name        :: atom(),
+                  explanation :: string(),
+                  method      :: atom()}).
 -endif.
 
 %%----------------------------------------------------------------------------
 
--define(COPYRIGHT_MESSAGE, "Copyright (C) 2007-2009 LShift Ltd., Cohesive Financial Technologies LLC., and Rabbit Technologies Ltd.").
+-define(COPYRIGHT_MESSAGE, "Copyright (C) 2007-2010 LShift Ltd., Cohesive Financial Technologies LLC., and Rabbit Technologies Ltd.").
 -define(INFORMATION_MESSAGE, "Licensed under the MPL.  See http://www.rabbitmq.com/").
+
+-define(MAX_WAIT, 16#ffffffff).
 
 -ifdef(debug).
 -define(LOGDEBUG0(F), rabbit_log:debug(F)).

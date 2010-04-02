@@ -4,7 +4,7 @@
 //            Portions ©2008-2009 Apple Inc. All rights reserved.
 // License:   Licened under MIT license (see license.js)
 // ==========================================================================
-/*globals CQ add*/
+/*globals CQ*/
 
 require('system/builder') ;
 
@@ -95,19 +95,8 @@ SC.CoreQuery = (function() {
   // (both of which we optimize for)
   var quickExpr = /^[^<]*(<(.|\s)+>)[^>]*$|^#([\w-]+)$/,
   // Is it a simple selector
-  isSimple = /^.[^:#\[\.]*$/;
-  
-  // Regular expressions
-  var CQHtmlRegEx =/ CQ\d+="(?:\d+|null)"/g,
-  tagSearchRegEx = /(<(\w+)[^>]*?)\/>/g,
-  xmlTagsRegEx = /^(abbr|br|col|img|input|link|meta|param|hr|area|embed)$/i,
-  checkforSpaceRegEx = /\s+/,
-  trimWhiteSpaceRegEx = /^\s+/,
-  bodyHTMLOffsetRegEx = /^body|html$/i,
-  specialAttributesRegEx = /href|src|style/,
-  tagsWithTabIndexRegEx = /(button|input|object|select|textarea)/i,
-  alphaDetectRegEx = /alpha\([^)]*\)/,
-  alphaReplaceRegEx = /opacity=([^)]*)/;
+  isSimple = /^.[^:#\[\.]*$/,
+  undefined ;
 
   var styleFloat = SC.browser.msie ? "styleFloat" : "cssFloat";
 
@@ -127,7 +116,7 @@ SC.CoreQuery = (function() {
   } ;
 
   var getWH = function getWH(elem, name, which) {
-    var val = name === "width" ? elem.offsetWidth : elem.offsetHeight;
+    var val = name == "width" ? elem.offsetWidth : elem.offsetHeight;
     var padding = 0, border = 0, loc=which.length, dim;
     while(--loc>=0) {
       dim = which[loc];
@@ -150,7 +139,7 @@ SC.CoreQuery = (function() {
 
     // defaultView is cached
     var ret = defaultView.getComputedStyle( elem, null );
-    return !ret || ret.getPropertyValue("color") === "";
+    return !ret || ret.getPropertyValue("color") == "";
   } ;
 
   
@@ -158,7 +147,7 @@ SC.CoreQuery = (function() {
   // Helper function used by the dimensions and offset modules
   function num(elem, prop) {
     return elem[0] && parseInt( CQ.curCSS(elem[0], prop, true), 10 ) || 0;
-  }
+  } ;
 
   var CoreQuery, CQ ;
   
@@ -202,9 +191,9 @@ SC.CoreQuery = (function() {
         if ( match && (match[1] || !context) ) {
 
           // HANDLE: $(html) -> $(array)
-          if ( match[1] ) {
+          if ( match[1] )
             selector = CQ.clean( [ match[1] ], context );
-          }
+
           // HANDLE: $("#id")
           else {
             var elem = document.getElementById( match[3] );
@@ -294,11 +283,10 @@ SC.CoreQuery = (function() {
     not: function( selector ) {
       if ( typeof selector === "string" ) {
         // test special case where just one selector is passed in
-        if ( isSimple.test( selector ) ) {
+        if ( isSimple.test( selector ) )
           return this.pushStack( CQ.multiFilter( selector, this, true ) );
-        }else {
+        else
           selector = CQ.multiFilter( selector, this );
-        }
       }
 
       var isArrayLike = selector.length && selector[selector.length - 1] !== undefined && !selector.nodeType;
@@ -418,32 +406,34 @@ SC.CoreQuery = (function() {
       var options = name;
 
       // Look for the case where we're accessing a style value
-      if ( typeof name === "string" ) {
-        if ( value === undefined ) {
+      if ( typeof name === "string" )
+        if ( value === undefined )
           return this[0] && CQ[ type || "attr" ]( this[0], name );
-        }
+
         else {
           options = {};
           options[ name ] = value;
         }
-      }
+
       // Check to see if we're setting style values
       return this.each(function(i){
         // Set all the styles
-        for ( name in options ) {
+        for ( name in options )
           CQ.attr(
             (type)?this.style:this,
             name, CQ.prop( this, options[ name ], type, i, name ));
-        }
       });
     },
     
     html: function( value ) {
       return value === undefined ?
       			(this[0] ?
-      				this[0].innerHTML.replace(CQHtmlRegEx, "") :
+      				this[0].innerHTML.replace(/ CQ\d+="(?:\d+|null)"/g, "") :
       				null) :
       			this.empty().append( value );
+      // return value == undefined ?
+      //  (this[0] ? this[0].innerHTML : null) :
+      //  this.empty().append( value );
     },
 
     andSelf: function() { return this.add( this.prevObject ); },
@@ -469,7 +459,7 @@ SC.CoreQuery = (function() {
     */
     hasClass: function( className ) {
       return Array.prototype.every.call(this, function(elem) {
-        return (elem.nodeType===1) && CQ.className.has(elem, className) ;
+        return (elem.nodeType!=1) || CQ.className.has(elem, className) ;
       });
     },
 
@@ -487,16 +477,15 @@ SC.CoreQuery = (function() {
       if ( value === undefined ) {     
         var elem = this[0];
         if (elem) {
-          if(CQ.nodeName(elem, 'option')) {
+          if(CQ.nodeName(elem, 'option'))
             return (elem.attributes.value || {}).specified ? elem.value : elem.text;
-          }
+
           // We need to handle select boxes special
           if ( CQ.nodeName( elem, "select" ) ) {
             var index = elem.selectedIndex,
               values = [],
               options = elem.options,
-              one = elem.type === "select-one",
-              option;
+              one = elem.type == "select-one";
 
             // Nothing was selected
             if ( index < 0 ) return null;
@@ -504,7 +493,7 @@ SC.CoreQuery = (function() {
             // Loop through all the selected options
             var i, max = one ? index+1:options.length;
             for (i = one ? index : 0; i < max; i++ ) {
-              option = options[ i ];
+              var option = options[ i ];
               if ( option.selected ) {
                 value = CQ(option).val(); // get value
                 if (one) return value; // We don't need an array for one
@@ -524,7 +513,7 @@ SC.CoreQuery = (function() {
       } else {
         if( typeof value === "number" ) value += ''; // force to string
         this.each(function(){
-          if ( this.nodeType !== 1 ) return;
+          if ( this.nodeType != 1 ) return;
           
           // handle radio/checkbox.  set the checked value
           if (SC.typeOf(value) === SC.T_ARRAY && (/radio|checkbox/).test(this.type)) {
@@ -577,9 +566,8 @@ SC.CoreQuery = (function() {
       // this is primarily for IE but the data expando shouldn't be copied 
       // over in any browser
       var clone = ret.find("*").andSelf().each(function(){
-        if ( this[ SC.guidKey ] !== undefined ) {
+        if ( this[ SC.guidKey ] !== undefined )
           this[ SC.guidKey ] = null;
-        }
       });
 
       // Return the cloned set
@@ -596,7 +584,7 @@ SC.CoreQuery = (function() {
     */
     css: function( key, value ) {
       // ignore negative width and height values
-      if ((key === 'width' || key === 'height') && parseFloat(value,0) < 0 ) {
+      if ((key == 'width' || key == 'height') && parseFloat(value,0) < 0 ) {
         value = undefined;
       }
       return this.attr( key, value, "curCSS" );
@@ -610,17 +598,16 @@ SC.CoreQuery = (function() {
       @returns {String|CoreQuery}
     */
     text: function( text ) {
-      if ( text !== undefined && typeof text !== "object" && text != null ) {
+      if ( typeof text !== "object" && text != null )
         return this.empty().append( (this[0] && this[0].ownerDocument || document).createTextNode( text ) );
-      }
+
       var ret = "";
 
       CQ.each( text || this, function(){
         CQ.each( this.childNodes, function(){
-          if ( this.nodeType !== 8 ){
-            ret += this.nodeType !== 1 ?
+          if ( this.nodeType != 8 )
+            ret += this.nodeType != 1 ?
               this.nodeValue : CQ.fn.text( [ this ] );
-          }
         });
       });
 
@@ -638,7 +625,7 @@ SC.CoreQuery = (function() {
           
           // handle edge case where the CSS style is none so we can't detect
           // the natural display state.
-          if (CQ.css(this,'display') === 'none') {
+          if (CQ.css(this,'display') == 'none') {
             var elem = CQ('<' + this.tagName + '/>');
             CQ('body').append(elem);
             this.style.display = elem.css('display');
@@ -692,13 +679,15 @@ SC.CoreQuery = (function() {
     
     append: function() {
       return this.domManip(arguments, true, false, function(elem){
-        if (this.nodeType === 1) this.appendChild( elem );
+        if (this.nodeType == 1)
+          this.appendChild( elem );
       });
     },
 
     prepend: function() {
       return this.domManip(arguments, true, true, function(elem){
-        if (this.nodeType === 1) this.insertBefore( elem, this.firstChild );
+        if (this.nodeType == 1)
+          this.insertBefore( elem, this.firstChild );
       });
     },
 
@@ -728,7 +717,7 @@ SC.CoreQuery = (function() {
   CoreQuery.mixin(/** @scope SC.CoreQuery */ {
     
     nodeName: function( elem, name ) {
-      return elem.nodeName && elem.nodeName.toUpperCase() === name.toUpperCase();
+      return elem.nodeName && elem.nodeName.toUpperCase() == name.toUpperCase();
     },
     
     /**
@@ -750,14 +739,15 @@ SC.CoreQuery = (function() {
       @returns {Array} mapped elements
     */
     map: function( elems, callback ) {
-      var ret = [], value, i, length;
+      var ret = [];
 
       // Go through the array, translating each of the items to their
       // new value (or values).
-      for ( i = 0, length = elems.length; i < length; i++ ) {
-        value = callback( elems[ i ], i );
+      for ( var i = 0, length = elems.length; i < length; i++ ) {
+        var value = callback( elems[ i ], i );
 
-        if ( value != null ) ret[ ret.length ] = value;
+        if ( value != null )
+          ret[ ret.length ] = value;
       }
       
       return ret.concat.apply([],ret) ;
@@ -778,24 +768,23 @@ SC.CoreQuery = (function() {
 
       if ( args ) {
         if ( length === undefined ) {
-          for ( name in object ) {
-            if ( callback.apply( object[ name ], args ) === false ) break;
-          }
-        } else {
-          for ( ; i < length; ) {
-            if ( callback.apply( object[ i++ ], args ) === false ) break;
-          }
-        }
+          for ( name in object )
+            if ( callback.apply( object[ name ], args ) === false )
+              break;
+        } else
+          for ( ; i < length; )
+            if ( callback.apply( object[ i++ ], args ) === false )
+              break;
+
       // A special, fast, case for the most common use of each
       } else {
         if ( length === undefined ) {
-          for ( name in object ) {
-            if ( callback.call( object[ name ], name, object[ name ] ) === false ) break;
-          }
-        } else {
+          for ( name in object )
+            if ( callback.call( object[ name ], name, object[ name ] ) === false )
+              break;
+        } else
           for ( var value = object[0];
             i < length && callback.call( value, i, value ) !== false; value = object[++i] ){}
-          }
       }
 
       return object;
@@ -821,14 +810,14 @@ SC.CoreQuery = (function() {
         // Convert html string into DOM nodes
         if ( typeof elem === "string" ) {
           // Fix "XHTML"-style tags in all browsers
-          elem = elem.replace(tagSearchRegEx, function(all, front, tag){
-            return tag.match(xmlTagsRegEx) ?
+          elem = elem.replace(/(<(\w+)[^>]*?)\/>/g, function(all, front, tag){
+            return tag.match(/^(abbr|br|col|img|input|link|meta|param|hr|area|embed)$/i) ?
               all :
               front + "></" + tag + ">";
           });
 
           // Trim whitespace, otherwise indexOf won't work as expected
-          var tags = elem.replace(trimWhiteSpaceRegEx, "").substring(0, 10).toLowerCase(), 
+          var tags = elem.replace(/^\s+/, "").substring(0, 10).toLowerCase(), 
               div = context.createElement("div");
 
           var wrap =
@@ -872,19 +861,18 @@ SC.CoreQuery = (function() {
               div.firstChild && div.firstChild.childNodes :
 
               // String was a bare <thead> or <tfoot>
-              wrap[1] === "<table>" && tags.indexOf("<tbody") < 0 ?
+              wrap[1] == "<table>" && tags.indexOf("<tbody") < 0 ?
                 div.childNodes :
                 [];
 
-            for ( var j = tbody.length - 1; j >= 0 ; --j ) {
-              if ( CQ.nodeName( tbody[ j ], "tbody" ) && !tbody[ j ].childNodes.length ) {
+            for ( var j = tbody.length - 1; j >= 0 ; --j )
+              if ( CQ.nodeName( tbody[ j ], "tbody" ) && !tbody[ j ].childNodes.length )
                 tbody[ j ].parentNode.removeChild( tbody[ j ] );
-              }
-            }
+
             // IE completely kills leading whitespace when innerHTML is used
-            if ( /^\s/.test( elem ) ) {
+            if ( /^\s/.test( elem ) )
               div.insertBefore( context.createTextNode( elem.match(/^\s*/)[0] ), div.firstChild );
-            }
+
           }
 
           elem = CQ.makeArray( div.childNodes );
@@ -938,15 +926,14 @@ SC.CoreQuery = (function() {
       @returns {Array} matched elements
     */
     find: function( t, context ) {
-      var ret;
       
       // Quickly handle non-string expressions
-      if ( typeof t !== "string" ) return [ t ];
+      if ( typeof t != "string" ) return [ t ];
 
       // if the selector contains commas, then we actually want to search
       // multiple selectors.
       if (t.indexOf(',')>=0) {
-        ret = t.split(',').map(function(sel) {
+        var ret = t.split(',').map(function(sel) {
           return CQ.find(sel,context);
         });
 
@@ -955,7 +942,7 @@ SC.CoreQuery = (function() {
       }
       
       // check to make sure context is a DOM element or a document
-      if ( context && context.nodeType !== 1 && context.nodeType !== 9) {
+      if ( context && context.nodeType != 1 && context.nodeType != 9) {
         return [];
       }
 
@@ -963,9 +950,8 @@ SC.CoreQuery = (function() {
       context = context || document;
 
       // Initialize the search.  split the selector into pieces
-      ret = [context];
-      var nodeName, inFindMode = YES,
-          parts = t.match(quickSplit), len = parts.length, m ;
+      var ret = [context], nodeName, inFindMode = YES;
+      var parts = t.match(quickSplit), len = parts.length, m ;
       
       // loop through each part and either find or filter as needed
       for(var idx=0;idx<len;idx++) {
@@ -997,7 +983,7 @@ SC.CoreQuery = (function() {
             case '': // tag
               if (!val) val = '*';
               // Handle IE7 being really dumb about <object>s
-              if ( val === "*" && cur.nodeName.toLowerCase() === "object" ) {
+              if ( val == "*" && cur.nodeName.toLowerCase() == "object" ) {
                 val = "param";
               }
               
@@ -1042,8 +1028,7 @@ SC.CoreQuery = (function() {
               // do nothing
             }
           }
-          delete ret; 
-          ret = next ; // swap array
+          delete ret; ret = next ; // swap array
           inFindMode = NO;
           
         // if we are not in findMode then simply filter the results.
@@ -1057,12 +1042,11 @@ SC.CoreQuery = (function() {
 
     classFilter: function(r,m,not){
       m = " " + m + " ";
-      var tmp = [], pass;
+      var tmp = [];
       for ( var i = 0; r[i]; i++ ) {
-        pass = (" " + r[i].className + " ").indexOf( m ) >= 0;
-        if ( !not && pass || not && !pass ) {
+        var pass = (" " + r[i].className + " ").indexOf( m ) >= 0;
+        if ( !not && pass || not && !pass )
           tmp.push( r[i] );
-        }
       }
       return tmp;
     },
@@ -1106,7 +1090,7 @@ SC.CoreQuery = (function() {
 
     /** @private Accepts filters separated by commas. */
     multiFilter: function( expr, elems, not ) {
-      expr = expr.indexOf(',') ? expr.split(',') : [expr];
+      expr = (expr.indexOf(',')) ? expr.split(',') : [expr];
       var loc=expr.length,cur,ret=[];
       while(--loc >= 0) { // unit tests expect reverse iteration
         cur = CQ.filter(expr[loc].trim(), elems, not) ;
@@ -1127,7 +1111,7 @@ SC.CoreQuery = (function() {
       // returned (IE returns comment nodes in a '*' query)
       if ( SC.browser.msie ) {
         while ( elem = second[ i++ ] ) {
-          if ( elem.nodeType !== 8 ) first[ pos++ ] = elem;
+          if ( elem.nodeType != 8 ) first[ pos++ ] = elem;
         }
 
       } else {
@@ -1141,26 +1125,25 @@ SC.CoreQuery = (function() {
     makeArray: function(array) {
       var ret = [];
 
-      if( array !== undefined || array != null ){
+      if( array != null ){
         var i = array.length;
         // The window, strings (and functions) also have 'length'
-        if( i == null || typeof array === 'string' || array.setInterval ) {
+        if( i == null || typeof array === 'string' || array.setInterval )
           ret[0] = array;
-        }
-        else {
-          while( i ) ret[--i] = array[i];
-        }
+        else
+          while( i )
+            ret[--i] = array[i];
       }
 
       return ret;
     },
 
     inArray: function(elem,array) {
-      return array.indexOf ? array.indexOf(elem) : Array.prototype.indexOf.call(array, elem);
+      return (array.indexOf) ? array.indexOf(elem) : Array.prototype.indexOf.call(array, elem);
     },
     
     // Check to see if the W3C box model is being used
-    boxModel: !SC.browser.msie || document.compatMode === "CSS1Compat",
+    boxModel: !SC.browser.msie || document.compatMode == "CSS1Compat",
 
     props: {
       "for": "htmlFor",
@@ -1180,7 +1163,7 @@ SC.CoreQuery = (function() {
       if (SC.typeOf(value) === SC.T_FUNCTION) value = value.call(elem, i);
 
       // Handle passing in a number to a CSS property
-      return value && (typeof value === "number") && type === "curCSS" && !exclude.test( name ) ? value + "px" : value;
+      return value && (typeof value === "number") && type == "curCSS" && !exclude.test( name ) ? value + "px" : value;
     },
     
     
@@ -1201,18 +1184,17 @@ SC.CoreQuery = (function() {
       // internal only, use addClass("class")
       add: function( elem, classNames ) {
         var has = CQ.className.has ;
-        CQ.each((classNames || "").split(checkforSpaceRegEx), function(i, className){
-          if ( elem.nodeType === 1 && !has( elem.className, className ) ) {
+        CQ.each((classNames || "").split(/\s+/), function(i, className){
+          if ( elem.nodeType == 1 && !has( elem.className, className ) )
             elem.className += (elem.className ? " " : "") + className;
-          }
         });
       },
 
       // internal only, use removeClass("class")
       remove: function( elem, classNames ) {
-        if (elem.nodeType === 1) {
+        if (elem.nodeType == 1) {
           elem.className = classNames !== undefined ?
-            CQ.grep(elem.className.split(checkforSpaceRegEx), function(className){
+            CQ.grep(elem.className.split(/\s+/), function(className){
               return !CQ.className.has( classNames, className );
             }).join(" ") : "";
         }
@@ -1220,16 +1202,16 @@ SC.CoreQuery = (function() {
 
       // internal only, use hasClass("class")
       has: function( elem, className ) {
-        return elem && CQ.inArray( className, (elem.className || elem).toString().split(checkforSpaceRegEx) ) > -1;
+        return elem && CQ.inArray( className, (elem.className || elem).toString().split(/\s+/) ) > -1;
       }
     },
     
     /** @private A method for quickly swapping in/out CSS properties to get 
       correct calculations */
     swap: function( elem, options, callback, direction, arg ) {
-      var old = {}, name;
+      var old = {};
       // Remember the old values, and insert the new ones
-      for ( name in options ) {
+      for ( var name in options ) {
         old[ name ] = elem.style[ name ];
         elem.style[ name ] = options[ name ];
       }
@@ -1237,15 +1219,15 @@ SC.CoreQuery = (function() {
       var ret = callback(elem, direction, arg );
 
       // Revert the old values
-      for ( name in options ) elem.style[ name ] = old[ name ];
+      for ( var name in options ) elem.style[ name ] = old[ name ];
       return ret ;
     },
     
     /** returns a normalized value for the specified style name. */
     css: function( elem, name, force ) {
       // handle special case for width/height
-      if ( name === "width" || name === "height" ) {
-        var val, which = (name === "width") ? LEFT_RIGHT : TOP_BOTTOM,
+      if ( name == "width" || name == "height" ) {
+        var val, which = (name == "width") ? LEFT_RIGHT : TOP_BOTTOM,
         props = CSS_DISPLAY_PROPS;
 
         val = SC.$.isVisible(elem) ? getWH(elem,name,which) : CQ.swap(elem,props,getWH,name,which) ;
@@ -1261,9 +1243,9 @@ SC.CoreQuery = (function() {
       var ret, style = elem.style;
 
       // We need to handle opacity special in IE
-      if ( name === "opacity" && SC.browser.msie ) {
+      if ( name == "opacity" && SC.browser.msie ) {
         ret = CQ.attr( style, "opacity" );
-        return ret === "" ? "1" : ret;
+        return ret == "" ? "1" : ret;
       }
       
       // Opera sometimes will give the wrong display answer, this fixes it, 
@@ -1315,17 +1297,17 @@ SC.CoreQuery = (function() {
 
           // Since we flip the display style, we have to handle that
           // one special, otherwise get the value
-          ret = (name === "display" && swap[stack.length-1]!==null) ? "none" :
+          ret = (name == "display" && swap[stack.length-1]!=null) ? "none" :
             (computedStyle && computedStyle.getPropertyValue(name)) || "";
 
           // Finally, revert the display styles back
           for ( i = 0, swLen = swap.length; i < swLen; i++ ) {
-            if (swap[i]!==null) stack[i].style.display = swap[i];
+            if (swap[i]!=null) stack[i].style.display = swap[i];
           }
         }
 
         // We should always get a number back from opacity
-        if (name === "opacity" && ret === "") ret = "1";
+        if (name == "opacity" && ret == "") ret = "1";
 
       } else if (elem.currentStyle) {
         // var camelCase = name.camelize();
@@ -1362,7 +1344,7 @@ SC.CoreQuery = (function() {
     dir: function( elem, dir ){
       var matched = [], cur = elem[dir];
       while ( cur && cur != document ) {
-        if ( cur.nodeType === 1 ) matched.push( cur );
+        if ( cur.nodeType == 1 ) matched.push( cur );
         cur = cur[dir];
       }
       return matched;
@@ -1376,7 +1358,7 @@ SC.CoreQuery = (function() {
       result = result || 1;
       var num = 0;
       for ( ; cur; cur = cur[dir] ) {
-        if ( cur.nodeType === 1 && ++num == result ) break;
+        if ( cur.nodeType == 1 && ++num == result ) break;
       }
       return cur;
     },
@@ -1385,7 +1367,7 @@ SC.CoreQuery = (function() {
     sibling: function( n, elem ) {
       var r = [];
       for ( ; n; n = n.nextSibling ) {
-        if ( n.nodeType === 1 && n != elem ) r.push( n );
+        if ( n.nodeType == 1 && n != elem ) r.push( n );
       }
       return r;
     },
@@ -1393,7 +1375,7 @@ SC.CoreQuery = (function() {
     /** Primitive helper can read or update an attribute on an element. */
     attr: function( elem, name, value ) {
       // don't set attributes on text and comment nodes
-      if (!elem || elem.nodeType === 3 || elem.nodeType === 8) return undefined;
+      if (!elem || elem.nodeType == 3 || elem.nodeType == 8) return undefined;
 
       var notxml = !CQ.isXMLDoc( elem ),
         set = value !== undefined,
@@ -1407,11 +1389,11 @@ SC.CoreQuery = (function() {
       if ( elem.tagName ) {
 
         // These attributes require special treatment
-        var special = specialAttributesRegEx.test( name );
+        var special = /href|src|style/.test( name );
 
         // Safari mis-reports the default selected property of a hidden option
         // Accessing the parent's selectedIndex property fixes it
-        if ( name === "selected" && elem.parentNode ) {
+        if ( name == "selected" && elem.parentNode ) {
           elem.parentNode.selectedIndex;
         }
 
@@ -1420,7 +1402,7 @@ SC.CoreQuery = (function() {
           if ( set ){
             // We can't allow the type property to be changed (since it causes 
             // problems in IE)
-            if ( name === "type" && CQ.nodeName( elem, "input" ) && elem.parentNode ) {
+            if ( name == "type" && CQ.nodeName( elem, "input" ) && elem.parentNode ) {
               throw "type property can't be changed";
             }
 
@@ -1435,11 +1417,11 @@ SC.CoreQuery = (function() {
           
           // elem.tabIndex doesn't always return the correct value when it hasn't been explicitly set
           // http://fluidproject.org/blog/2008/01/09/getting-setting-and-removing-tabindex-values-with-javascript/
-          if ( name === "tabIndex" ) {
+          if ( name == "tabIndex" ) {
           	var attributeNode = elem.getAttributeNode( "tabIndex" );
           	return attributeNode && attributeNode.specified
           				? attributeNode.value
-          				: elem.nodeName.match(tagsWithTabIndexRegEx)
+          				: elem.nodeName.match(/(button|input|object|select|textarea)/i)
           					? 0
           					: elem.nodeName.match(/^(a|area)$/i) && elem.href
           						? 0
@@ -1449,9 +1431,9 @@ SC.CoreQuery = (function() {
           return elem[ name ];
         }
 
-        if ( msie && notxml &&  name === "style" ) {
+        if ( msie && notxml &&  name === "style" )
           return CQ.attr( elem.style, "cssText", value );
-        }
+
         // convert the value to a string (all browsers do this but IE) see 
         // #1070 (jQuery)
         if ( set ) elem.setAttribute( name, "" + value );
@@ -1468,19 +1450,19 @@ SC.CoreQuery = (function() {
       // elem is actually elem.style ... set the style
 
       // IE uses filters for opacity
-      if ( msie && name === "opacity" ) {
+      if ( msie && name == "opacity" ) {
         if ( set ) {
           // IE has trouble with opacity if it does not have layout
           // Force it by setting the zoom level
           elem.zoom = 1;
 
           // Set the alpha filter to set the opacity
-          elem.filter = (elem.filter || "").replace( alphaDetectRegEx, "" ) +
+          elem.filter = (elem.filter || "").replace( /alpha\([^)]*\)/, "" ) +
             (parseInt(value,0) + '' == "NaN" ? "" : "alpha(opacity=" + value * 100 + ")");
         }
 
         return elem.filter && elem.filter.indexOf("opacity=") >= 0 ?
-          (parseFloat( elem.filter.match(alphaReplaceRegEx)[1] ) / 100) + '':
+          (parseFloat( elem.filter.match(/opacity=([^)]*)/)[1] ) / 100) + '':
           "";
       }
 
@@ -1528,9 +1510,9 @@ SC.CoreQuery = (function() {
     CQ.fn[ name ] = function( selector ) {
       var ret = CQ.map( this, fn );
 
-      if ( selector && typeof selector === "string" ) {
+      if ( selector && typeof selector == "string" )
         ret = CQ.multiFilter( selector, ret );
-      }
+
       return this.pushStack(ret.uniq());
     };
   });
@@ -1546,9 +1528,8 @@ SC.CoreQuery = (function() {
       var args = arguments;
 
       return this.each(function(){
-        for ( var i = 0, length = args.length; i < length; i++ ) {
+        for ( var i = 0, length = args.length; i < length; i++ )
           CQ( args[ i ] )[ original ]( this );
-        }
       });
     };
   });
@@ -1556,7 +1537,7 @@ SC.CoreQuery = (function() {
   CQ.each({
     removeAttr: function( name ) {
       CQ.attr( this, name, "" );
-      if (this.nodeType === 1) this.removeAttribute( name );
+      if (this.nodeType == 1) this.removeAttribute( name );
     },
 
     addClass: function( classNames ) {
@@ -1597,7 +1578,7 @@ SC.CoreQuery = (function() {
   
   // Setup width and height functions
   CQ.each([ "Height", "Width" ], function(i, name){
-    var type = name.toLowerCase(), ret;
+    var type = name.toLowerCase();
 
     CQ.fn[ type ] = function( size ) {
       
@@ -1630,7 +1611,7 @@ SC.CoreQuery = (function() {
           
       // get/set element width/or height
       } else {
-        if (size === undefined) {
+        if (size == undefined) {
           return this.length ? CQ.css(this[0], type) : null ;
 
           // Set the width or height on the element (default to pixels if value is unitless)
@@ -1685,7 +1666,7 @@ SC.CoreQuery = (function() {
         doc          = elem.ownerDocument,
         safari2      = br.safari && parseInt(br.version,0) < 522 && !(/adobeair/i).test(br.userAgent),
         css          = CQ.curCSS,
-        fixed        = CQ.css(elem, "position") === "fixed";
+        fixed        = CQ.css(elem, "position") == "fixed";
 
     // Use getBoundingClientRect if available
     if (!(br.mozilla && elem==document.body) && elem.getBoundingClientRect){
@@ -1722,7 +1703,7 @@ SC.CoreQuery = (function() {
 
         // Add the document scroll offsets if position is fixed on any 
         // offsetParent
-        if (!fixed && css(offsetParent, "position") === "fixed") fixed = true;
+        if (!fixed && css(offsetParent, "position") == "fixed") fixed = true;
 
         // Set offsetChild to previous offsetParent unless it is the body 
         // element
@@ -1732,7 +1713,7 @@ SC.CoreQuery = (function() {
       }
 
       // Get parent scroll offsets
-      while ( parent && parent.tagName && !(bodyHTMLOffsetRegEx).test(parent.tagName)) {
+      while ( parent && parent.tagName && !(/^body|html$/i).test(parent.tagName)) {
         
         // Remove parent scroll UNLESS that parent is inline or a table to 
         // work around Opera inline/table scrollLeft/Top bug
@@ -1743,7 +1724,7 @@ SC.CoreQuery = (function() {
 
         // Mozilla does not add the border for a parent that has overflow != 
         // visible
-        if ( br.mozilla && css(parent, "overflow") !== "visible" ) border(parent);
+        if ( br.mozilla && css(parent, "overflow") != "visible" ) border(parent);
 
         // Get next parent
         parent = parent.parentNode;
@@ -1753,8 +1734,8 @@ SC.CoreQuery = (function() {
       // element/offsetParent or absolutely positioned offsetChild
       // Mozilla doubles body offsets with a non-absolutely positioned 
       // offsetChild
-      if ((safari2 && (fixed || css(offsetChild, "position") === "absolute"))||
-        (br.mozilla && css(offsetChild, "position") !== "absolute") ) {
+      if ((safari2 && (fixed || css(offsetChild, "position") == "absolute"))||
+        (br.mozilla && css(offsetChild, "position") != "absolute") ) {
           add( -doc.body.offsetLeft, -doc.body.offsetTop );
         }
 
@@ -1781,7 +1762,7 @@ SC.CoreQuery = (function() {
 
         // Get correct offsets
         offset       = this.offset(),
-        parentOffset = bodyHTMLOffsetRegEx.test(offsetParent[0].tagName) ? { top: 0, left: 0 } : offsetParent.offset();
+        parentOffset = /^body|html$/i.test(offsetParent[0].tagName) ? { top: 0, left: 0 } : offsetParent.offset();
 
         // Subtract element margins
         // note: when an element has margin: auto the offsetLeft and marginLeft 
@@ -1805,7 +1786,7 @@ SC.CoreQuery = (function() {
 
     offsetParent: function() {
       var offsetParent = this[0].offsetParent || document.body;
-      while ( offsetParent && (!(bodyHTMLOffsetRegEx).test(offsetParent.tagName) && CQ.css(offsetParent, 'position') === 'static') ) {
+      while ( offsetParent && (!(/^body|html$/i).test(offsetParent.tagName) && CQ.css(offsetParent, 'position') == 'static') ) {
         offsetParent = offsetParent.offsetParent;
       }
       return CQ(offsetParent);
@@ -1820,7 +1801,7 @@ SC.CoreQuery = (function() {
     CQ.fn[ method ] = function(val) {
       if (!this[0]) return;
 
-      return val !== undefined ?
+      return val != undefined ?
 
         // Set the scroll offset
         this.each(function() {
@@ -1858,7 +1839,7 @@ SC.mixin(SC.$.fn, /** @scope SC.CoreQuery.prototype */ {
     var values = [];
     var len = this.length, idx=0;
     for(idx=0;idx<len;idx++) {
-      values[idx] = '%@: %@'.fmt(idx, this[idx] ? this[idx].toString() : '(null)');
+      values[idx] = '%@: %@'.fmt(idx,(this[idx]) ? this[idx].toString() : '(null)');
     }
     return "<$:%@>(%@)".fmt(SC.guidFor(this),values.join(' , '));  
   },
@@ -2021,12 +2002,11 @@ SC.mixin(SC.$.fn, /** @scope SC.CoreQuery.prototype */ {
   // loop through an update some enumerable methods.  If this is CoreQuery,
   // we just need to patch up the wrapped methods.  If this is jQuery, we
   // need to go through the entire set of SC.Enumerable.
-  var isCoreQuery = SC.$.jquery === 'SC.CoreQuery',
-      fn = SC.$.fn, enumerable = isCoreQuery ? wrappers : SC.Enumerable ,
-      value;
+  var isCoreQuery = SC.$.jquery === 'SC.CoreQuery';
+  var fn = SC.$.fn, enumerable = isCoreQuery ? wrappers : SC.Enumerable ;
   for(var key in enumerable) {
     if (!enumerable.hasOwnProperty(key)) continue ;
-    value = enumerable[key];
+    var value = enumerable[key];
     if (key in wrappers) {
       original[key] = fn[key]; value = wrappers[key];
     }

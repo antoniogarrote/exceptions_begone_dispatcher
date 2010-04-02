@@ -300,8 +300,6 @@ SC.ManyArray = SC.Object.extend(SC.Enumerable, SC.Array,
         record.recordDidChange(this.get('propertyName'));
       }
     }
-    
-    return this;
   },
 
   /**
@@ -332,8 +330,6 @@ SC.ManyArray = SC.Object.extend(SC.Enumerable, SC.Array,
     if (this.get('isMaster') && (record = this.get('record'))) {
       record.recordDidChange(this.get('propertyName'));
     }
-    
-    return this;
   },
   
   // binary search to find insertion location

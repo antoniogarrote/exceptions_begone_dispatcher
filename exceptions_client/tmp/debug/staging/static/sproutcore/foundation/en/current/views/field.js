@@ -33,6 +33,14 @@ SC.FieldView = SC.View.extend(SC.Control, SC.Validatable,
      WARNING: Use only with textField** Juan
   */
   isTextArea: NO,
+  
+  /*
+    This variable is here to make the tab focus behavior work like safari's.
+    We believe that is a better experience for accesibility and the user in 
+    general to be able to access all controls through you keyboard. If you
+    disagree set this variable to YES.
+  */
+  followSafariTabFocusBehavior: NO,
 
 
   _field_isMouseDown: NO,
@@ -175,17 +183,6 @@ SC.FieldView = SC.View.extend(SC.Control, SC.Validatable,
     SC.Event.add(this.$input(), 'change', this, this._field_fieldValueDidChange) ;
   },
   
-  /** @private
-    after the layer is append to the doc, set the field value and observe events
-    only for textarea.
-  */
-  didAppendToDocument: function() {
-    if(this.get('isTextArea')){
-      this.setFieldValue(this.get('fieldValue'));
-      SC.Event.add(this.$input(), 'change', this, this._field_fieldValueDidChange) ;
-    }
-  },
-  
   willDestroyLayer: function() {
     SC.Event.remove(this.$input(), 'change', this, this._field_fieldValueDidChange); 
   },
@@ -275,8 +272,7 @@ SC.FieldView = SC.View.extend(SC.Control, SC.Validatable,
     // handle tab key
     if (evt.which === 9) {
       var view = evt.shiftKey ? this.get('previousValidKeyView') : this.get('nextValidKeyView');
-      if(view) view.becomeFirstResponder();
-      else evt.allowDefault();
+      view.becomeFirstResponder();
       return YES ; // handled
     }
     
@@ -293,8 +289,10 @@ SC.FieldView = SC.View.extend(SC.Control, SC.Validatable,
   
   /** tied to the isEnabled state */
   acceptsFirstResponder: function() {
-    if(!SC.SAFARI_FOCUS_BEHAVIOR) return this.get('isEnabled');
-    else return NO;
+    if(!this.get('followSafariTabFocusBehavior')){
+      return this.get('isEnabled');
+    }
+    return NO;
   }.property('isEnabled'),
   
   willBecomeKeyResponderFrom: function(keyView) {
@@ -303,7 +301,7 @@ SC.FieldView = SC.View.extend(SC.Control, SC.Validatable,
       this._isFocused = YES ;
       this.becomeFirstResponder();
       if (this.get('isVisibleInWindow')) {
-        this.$input()[0].focus();
+        this.$input().get(0).focus();
       }
     }
   },

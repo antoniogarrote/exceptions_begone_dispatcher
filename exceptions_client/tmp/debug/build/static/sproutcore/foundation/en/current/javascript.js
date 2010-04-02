@@ -346,12 +346,6 @@ SC.DROP_AFTER = 0x04 ;
 */
 SC.DROP_ANY = 0x07 ;
 
-
-/**
-  This variable is here to make the tab focus behavior work like safari's.
-*/
-SC.SAFARI_FOCUS_BEHAVIOR = YES;
-
 SC.mixin(/** @lends SC */ {
   
   /**
@@ -3269,7 +3263,7 @@ SC.Builder.fn = {
 //            Portions ©2008-2009 Apple Inc. All rights reserved.
 // License:   Licened under MIT license (see license.js)
 // ==========================================================================
-/*globals CQ add*/
+/*globals CQ*/
 
 require('system/builder') ;
 
@@ -3360,19 +3354,8 @@ SC.CoreQuery = (function() {
   // (both of which we optimize for)
   var quickExpr = /^[^<]*(<(.|\s)+>)[^>]*$|^#([\w-]+)$/,
   // Is it a simple selector
-  isSimple = /^.[^:#\[\.]*$/;
-  
-  // Regular expressions
-  var CQHtmlRegEx =/ CQ\d+="(?:\d+|null)"/g,
-  tagSearchRegEx = /(<(\w+)[^>]*?)\/>/g,
-  xmlTagsRegEx = /^(abbr|br|col|img|input|link|meta|param|hr|area|embed)$/i,
-  checkforSpaceRegEx = /\s+/,
-  trimWhiteSpaceRegEx = /^\s+/,
-  bodyHTMLOffsetRegEx = /^body|html$/i,
-  specialAttributesRegEx = /href|src|style/,
-  tagsWithTabIndexRegEx = /(button|input|object|select|textarea)/i,
-  alphaDetectRegEx = /alpha\([^)]*\)/,
-  alphaReplaceRegEx = /opacity=([^)]*)/;
+  isSimple = /^.[^:#\[\.]*$/,
+  undefined ;
 
   var styleFloat = SC.browser.msie ? "styleFloat" : "cssFloat";
 
@@ -3392,7 +3375,7 @@ SC.CoreQuery = (function() {
   } ;
 
   var getWH = function getWH(elem, name, which) {
-    var val = name === "width" ? elem.offsetWidth : elem.offsetHeight;
+    var val = name == "width" ? elem.offsetWidth : elem.offsetHeight;
     var padding = 0, border = 0, loc=which.length, dim;
     while(--loc>=0) {
       dim = which[loc];
@@ -3415,7 +3398,7 @@ SC.CoreQuery = (function() {
 
     // defaultView is cached
     var ret = defaultView.getComputedStyle( elem, null );
-    return !ret || ret.getPropertyValue("color") === "";
+    return !ret || ret.getPropertyValue("color") == "";
   } ;
 
   
@@ -3423,7 +3406,7 @@ SC.CoreQuery = (function() {
   // Helper function used by the dimensions and offset modules
   function num(elem, prop) {
     return elem[0] && parseInt( CQ.curCSS(elem[0], prop, true), 10 ) || 0;
-  }
+  } ;
 
   var CoreQuery, CQ ;
   
@@ -3467,9 +3450,9 @@ SC.CoreQuery = (function() {
         if ( match && (match[1] || !context) ) {
 
           // HANDLE: $(html) -> $(array)
-          if ( match[1] ) {
+          if ( match[1] )
             selector = CQ.clean( [ match[1] ], context );
-          }
+
           // HANDLE: $("#id")
           else {
             var elem = document.getElementById( match[3] );
@@ -3559,11 +3542,10 @@ SC.CoreQuery = (function() {
     not: function( selector ) {
       if ( typeof selector === "string" ) {
         // test special case where just one selector is passed in
-        if ( isSimple.test( selector ) ) {
+        if ( isSimple.test( selector ) )
           return this.pushStack( CQ.multiFilter( selector, this, true ) );
-        }else {
+        else
           selector = CQ.multiFilter( selector, this );
-        }
       }
 
       var isArrayLike = selector.length && selector[selector.length - 1] !== undefined && !selector.nodeType;
@@ -3683,32 +3665,34 @@ SC.CoreQuery = (function() {
       var options = name;
 
       // Look for the case where we're accessing a style value
-      if ( typeof name === "string" ) {
-        if ( value === undefined ) {
+      if ( typeof name === "string" )
+        if ( value === undefined )
           return this[0] && CQ[ type || "attr" ]( this[0], name );
-        }
+
         else {
           options = {};
           options[ name ] = value;
         }
-      }
+
       // Check to see if we're setting style values
       return this.each(function(i){
         // Set all the styles
-        for ( name in options ) {
+        for ( name in options )
           CQ.attr(
             (type)?this.style:this,
             name, CQ.prop( this, options[ name ], type, i, name ));
-        }
       });
     },
     
     html: function( value ) {
       return value === undefined ?
       			(this[0] ?
-      				this[0].innerHTML.replace(CQHtmlRegEx, "") :
+      				this[0].innerHTML.replace(/ CQ\d+="(?:\d+|null)"/g, "") :
       				null) :
       			this.empty().append( value );
+      // return value == undefined ?
+      //  (this[0] ? this[0].innerHTML : null) :
+      //  this.empty().append( value );
     },
 
     andSelf: function() { return this.add( this.prevObject ); },
@@ -3734,7 +3718,7 @@ SC.CoreQuery = (function() {
     */
     hasClass: function( className ) {
       return Array.prototype.every.call(this, function(elem) {
-        return (elem.nodeType===1) && CQ.className.has(elem, className) ;
+        return (elem.nodeType!=1) || CQ.className.has(elem, className) ;
       });
     },
 
@@ -3752,16 +3736,15 @@ SC.CoreQuery = (function() {
       if ( value === undefined ) {     
         var elem = this[0];
         if (elem) {
-          if(CQ.nodeName(elem, 'option')) {
+          if(CQ.nodeName(elem, 'option'))
             return (elem.attributes.value || {}).specified ? elem.value : elem.text;
-          }
+
           // We need to handle select boxes special
           if ( CQ.nodeName( elem, "select" ) ) {
             var index = elem.selectedIndex,
               values = [],
               options = elem.options,
-              one = elem.type === "select-one",
-              option;
+              one = elem.type == "select-one";
 
             // Nothing was selected
             if ( index < 0 ) return null;
@@ -3769,7 +3752,7 @@ SC.CoreQuery = (function() {
             // Loop through all the selected options
             var i, max = one ? index+1:options.length;
             for (i = one ? index : 0; i < max; i++ ) {
-              option = options[ i ];
+              var option = options[ i ];
               if ( option.selected ) {
                 value = CQ(option).val(); // get value
                 if (one) return value; // We don't need an array for one
@@ -3789,7 +3772,7 @@ SC.CoreQuery = (function() {
       } else {
         if( typeof value === "number" ) value += ''; // force to string
         this.each(function(){
-          if ( this.nodeType !== 1 ) return;
+          if ( this.nodeType != 1 ) return;
           
           // handle radio/checkbox.  set the checked value
           if (SC.typeOf(value) === SC.T_ARRAY && (/radio|checkbox/).test(this.type)) {
@@ -3842,9 +3825,8 @@ SC.CoreQuery = (function() {
       // this is primarily for IE but the data expando shouldn't be copied 
       // over in any browser
       var clone = ret.find("*").andSelf().each(function(){
-        if ( this[ SC.guidKey ] !== undefined ) {
+        if ( this[ SC.guidKey ] !== undefined )
           this[ SC.guidKey ] = null;
-        }
       });
 
       // Return the cloned set
@@ -3861,7 +3843,7 @@ SC.CoreQuery = (function() {
     */
     css: function( key, value ) {
       // ignore negative width and height values
-      if ((key === 'width' || key === 'height') && parseFloat(value,0) < 0 ) {
+      if ((key == 'width' || key == 'height') && parseFloat(value,0) < 0 ) {
         value = undefined;
       }
       return this.attr( key, value, "curCSS" );
@@ -3875,17 +3857,16 @@ SC.CoreQuery = (function() {
       @returns {String|CoreQuery}
     */
     text: function( text ) {
-      if ( text !== undefined && typeof text !== "object" && text != null ) {
+      if ( typeof text !== "object" && text != null )
         return this.empty().append( (this[0] && this[0].ownerDocument || document).createTextNode( text ) );
-      }
+
       var ret = "";
 
       CQ.each( text || this, function(){
         CQ.each( this.childNodes, function(){
-          if ( this.nodeType !== 8 ){
-            ret += this.nodeType !== 1 ?
+          if ( this.nodeType != 8 )
+            ret += this.nodeType != 1 ?
               this.nodeValue : CQ.fn.text( [ this ] );
-          }
         });
       });
 
@@ -3903,7 +3884,7 @@ SC.CoreQuery = (function() {
           
           // handle edge case where the CSS style is none so we can't detect
           // the natural display state.
-          if (CQ.css(this,'display') === 'none') {
+          if (CQ.css(this,'display') == 'none') {
             var elem = CQ('<' + this.tagName + '/>');
             CQ('body').append(elem);
             this.style.display = elem.css('display');
@@ -3957,13 +3938,15 @@ SC.CoreQuery = (function() {
     
     append: function() {
       return this.domManip(arguments, true, false, function(elem){
-        if (this.nodeType === 1) this.appendChild( elem );
+        if (this.nodeType == 1)
+          this.appendChild( elem );
       });
     },
 
     prepend: function() {
       return this.domManip(arguments, true, true, function(elem){
-        if (this.nodeType === 1) this.insertBefore( elem, this.firstChild );
+        if (this.nodeType == 1)
+          this.insertBefore( elem, this.firstChild );
       });
     },
 
@@ -3993,7 +3976,7 @@ SC.CoreQuery = (function() {
   CoreQuery.mixin(/** @scope SC.CoreQuery */ {
     
     nodeName: function( elem, name ) {
-      return elem.nodeName && elem.nodeName.toUpperCase() === name.toUpperCase();
+      return elem.nodeName && elem.nodeName.toUpperCase() == name.toUpperCase();
     },
     
     /**
@@ -4015,14 +3998,15 @@ SC.CoreQuery = (function() {
       @returns {Array} mapped elements
     */
     map: function( elems, callback ) {
-      var ret = [], value, i, length;
+      var ret = [];
 
       // Go through the array, translating each of the items to their
       // new value (or values).
-      for ( i = 0, length = elems.length; i < length; i++ ) {
-        value = callback( elems[ i ], i );
+      for ( var i = 0, length = elems.length; i < length; i++ ) {
+        var value = callback( elems[ i ], i );
 
-        if ( value != null ) ret[ ret.length ] = value;
+        if ( value != null )
+          ret[ ret.length ] = value;
       }
       
       return ret.concat.apply([],ret) ;
@@ -4043,24 +4027,23 @@ SC.CoreQuery = (function() {
 
       if ( args ) {
         if ( length === undefined ) {
-          for ( name in object ) {
-            if ( callback.apply( object[ name ], args ) === false ) break;
-          }
-        } else {
-          for ( ; i < length; ) {
-            if ( callback.apply( object[ i++ ], args ) === false ) break;
-          }
-        }
+          for ( name in object )
+            if ( callback.apply( object[ name ], args ) === false )
+              break;
+        } else
+          for ( ; i < length; )
+            if ( callback.apply( object[ i++ ], args ) === false )
+              break;
+
       // A special, fast, case for the most common use of each
       } else {
         if ( length === undefined ) {
-          for ( name in object ) {
-            if ( callback.call( object[ name ], name, object[ name ] ) === false ) break;
-          }
-        } else {
+          for ( name in object )
+            if ( callback.call( object[ name ], name, object[ name ] ) === false )
+              break;
+        } else
           for ( var value = object[0];
             i < length && callback.call( value, i, value ) !== false; value = object[++i] ){}
-          }
       }
 
       return object;
@@ -4086,14 +4069,14 @@ SC.CoreQuery = (function() {
         // Convert html string into DOM nodes
         if ( typeof elem === "string" ) {
           // Fix "XHTML"-style tags in all browsers
-          elem = elem.replace(tagSearchRegEx, function(all, front, tag){
-            return tag.match(xmlTagsRegEx) ?
+          elem = elem.replace(/(<(\w+)[^>]*?)\/>/g, function(all, front, tag){
+            return tag.match(/^(abbr|br|col|img|input|link|meta|param|hr|area|embed)$/i) ?
               all :
               front + "></" + tag + ">";
           });
 
           // Trim whitespace, otherwise indexOf won't work as expected
-          var tags = elem.replace(trimWhiteSpaceRegEx, "").substring(0, 10).toLowerCase(), 
+          var tags = elem.replace(/^\s+/, "").substring(0, 10).toLowerCase(), 
               div = context.createElement("div");
 
           var wrap =
@@ -4137,19 +4120,18 @@ SC.CoreQuery = (function() {
               div.firstChild && div.firstChild.childNodes :
 
               // String was a bare <thead> or <tfoot>
-              wrap[1] === "<table>" && tags.indexOf("<tbody") < 0 ?
+              wrap[1] == "<table>" && tags.indexOf("<tbody") < 0 ?
                 div.childNodes :
                 [];
 
-            for ( var j = tbody.length - 1; j >= 0 ; --j ) {
-              if ( CQ.nodeName( tbody[ j ], "tbody" ) && !tbody[ j ].childNodes.length ) {
+            for ( var j = tbody.length - 1; j >= 0 ; --j )
+              if ( CQ.nodeName( tbody[ j ], "tbody" ) && !tbody[ j ].childNodes.length )
                 tbody[ j ].parentNode.removeChild( tbody[ j ] );
-              }
-            }
+
             // IE completely kills leading whitespace when innerHTML is used
-            if ( /^\s/.test( elem ) ) {
+            if ( /^\s/.test( elem ) )
               div.insertBefore( context.createTextNode( elem.match(/^\s*/)[0] ), div.firstChild );
-            }
+
           }
 
           elem = CQ.makeArray( div.childNodes );
@@ -4203,15 +4185,14 @@ SC.CoreQuery = (function() {
       @returns {Array} matched elements
     */
     find: function( t, context ) {
-      var ret;
       
       // Quickly handle non-string expressions
-      if ( typeof t !== "string" ) return [ t ];
+      if ( typeof t != "string" ) return [ t ];
 
       // if the selector contains commas, then we actually want to search
       // multiple selectors.
       if (t.indexOf(',')>=0) {
-        ret = t.split(',').map(function(sel) {
+        var ret = t.split(',').map(function(sel) {
           return CQ.find(sel,context);
         });
 
@@ -4220,7 +4201,7 @@ SC.CoreQuery = (function() {
       }
       
       // check to make sure context is a DOM element or a document
-      if ( context && context.nodeType !== 1 && context.nodeType !== 9) {
+      if ( context && context.nodeType != 1 && context.nodeType != 9) {
         return [];
       }
 
@@ -4228,9 +4209,8 @@ SC.CoreQuery = (function() {
       context = context || document;
 
       // Initialize the search.  split the selector into pieces
-      ret = [context];
-      var nodeName, inFindMode = YES,
-          parts = t.match(quickSplit), len = parts.length, m ;
+      var ret = [context], nodeName, inFindMode = YES;
+      var parts = t.match(quickSplit), len = parts.length, m ;
       
       // loop through each part and either find or filter as needed
       for(var idx=0;idx<len;idx++) {
@@ -4262,7 +4242,7 @@ SC.CoreQuery = (function() {
             case '': // tag
               if (!val) val = '*';
               // Handle IE7 being really dumb about <object>s
-              if ( val === "*" && cur.nodeName.toLowerCase() === "object" ) {
+              if ( val == "*" && cur.nodeName.toLowerCase() == "object" ) {
                 val = "param";
               }
               
@@ -4307,8 +4287,7 @@ SC.CoreQuery = (function() {
               // do nothing
             }
           }
-          delete ret; 
-          ret = next ; // swap array
+          delete ret; ret = next ; // swap array
           inFindMode = NO;
           
         // if we are not in findMode then simply filter the results.
@@ -4322,12 +4301,11 @@ SC.CoreQuery = (function() {
 
     classFilter: function(r,m,not){
       m = " " + m + " ";
-      var tmp = [], pass;
+      var tmp = [];
       for ( var i = 0; r[i]; i++ ) {
-        pass = (" " + r[i].className + " ").indexOf( m ) >= 0;
-        if ( !not && pass || not && !pass ) {
+        var pass = (" " + r[i].className + " ").indexOf( m ) >= 0;
+        if ( !not && pass || not && !pass )
           tmp.push( r[i] );
-        }
       }
       return tmp;
     },
@@ -4371,7 +4349,7 @@ SC.CoreQuery = (function() {
 
     /** @private Accepts filters separated by commas. */
     multiFilter: function( expr, elems, not ) {
-      expr = expr.indexOf(',') ? expr.split(',') : [expr];
+      expr = (expr.indexOf(',')) ? expr.split(',') : [expr];
       var loc=expr.length,cur,ret=[];
       while(--loc >= 0) { // unit tests expect reverse iteration
         cur = CQ.filter(expr[loc].trim(), elems, not) ;
@@ -4392,7 +4370,7 @@ SC.CoreQuery = (function() {
       // returned (IE returns comment nodes in a '*' query)
       if ( SC.browser.msie ) {
         while ( elem = second[ i++ ] ) {
-          if ( elem.nodeType !== 8 ) first[ pos++ ] = elem;
+          if ( elem.nodeType != 8 ) first[ pos++ ] = elem;
         }
 
       } else {
@@ -4406,26 +4384,25 @@ SC.CoreQuery = (function() {
     makeArray: function(array) {
       var ret = [];
 
-      if( array !== undefined || array != null ){
+      if( array != null ){
         var i = array.length;
         // The window, strings (and functions) also have 'length'
-        if( i == null || typeof array === 'string' || array.setInterval ) {
+        if( i == null || typeof array === 'string' || array.setInterval )
           ret[0] = array;
-        }
-        else {
-          while( i ) ret[--i] = array[i];
-        }
+        else
+          while( i )
+            ret[--i] = array[i];
       }
 
       return ret;
     },
 
     inArray: function(elem,array) {
-      return array.indexOf ? array.indexOf(elem) : Array.prototype.indexOf.call(array, elem);
+      return (array.indexOf) ? array.indexOf(elem) : Array.prototype.indexOf.call(array, elem);
     },
     
     // Check to see if the W3C box model is being used
-    boxModel: !SC.browser.msie || document.compatMode === "CSS1Compat",
+    boxModel: !SC.browser.msie || document.compatMode == "CSS1Compat",
 
     props: {
       "for": "htmlFor",
@@ -4445,7 +4422,7 @@ SC.CoreQuery = (function() {
       if (SC.typeOf(value) === SC.T_FUNCTION) value = value.call(elem, i);
 
       // Handle passing in a number to a CSS property
-      return value && (typeof value === "number") && type === "curCSS" && !exclude.test( name ) ? value + "px" : value;
+      return value && (typeof value === "number") && type == "curCSS" && !exclude.test( name ) ? value + "px" : value;
     },
     
     
@@ -4466,18 +4443,17 @@ SC.CoreQuery = (function() {
       // internal only, use addClass("class")
       add: function( elem, classNames ) {
         var has = CQ.className.has ;
-        CQ.each((classNames || "").split(checkforSpaceRegEx), function(i, className){
-          if ( elem.nodeType === 1 && !has( elem.className, className ) ) {
+        CQ.each((classNames || "").split(/\s+/), function(i, className){
+          if ( elem.nodeType == 1 && !has( elem.className, className ) )
             elem.className += (elem.className ? " " : "") + className;
-          }
         });
       },
 
       // internal only, use removeClass("class")
       remove: function( elem, classNames ) {
-        if (elem.nodeType === 1) {
+        if (elem.nodeType == 1) {
           elem.className = classNames !== undefined ?
-            CQ.grep(elem.className.split(checkforSpaceRegEx), function(className){
+            CQ.grep(elem.className.split(/\s+/), function(className){
               return !CQ.className.has( classNames, className );
             }).join(" ") : "";
         }
@@ -4485,16 +4461,16 @@ SC.CoreQuery = (function() {
 
       // internal only, use hasClass("class")
       has: function( elem, className ) {
-        return elem && CQ.inArray( className, (elem.className || elem).toString().split(checkforSpaceRegEx) ) > -1;
+        return elem && CQ.inArray( className, (elem.className || elem).toString().split(/\s+/) ) > -1;
       }
     },
     
     /** @private A method for quickly swapping in/out CSS properties to get 
       correct calculations */
     swap: function( elem, options, callback, direction, arg ) {
-      var old = {}, name;
+      var old = {};
       // Remember the old values, and insert the new ones
-      for ( name in options ) {
+      for ( var name in options ) {
         old[ name ] = elem.style[ name ];
         elem.style[ name ] = options[ name ];
       }
@@ -4502,15 +4478,15 @@ SC.CoreQuery = (function() {
       var ret = callback(elem, direction, arg );
 
       // Revert the old values
-      for ( name in options ) elem.style[ name ] = old[ name ];
+      for ( var name in options ) elem.style[ name ] = old[ name ];
       return ret ;
     },
     
     /** returns a normalized value for the specified style name. */
     css: function( elem, name, force ) {
       // handle special case for width/height
-      if ( name === "width" || name === "height" ) {
-        var val, which = (name === "width") ? LEFT_RIGHT : TOP_BOTTOM,
+      if ( name == "width" || name == "height" ) {
+        var val, which = (name == "width") ? LEFT_RIGHT : TOP_BOTTOM,
         props = CSS_DISPLAY_PROPS;
 
         val = SC.$.isVisible(elem) ? getWH(elem,name,which) : CQ.swap(elem,props,getWH,name,which) ;
@@ -4526,9 +4502,9 @@ SC.CoreQuery = (function() {
       var ret, style = elem.style;
 
       // We need to handle opacity special in IE
-      if ( name === "opacity" && SC.browser.msie ) {
+      if ( name == "opacity" && SC.browser.msie ) {
         ret = CQ.attr( style, "opacity" );
-        return ret === "" ? "1" : ret;
+        return ret == "" ? "1" : ret;
       }
       
       // Opera sometimes will give the wrong display answer, this fixes it, 
@@ -4580,17 +4556,17 @@ SC.CoreQuery = (function() {
 
           // Since we flip the display style, we have to handle that
           // one special, otherwise get the value
-          ret = (name === "display" && swap[stack.length-1]!==null) ? "none" :
+          ret = (name == "display" && swap[stack.length-1]!=null) ? "none" :
             (computedStyle && computedStyle.getPropertyValue(name)) || "";
 
           // Finally, revert the display styles back
           for ( i = 0, swLen = swap.length; i < swLen; i++ ) {
-            if (swap[i]!==null) stack[i].style.display = swap[i];
+            if (swap[i]!=null) stack[i].style.display = swap[i];
           }
         }
 
         // We should always get a number back from opacity
-        if (name === "opacity" && ret === "") ret = "1";
+        if (name == "opacity" && ret == "") ret = "1";
 
       } else if (elem.currentStyle) {
         // var camelCase = name.camelize();
@@ -4627,7 +4603,7 @@ SC.CoreQuery = (function() {
     dir: function( elem, dir ){
       var matched = [], cur = elem[dir];
       while ( cur && cur != document ) {
-        if ( cur.nodeType === 1 ) matched.push( cur );
+        if ( cur.nodeType == 1 ) matched.push( cur );
         cur = cur[dir];
       }
       return matched;
@@ -4641,7 +4617,7 @@ SC.CoreQuery = (function() {
       result = result || 1;
       var num = 0;
       for ( ; cur; cur = cur[dir] ) {
-        if ( cur.nodeType === 1 && ++num == result ) break;
+        if ( cur.nodeType == 1 && ++num == result ) break;
       }
       return cur;
     },
@@ -4650,7 +4626,7 @@ SC.CoreQuery = (function() {
     sibling: function( n, elem ) {
       var r = [];
       for ( ; n; n = n.nextSibling ) {
-        if ( n.nodeType === 1 && n != elem ) r.push( n );
+        if ( n.nodeType == 1 && n != elem ) r.push( n );
       }
       return r;
     },
@@ -4658,7 +4634,7 @@ SC.CoreQuery = (function() {
     /** Primitive helper can read or update an attribute on an element. */
     attr: function( elem, name, value ) {
       // don't set attributes on text and comment nodes
-      if (!elem || elem.nodeType === 3 || elem.nodeType === 8) return undefined;
+      if (!elem || elem.nodeType == 3 || elem.nodeType == 8) return undefined;
 
       var notxml = !CQ.isXMLDoc( elem ),
         set = value !== undefined,
@@ -4672,11 +4648,11 @@ SC.CoreQuery = (function() {
       if ( elem.tagName ) {
 
         // These attributes require special treatment
-        var special = specialAttributesRegEx.test( name );
+        var special = /href|src|style/.test( name );
 
         // Safari mis-reports the default selected property of a hidden option
         // Accessing the parent's selectedIndex property fixes it
-        if ( name === "selected" && elem.parentNode ) {
+        if ( name == "selected" && elem.parentNode ) {
           elem.parentNode.selectedIndex;
         }
 
@@ -4685,7 +4661,7 @@ SC.CoreQuery = (function() {
           if ( set ){
             // We can't allow the type property to be changed (since it causes 
             // problems in IE)
-            if ( name === "type" && CQ.nodeName( elem, "input" ) && elem.parentNode ) {
+            if ( name == "type" && CQ.nodeName( elem, "input" ) && elem.parentNode ) {
               throw "type property can't be changed";
             }
 
@@ -4700,11 +4676,11 @@ SC.CoreQuery = (function() {
           
           // elem.tabIndex doesn't always return the correct value when it hasn't been explicitly set
           // http://fluidproject.org/blog/2008/01/09/getting-setting-and-removing-tabindex-values-with-javascript/
-          if ( name === "tabIndex" ) {
+          if ( name == "tabIndex" ) {
           	var attributeNode = elem.getAttributeNode( "tabIndex" );
           	return attributeNode && attributeNode.specified
           				? attributeNode.value
-          				: elem.nodeName.match(tagsWithTabIndexRegEx)
+          				: elem.nodeName.match(/(button|input|object|select|textarea)/i)
           					? 0
           					: elem.nodeName.match(/^(a|area)$/i) && elem.href
           						? 0
@@ -4714,9 +4690,9 @@ SC.CoreQuery = (function() {
           return elem[ name ];
         }
 
-        if ( msie && notxml &&  name === "style" ) {
+        if ( msie && notxml &&  name === "style" )
           return CQ.attr( elem.style, "cssText", value );
-        }
+
         // convert the value to a string (all browsers do this but IE) see 
         // #1070 (jQuery)
         if ( set ) elem.setAttribute( name, "" + value );
@@ -4733,19 +4709,19 @@ SC.CoreQuery = (function() {
       // elem is actually elem.style ... set the style
 
       // IE uses filters for opacity
-      if ( msie && name === "opacity" ) {
+      if ( msie && name == "opacity" ) {
         if ( set ) {
           // IE has trouble with opacity if it does not have layout
           // Force it by setting the zoom level
           elem.zoom = 1;
 
           // Set the alpha filter to set the opacity
-          elem.filter = (elem.filter || "").replace( alphaDetectRegEx, "" ) +
+          elem.filter = (elem.filter || "").replace( /alpha\([^)]*\)/, "" ) +
             (parseInt(value,0) + '' == "NaN" ? "" : "alpha(opacity=" + value * 100 + ")");
         }
 
         return elem.filter && elem.filter.indexOf("opacity=") >= 0 ?
-          (parseFloat( elem.filter.match(alphaReplaceRegEx)[1] ) / 100) + '':
+          (parseFloat( elem.filter.match(/opacity=([^)]*)/)[1] ) / 100) + '':
           "";
       }
 
@@ -4793,9 +4769,9 @@ SC.CoreQuery = (function() {
     CQ.fn[ name ] = function( selector ) {
       var ret = CQ.map( this, fn );
 
-      if ( selector && typeof selector === "string" ) {
+      if ( selector && typeof selector == "string" )
         ret = CQ.multiFilter( selector, ret );
-      }
+
       return this.pushStack(ret.uniq());
     };
   });
@@ -4811,9 +4787,8 @@ SC.CoreQuery = (function() {
       var args = arguments;
 
       return this.each(function(){
-        for ( var i = 0, length = args.length; i < length; i++ ) {
+        for ( var i = 0, length = args.length; i < length; i++ )
           CQ( args[ i ] )[ original ]( this );
-        }
       });
     };
   });
@@ -4821,7 +4796,7 @@ SC.CoreQuery = (function() {
   CQ.each({
     removeAttr: function( name ) {
       CQ.attr( this, name, "" );
-      if (this.nodeType === 1) this.removeAttribute( name );
+      if (this.nodeType == 1) this.removeAttribute( name );
     },
 
     addClass: function( classNames ) {
@@ -4862,7 +4837,7 @@ SC.CoreQuery = (function() {
   
   // Setup width and height functions
   CQ.each([ "Height", "Width" ], function(i, name){
-    var type = name.toLowerCase(), ret;
+    var type = name.toLowerCase();
 
     CQ.fn[ type ] = function( size ) {
       
@@ -4895,7 +4870,7 @@ SC.CoreQuery = (function() {
           
       // get/set element width/or height
       } else {
-        if (size === undefined) {
+        if (size == undefined) {
           return this.length ? CQ.css(this[0], type) : null ;
 
           // Set the width or height on the element (default to pixels if value is unitless)
@@ -4950,7 +4925,7 @@ SC.CoreQuery = (function() {
         doc          = elem.ownerDocument,
         safari2      = br.safari && parseInt(br.version,0) < 522 && !(/adobeair/i).test(br.userAgent),
         css          = CQ.curCSS,
-        fixed        = CQ.css(elem, "position") === "fixed";
+        fixed        = CQ.css(elem, "position") == "fixed";
 
     // Use getBoundingClientRect if available
     if (!(br.mozilla && elem==document.body) && elem.getBoundingClientRect){
@@ -4987,7 +4962,7 @@ SC.CoreQuery = (function() {
 
         // Add the document scroll offsets if position is fixed on any 
         // offsetParent
-        if (!fixed && css(offsetParent, "position") === "fixed") fixed = true;
+        if (!fixed && css(offsetParent, "position") == "fixed") fixed = true;
 
         // Set offsetChild to previous offsetParent unless it is the body 
         // element
@@ -4997,7 +4972,7 @@ SC.CoreQuery = (function() {
       }
 
       // Get parent scroll offsets
-      while ( parent && parent.tagName && !(bodyHTMLOffsetRegEx).test(parent.tagName)) {
+      while ( parent && parent.tagName && !(/^body|html$/i).test(parent.tagName)) {
         
         // Remove parent scroll UNLESS that parent is inline or a table to 
         // work around Opera inline/table scrollLeft/Top bug
@@ -5008,7 +4983,7 @@ SC.CoreQuery = (function() {
 
         // Mozilla does not add the border for a parent that has overflow != 
         // visible
-        if ( br.mozilla && css(parent, "overflow") !== "visible" ) border(parent);
+        if ( br.mozilla && css(parent, "overflow") != "visible" ) border(parent);
 
         // Get next parent
         parent = parent.parentNode;
@@ -5018,8 +4993,8 @@ SC.CoreQuery = (function() {
       // element/offsetParent or absolutely positioned offsetChild
       // Mozilla doubles body offsets with a non-absolutely positioned 
       // offsetChild
-      if ((safari2 && (fixed || css(offsetChild, "position") === "absolute"))||
-        (br.mozilla && css(offsetChild, "position") !== "absolute") ) {
+      if ((safari2 && (fixed || css(offsetChild, "position") == "absolute"))||
+        (br.mozilla && css(offsetChild, "position") != "absolute") ) {
           add( -doc.body.offsetLeft, -doc.body.offsetTop );
         }
 
@@ -5046,7 +5021,7 @@ SC.CoreQuery = (function() {
 
         // Get correct offsets
         offset       = this.offset(),
-        parentOffset = bodyHTMLOffsetRegEx.test(offsetParent[0].tagName) ? { top: 0, left: 0 } : offsetParent.offset();
+        parentOffset = /^body|html$/i.test(offsetParent[0].tagName) ? { top: 0, left: 0 } : offsetParent.offset();
 
         // Subtract element margins
         // note: when an element has margin: auto the offsetLeft and marginLeft 
@@ -5070,7 +5045,7 @@ SC.CoreQuery = (function() {
 
     offsetParent: function() {
       var offsetParent = this[0].offsetParent || document.body;
-      while ( offsetParent && (!(bodyHTMLOffsetRegEx).test(offsetParent.tagName) && CQ.css(offsetParent, 'position') === 'static') ) {
+      while ( offsetParent && (!(/^body|html$/i).test(offsetParent.tagName) && CQ.css(offsetParent, 'position') == 'static') ) {
         offsetParent = offsetParent.offsetParent;
       }
       return CQ(offsetParent);
@@ -5085,7 +5060,7 @@ SC.CoreQuery = (function() {
     CQ.fn[ method ] = function(val) {
       if (!this[0]) return;
 
-      return val !== undefined ?
+      return val != undefined ?
 
         // Set the scroll offset
         this.each(function() {
@@ -5123,7 +5098,7 @@ SC.mixin(SC.$.fn, /** @scope SC.CoreQuery.prototype */ {
     var values = [];
     var len = this.length, idx=0;
     for(idx=0;idx<len;idx++) {
-      values[idx] = '%@: %@'.fmt(idx, this[idx] ? this[idx].toString() : '(null)');
+      values[idx] = '%@: %@'.fmt(idx,(this[idx]) ? this[idx].toString() : '(null)');
     }
     return "<$:%@>(%@)".fmt(SC.guidFor(this),values.join(' , '));  
   },
@@ -5286,12 +5261,11 @@ SC.mixin(SC.$.fn, /** @scope SC.CoreQuery.prototype */ {
   // loop through an update some enumerable methods.  If this is CoreQuery,
   // we just need to patch up the wrapped methods.  If this is jQuery, we
   // need to go through the entire set of SC.Enumerable.
-  var isCoreQuery = SC.$.jquery === 'SC.CoreQuery',
-      fn = SC.$.fn, enumerable = isCoreQuery ? wrappers : SC.Enumerable ,
-      value;
+  var isCoreQuery = SC.$.jquery === 'SC.CoreQuery';
+  var fn = SC.$.fn, enumerable = isCoreQuery ? wrappers : SC.Enumerable ;
   for(var key in enumerable) {
     if (!enumerable.hasOwnProperty(key)) continue ;
-    value = enumerable[key];
+    var value = enumerable[key];
     if (key in wrappers) {
       original[key] = fn[key]; value = wrappers[key];
     }
@@ -5500,12 +5474,12 @@ SC.mixin(SC.Event, /** @scope SC.Event */ {
           this.add(e, eventType, target, method, context);
         }, this);
         return this;
-      } else elem = elem[0];
+      } else elem = elem.get(0);
     }
     if (!elem) return this; // nothing to do
     
     // cannot register events on text nodes, etc.
-    if ( elem.nodeType === 3 || elem.nodeType === 8 ) return SC.Event;
+    if ( elem.nodeType == 3 || elem.nodeType == 8 ) return SC.Event;
 
     // For whatever reason, IE has trouble passing the window object
     // around, causing it to be cloned in the process
@@ -5576,12 +5550,12 @@ SC.mixin(SC.Event, /** @scope SC.Event */ {
           this.remove(e, eventType, target, method);
         }, this);
         return this;
-      } else elem = elem[0];
+      } else elem = elem.get(0);
     }
     if (!elem) return this; // nothing to do
     
     // don't do events on text and comment nodes
-    if ( elem.nodeType === 3 || elem.nodeType === 8 ) return SC.Event;
+    if ( elem.nodeType == 3 || elem.nodeType == 8 ) return SC.Event;
 
     // For whatever reason, IE has trouble passing the window object
     // around, causing it to be cloned in the process
@@ -5705,18 +5679,18 @@ SC.mixin(SC.Event, /** @scope SC.Event */ {
           this.trigger(e, eventType, args, donative);
         }, this);
         return this;
-      } else elem = elem[0];
+      } else elem = elem.get(0);
     }
     if (!elem) return this; // nothing to do
 
     // don't do events on text and comment nodes
-    if ( elem.nodeType === 3 || elem.nodeType === 8 ) return undefined;
+    if ( elem.nodeType == 3 || elem.nodeType == 8 ) return undefined;
     
     // Normalize to an array
     args = SC.A(args) ;
 
     var ret, fn = SC.typeOf(elem[eventType] || null) === SC.T_FUNCTION , 
-        event, current, onfoo, isClick;
+        event, current, onfoo;
 
     // Get the event to pass, creating a fake one if necessary
     event = args[0];
@@ -6006,7 +5980,7 @@ SC.mixin(SC.Event, /** @scope SC.Event */ {
   
   /** @private Take an incoming event and convert it to a normalized event. */
   normalizeEvent: function(event) {
-    if (event === window.event) {
+    if (event == window.event) {
       // IE can't do event.normalized on an Event object
       return SC.Event.create(event) ; 
     } else {
@@ -6084,16 +6058,8 @@ SC.Event.prototype = {
   normalized: YES,
 
   /** Returns the pressed character (found in this.which) as a string. */
-  getCharString: function() {
-      if(SC.browser.msie){
-        if(this.keyCode == 8 || this.keyCode == 9 || (this.keyCode>=37 && this.keyCode<=40)){
-          return String.fromCharCode(0);
-        }else{
-          return (this.keyCode>0) ? String.fromCharCode(this.keyCode) : null;  
-        }
-      }else{
-        return (this.charCode>0) ? String.fromCharCode(this.charCode) : null;
-      }
+  getCharString: function() { 
+    return (this.charCode>0) ? String.fromCharCode(this.which) : null;
   },
   
   /** Returns character codes for the event.  The first value is the normalized code string, with any shift or ctrl characters added to the begining.  The second value is the char string by itself.
@@ -6442,12 +6408,6 @@ sc_require('system/locale');
 // SproutCore.
 /** @private */
 SC.STRING_TITLEIZE_REGEXP = (/([\s|\-|\_|\n])([^\s|\-|\_|\n]?)/g);
-SC.STRING_DECAMELIZE_REGEXP = (/([a-z])([A-Z])/g);
-SC.STRING_DASHERIZE_REGEXP = (/[ _]/g);
-SC.STRING_HUMANIZE_REGEXP = (/[\-_]/g);
-SC.STRING_TRIM_REGEXP = (/^\s+|\s+$/g);
-SC.STRING_TRIM_LEFT_REGEXP = (/^\s+/g);
-SC.STRING_TRIM_RIGHT_REGEXP = (/\s+$/g);
 
 /**
   @namespace
@@ -6548,7 +6508,7 @@ SC.String = {
     @return {String} titleized string.
   */
   titleize: function() {
-    var ret = this.replace(SC.STRING_DECAMELIZE_REGEXP,'$1_$2'); // decamelize
+    var ret = this.replace(/([a-z])([A-Z])/g,'$1_$2'); // decamelize
     return ret.replace(SC.STRING_TITLEIZE_REGEXP, 
       function(str,separater,character) { 
         return (character) ? (' ' + character.toUpperCase()) : ' ';
@@ -6615,7 +6575,7 @@ SC.String = {
     @returns {String} the decamelized string.
   */
   decamelize: function() { 
-    return this.replace(SC.STRING_DECAMELIZE_REGEXP,'$1_$2').toLowerCase();
+    return this.replace(/([a-z])([A-Z])/g,'$1_$2').toLowerCase();
   },
 
   /**
@@ -6633,7 +6593,7 @@ SC.String = {
     @returns {String} the dasherized string.
   */
   dasherize: function() {
-    return this.decamelize().replace(SC.STRING_DASHERIZE_REGEXP,'-') ;  
+    return this.decamelize().replace(/[ _]/g,'-') ;  
   },
   
   /**
@@ -6651,7 +6611,7 @@ SC.String = {
     @returns {String} the humanized string.
   */
   humanize: function() {
-    return this.decamelize().replace(SC.STRING_HUMANIZE_REGEXP,' ') ;
+    return this.decamelize().replace(/[\-_]/g,' ') ;
   },
   
   /**
@@ -6732,8 +6692,9 @@ SC.String = {
       diacriticMappingTable = SC.diacriticMappingTable;
     }
     
-    var original, replacement, ret = "",
-        length = this.length;
+    var original, replacement;
+    var ret = "";
+    var length = this.length;
     for (var i = 0; i <= length; ++i) {
       original = this.charAt(i);
       replacement = diacriticMappingTable[original];
@@ -6754,7 +6715,7 @@ SC.String = {
     @returns {String} the trimmed string
   */
   trim: function () {
-    return this.replace(SC.STRING_TRIM_REGEXP,"");
+    return this.replace(/^\s+|\s+$/g,"");
   },
   
   /**
@@ -6763,7 +6724,7 @@ SC.String = {
     @returns {String} the trimmed string
   */
   trimLeft: function () {
-    return this.replace(SC.STRING_TRIM_LEFT_REGEXP,"");
+    return this.replace(/^\s+/g,"");
   },
   
   /**
@@ -6772,7 +6733,7 @@ SC.String = {
     @returns {String} the trimmed string
   */
   trimRight: function () {
-    return this.replace(SC.STRING_TRIM_RIGHT_REGEXP,"");
+    return this.replace(/\s+$/g,"");
   }
     
 };
@@ -6911,14 +6872,6 @@ SC.EMPTY_CHILD_VIEWS_ARRAY.needsClone = YES;
     re-render the view using the render() method.  If you would like to 
     override this behavior with your own custom updating code, you can 
     replace updateLayer() with your own implementation instead.
-    
-  - *didAppendLayerToDocument:* in theory all DOM setup could be done
-    in didCreateLayer() as you already have a DOM element instantiated. 
-    However there is cases where the element has to be first appended to the
-    Document because there is either a bug on the browser or you are using 
-    plugins which objects are not instantiated until you actually append the
-    element to the DOM. This will allow you to do things like registering 
-    DOM events on flash or quicktime objects.
   
   @extends SC.Responder
   @extends SC.DelegateSupport
@@ -7049,8 +7002,8 @@ SC.View = SC.Responder.extend(SC.DelegateSupport,
     @returns {SC.View} receiver 
   */
   recomputeIsVisibleInWindow: function(parentViewIsVisible) {
-    var last = this.get('isVisibleInWindow'),
-        cur = this.get('isVisible'), parentView ;
+    var last = this.get('isVisibleInWindow') ;
+    var cur = this.get('isVisible'), parentView ;
     
     // isVisibleInWindow = isVisible && parentView.isVisibleInWindow
     // this approach only goes up to the parentView if necessary.
@@ -7061,7 +7014,7 @@ SC.View = SC.Responder.extend(SC.DelegateSupport,
     }
     
     // if the state has changed, update it and notify children
-    // if (last !== cur) {
+    if (last !== cur) {
       this.set('isVisibleInWindow', cur) ;
       this._needsVisibiltyChange = YES ; // update even if we aren't visible
       
@@ -7085,7 +7038,7 @@ SC.View = SC.Responder.extend(SC.DelegateSupport,
       // visible.
       if (!cur && this.get('isFirstResponder')) this.resignFirstResponder();
       
-    // }
+    }
     return this ;
   }.observes('isVisible'),
   
@@ -7139,10 +7092,6 @@ SC.View = SC.Responder.extend(SC.DelegateSupport,
     // The DOM will need some fixing up, note this on the view.
     view.parentViewDidChange() ;
     view.layoutDidChange() ;
-    var pane = view.get('pane');
-    if(pane && pane.get('isPaneAttached')) {
-      view._notifyDidAppendToDocument();
-    }
     
     // notify views
     if (this.didAddChild) this.didAddChild(view, beforeView) ;
@@ -7310,9 +7259,9 @@ SC.View = SC.Responder.extend(SC.DelegateSupport,
   _invalidatePaneCacheForSelfAndAllChildViews: function () {
     this.notifyPropertyChange('pane');
     
-    var childViews = this.get('childViews'),
-        len = childViews.length, idx ;
-    for (idx=0; idx<len; ++idx) {
+    var childViews = this.get('childViews');
+    var len = childViews.length ;
+    for (var idx=0; idx<len; ++idx) {
       var childView = childViews[idx];
       if (childView._invalidatePaneCacheForSelfAndAllChildViews) childView._invalidatePaneCacheForSelfAndAllChildViews();
     }
@@ -7404,8 +7353,8 @@ SC.View = SC.Responder.extend(SC.DelegateSupport,
     @returns {DOMElement} the discovered layer
   */
   findLayerInParentLayer: function(parentLayer) {
-    var layerId = this.get('layerId'),
-        node, i, ilen,found, elem;
+    var layerId = this.get('layerId') ;
+    var node, i, ilen,found, elem;
     
     // first, let's try the fast path...
     if(parentLayer.getElementById) elem = parentLayer.getElementById(layerId) ;
@@ -7417,7 +7366,7 @@ SC.View = SC.Responder.extend(SC.DelegateSupport,
     // if browser supports querySelector use that.
     if (!elem && parentLayer.querySelector) {
       // TODO: make querySelector work on all platforms...
-      elem = parentLayer.querySelector('#' + layerId);
+      // elem = parentLayer.querySelector('#' + layerId)[0];
     }
     
     // if no element was found the fast way, search down the parentLayer for
@@ -7535,14 +7484,7 @@ SC.View = SC.Responder.extend(SC.DelegateSupport,
     var context = this.renderContext(this.get('layer')) ;
     this.prepareContext(context, NO) ;
     context.update() ;
-    if (context._innerHTMLReplaced) {
-      var pane = this.get('pane');
-      if(pane && pane.get('isPaneAttached')) {
-        this._notifyDidAppendToDocument();
-      }
-    }
     if (this.didUpdateLayer) this.didUpdateLayer(); // call to update DOM
-    if(this.designer && this.designer.viewDidUpdateLayer) this.designer.viewDidUpdateLayer(); //let the designer know
     return this ;
   },
   
@@ -7590,13 +7532,13 @@ SC.View = SC.Responder.extend(SC.DelegateSupport,
   */
   _notifyDidCreateLayer: function() {
     if (this.didCreateLayer) this.didCreateLayer() ;
-    var mixins = this.didCreateLayerMixin, len, idx,
-        childViews = this.get('childViews');
+    var mixins = this.didCreateLayerMixin, len, idx ;
     if (mixins) {
       len = mixins.length ;
       for (idx=0; idx<len; ++idx) mixins[idx].call(this) ;
     }
     
+    var childViews = this.get('childViews') ;
     len = childViews.length ;
     for (idx=0; idx<len; ++idx) {
       if (!childViews[idx]) continue;
@@ -7654,13 +7596,13 @@ SC.View = SC.Responder.extend(SC.DelegateSupport,
   */
   _notifyWillDestroyLayer: function() {
     if (this.willDestroyLayer) this.willDestroyLayer() ;
-    var mixins = this.willDestroyLayerMixin, len, idx,
-        childViews = this.get('childViews') ;
+    var mixins = this.willDestroyLayerMixin, len, idx ;
     if (mixins) {
       len = mixins.length ;
       for (idx=0; idx<len; ++idx) mixins[idx].call(this) ;
     }
     
+    var childViews = this.get('childViews') ;
     len = childViews.length ;
     for (idx=0; idx<len; ++idx) childViews[idx]._notifyWillDestroyLayer() ;
     
@@ -7761,23 +7703,6 @@ SC.View = SC.Responder.extend(SC.DelegateSupport,
   */
   render: function(context, firstTime) {
     if (firstTime) this.renderChildViews(context, firstTime) ;
-  },
-  
-  
-  /** @private - 
-    Invokes the receivers didAppendLayerToDocument() method if it exists and then
-    invokes the same on all child views. 
-  */
-  
-  _notifyDidAppendToDocument: function() {
-    if(this.didAppendToDocument) this.didAppendToDocument();
-    var i=0, child, childLen, children = this.get('childViews');
-    for(i=0, childLen=children.length; i<childLen; i++) {
-      child = children[i];
-      if(child._notifyDidAppendToDocument){
-        child._notifyDidAppendToDocument();
-      }
-    }
   },
   
   // ..........................................................
@@ -7882,9 +7807,9 @@ SC.View = SC.Responder.extend(SC.DelegateSupport,
   updateLayerLocation: function() {
     // collect some useful value
     // if there is no node for some reason, just exit
-    var node = this.get('layer'),
-        parentView = this.get('parentView'),
-        parentNode = parentView ? parentView.get('containerLayer') : null ;
+    var node = this.get('layer') ;
+    var parentView = this.get('parentView') ;
+    var parentNode = parentView ? parentView.get('containerLayer') : null ;
     
     // remove node from current parentNode if the node does not match the new 
     // parent node.
@@ -7931,7 +7856,7 @@ SC.View = SC.Responder.extend(SC.DelegateSupport,
       }
     }
     
-    parentNode = parentView = node = nextNode = null ; // avoid memory leaks
+    parentNode = parentView = node = null ; // avoid memory leaks
     return this ; 
   },
   
@@ -8076,33 +8001,36 @@ SC.View = SC.Responder.extend(SC.DelegateSupport,
     @type SC.View
   */
   nextValidKeyView: function() {
-    var seen = [],
-        rootView = this.pane(), ret; 
-    ret = rootView._computeNextValidKeyView(this, seen);
+    var seen = SC.CoreSet.create(),
+        ret  = this._computeNextValidKeyView(seen);
+    seen.destroy();
     return ret ;
   }.property('nextKeyView'),
   
-  _computeNextValidKeyView: function(currentView, seen) {  
+  _computeNextValidKeyView: function(seen) {  
     var ret = this.get('nextKeyView'),
-        children, i, childLen, child;
-    if(this !== currentView && seen.indexOf(currentView)!=-1 && 
-      this.get('acceptsFirstResponder') && this.get('isVisibleInWindow')){
-      return this;
-    }
-    seen.push(this); // avoid cycles
+        pv, cv, idx;
+
+    seen.add(this); // avoid cycles
     
     // find next sibling
     if (!ret) {
-      children = this.get('childViews');
-      for(i=0, childLen= children.length; i<childLen; i++){
-        child = children[i];
-        if(child.get('isVisibleInWindow') && child.get('isVisible')){
-          ret = child._computeNextValidKeyView(currentView, seen);
-        }
-        if (ret) return ret;
-      }
-      ret = null;
+      pv = this.get('parentView');
+      cv = pv ? pv.get('childViews') : null;
+      idx = cv ? cv.indexOf(this) : -1 ;
+      
+      // get next child if possible
+      if (idx<0) ret = null;
+      else if (idx+1 >= cv.get('length')) ret = cv.objectAt(0);
+      else ret = cv.objectAt(idx+1);
     }
+    
+    // if next view does not accept responder then get nextValidKeyView...
+    if (ret && !ret.get('acceptsFirstResponder')) {
+      if (seen.contains(ret)) ret = null;
+      else ret = ret._computeNextValidKeyView(seen);
+    }
+    
     return ret ;
   },
   
@@ -8121,34 +8049,36 @@ SC.View = SC.Responder.extend(SC.DelegateSupport,
     @type SC.View
   */
   previousValidKeyView: function() {
-    var seen = [],
-        rootView = this.pane(), ret; 
-    ret = rootView._computePreviousValidKeyView(this, seen);
+    var seen = SC.CoreSet.create(),
+        ret  = this._computePreviousValidKeyView(seen);
+    seen.destroy();
     return ret ;
   }.property('previousKeyView'),
   
-  _computePreviousValidKeyView: function(currentView, seen) {  
+  _computePreviousValidKeyView: function(seen) {  
     var ret = this.get('previousKeyView'),
-        children, i, child;
-        
-    if(this !== currentView && seen.indexOf(currentView)!=-1 && 
-      this.get('acceptsFirstResponder') && this.get('isVisibleInWindow')){
-      return this;
-    }
-    seen.push(this); // avoid cycles
+        pv, cv, idx;
+
+    seen.add(this); // avoid cycles
     
-    // find next sibling
+    // find previous sibling
     if (!ret) {
-      children = this.get('childViews');
-      for(i=children.length-1; 0<=i; i--){
-        child = children[i];
-        if(child.get('isVisibleInWindow') && child.get('isVisible')){
-          ret = child._computePreviousValidKeyView(currentView, seen);
-        }
-        if (ret) return ret;
-      }
-      ret = null;
+      pv = this.get('parentView');
+      cv = pv ? pv.get('childViews') : null;
+      idx = cv ? cv.indexOf(this) : -1 ;
+      
+      // get next child if possible
+      if (idx<0) ret = null;
+      else if (idx > 0) ret = cv.objectAt(idx-1);
+      else ret = cv.objectAt(cv.get('length')-1);
     }
+    
+    // if next view does not accept responder then get nextValidKeyView...
+    if (ret && !ret.get('acceptsFirstResponder')) {
+      if (seen.contains(ret)) ret = null;
+      else ret = ret._computePreviousValidKeyView(seen);
+    }
+    
     return ret ;
   },
   
@@ -8504,7 +8434,7 @@ SC.View = SC.Responder.extend(SC.DelegateSupport,
     }
     
     // walk up this side
-    while (view && view.get('frame')) {
+    while (view) {
       f = view.get('frame'); myX += f.x; myY += f.y ;
       view = view.get('parentView') ; 
     }
@@ -8571,9 +8501,9 @@ SC.View = SC.Responder.extend(SC.DelegateSupport,
     @returns {Rect} the computed frame
   */
   computeFrameWithParentFrame: function(pdim) {
-    var layout = this.get('layout'),
-        f = {} , error, layer, AUTO = SC.LAYOUT_AUTO,
-        stLayout = this.get('useStaticLayout') ;
+    var layout = this.get('layout') ;
+    var f = {} , error, layer, AUTO = SC.LAYOUT_AUTO;
+    var stLayout = this.get('useStaticLayout') ;
     
     if (layout.width !== undefined &&
         layout.width === SC.LAYOUT_AUTO &&
@@ -8871,9 +8801,8 @@ SC.View = SC.Responder.extend(SC.DelegateSupport,
     @readOnly
   */
   layoutStyle: function() {
-    var layout = this.get('layout'), ret = {}, pdim = null, error, 
-        AUTO = SC.LAYOUT_AUTO,
-        stLayout = this.get('useStaticLayout');
+    var layout = this.get('layout'), ret = {}, pdim = null, error, AUTO = SC.LAYOUT_AUTO;
+    var stLayout = this.get('useStaticLayout');
     
     if (layout.width !== undefined &&
         layout.width === SC.LAYOUT_AUTO &&
@@ -9128,8 +9057,8 @@ SC.View = SC.Responder.extend(SC.DelegateSupport,
     @returns {void}
   */
   layoutChildViews: function() {
-    var set = this._needLayoutViews, len = set ? set.length : 0, idx,
-        view, context, layer;
+    var set = this._needLayoutViews, len = set ? set.length : 0, idx;
+    var view, context, layer;
     for(idx=0;idx<len;idx++) {
       view = set[idx];
       view.updateLayout();
@@ -9234,122 +9163,6 @@ SC.View.mixin(/** @scope SC.View */ {
   },
   
   /**
-    Convert any layout to a Top, Left, Width, Height layout
-  */
-  convertLayoutToAnchoredLayout: function(layout, parentFrame){
-    var ret = {top: 0, left: 0, width: parentFrame.width, height: parentFrame.height};
-    
-    // X Conversion
-    // handle left aligned and left/right
-    if (!SC.none(layout.left)) {
-      ret.left = Math.floor(layout.left);
-      if (layout.width !== undefined) {
-        if(layout.width === SC.LAYOUT_AUTO) ret.width = SC.LAYOUT_AUTO ;
-        else ret.width = Math.floor(layout.width) ;
-      } else {
-        ret.width = parentFrame.width - ret.left - Math.floor(layout.right || 0);
-      }
-
-    // handle right aligned
-    } else if (!SC.none(layout.right)) {
-      
-      // if no width, calculate it from the parent frame
-      if (SC.none(layout.width)) {
-        ret.left = 0;
-        ret.width = parentFrame.width - Math.floor(layout.right || 0);
-      
-      // If has width, calculate the left anchor from the width and right and parent frame
-      } else {
-        if(layout.width === SC.LAYOUT_AUTO) ret.width = SC.LAYOUT_AUTO ;
-        else { 
-          ret.width = layout.width;
-          ret.left = parentFrame.width - (layout.width + layout.right); 
-        }
-      }
-
-    // handle centered
-    } else if (!SC.none(layout.centerX)) {
-      ret.width = Math.floor(layout.width || 0) ;
-      ret.left = Math.floor((parentFrame.width - ret.width)/2) + layout.centerX;
-    
-    // if width defined, assume left of zero
-    } else if (!SC.none(layout.width)) {
-      ret.left =  0;
-      if(layout.width === SC.LAYOUT_AUTO) ret.width = SC.LAYOUT_AUTO ;
-      else {
-        ret.width = Math.floor(layout.width);
-      }
-
-    // fallback, full width.
-    } else {
-      ret.left = 0;
-      ret.width = 0;
-    }
-
-    // handle min/max
-    if (layout.minWidth !== undefined) ret.minWidth = layout.minWidth ;
-    if (layout.maxWidth !== undefined) ret.maxWidth = layout.maxWidth ; 
-    
-    // Y Conversion
-    // handle left aligned and top/bottom
-    if (!SC.none(layout.top)) {
-      ret.top = Math.floor(layout.top);
-      if (layout.height !== undefined) {
-        if(layout.height === SC.LAYOUT_AUTO) ret.height = SC.LAYOUT_AUTO ;
-        else ret.height = Math.floor(layout.height) ;
-      } else {
-        ret.height = parentFrame.height - ret.top - Math.floor(layout.bottom || 0);
-      }
-
-    // handle bottom aligned
-    } else if (!SC.none(layout.bottom)) {
-      
-      // if no height, calculate it from the parent frame
-      if (SC.none(layout.height)) {
-        ret.top = 0;
-        ret.height = parentFrame.height - Math.floor(layout.bottom || 0);
-      
-      // If has height, calculate the top anchor from the height and bottom and parent frame
-      } else {
-        if(layout.height === SC.LAYOUT_AUTO) ret.height = SC.LAYOUT_AUTO ;
-        else { 
-          ret.height = layout.height;
-          ret.top = parentFrame.height - (layout.height + layout.bottom); 
-        }
-      }
-
-    // handle centered
-    } else if (!SC.none(layout.centerY)) {
-      ret.height = Math.floor(layout.height || 0) ;
-      ret.top = Math.floor((parentFrame.height - ret.height)/2) + layout.centerY;
-    
-    // if height defined, assume top of zero
-    } else if (!SC.none(layout.height)) {
-      ret.top =  0;
-      if(layout.height === SC.LAYOUT_AUTO) ret.height = SC.LAYOUT_AUTO ;
-      else ret.height = Math.floor(layout.height);
-
-    // fallback, full height.
-    } else {
-      ret.top = 0;
-      ret.height = 0;
-    }
-
-    // handle min/max
-    if (layout.minHeight !== undefined) ret.minHeight = layout.minHeight ;
-    if (layout.maxHeight !== undefined) ret.maxHeight = layout.maxHeight ;
-    
-    return ret;
-  },
-  
-  /**
-    For now can only convert Top/Left/Width/Height to a Custom Layout
-  */
-  convertLayoutToCustomLayout: function(layout, layoutParams, parentFrame){
-    // TODO: [EG] Create Top/Left/Width/Height to a Custom Layout conversion
-  },
-  
-  /**
     Helper applies the classNames to the prototype
   */
   classNames: function(sc) {
@@ -9410,7 +9223,7 @@ SC.View.mixin(/** @scope SC.View */ {
   */
   localization: function(attrs, rootElement) { 
     // add rootElement
-    if (rootElement) attrs.rootElement = SC.$(rootElement)[0];
+    if (rootElement) attrs.rootElement = SC.$(rootElement).get(0);
     return attrs; 
   },
   
@@ -9428,7 +9241,7 @@ SC.View.mixin(/** @scope SC.View */ {
     var args = SC.$A(arguments); // prepare to edit
     if (SC.none(element)) {
       args.shift(); // remove if no element passed
-    } else args[0] = { rootElement: SC.$(element)[0] } ;
+    } else args[0] = { rootElement: SC.$(element).get(0) } ;
     var ret = this.create.apply(this, arguments) ;
     args = args[0] = null;
     return ret ;
@@ -9642,38 +9455,14 @@ SC.Pane = SC.View.extend( /** @scope SC.Pane.prototype */ {
     
     @returns {Rect} current window size 
   */
-  computeParentDimensions: function(frame) {
-    var wframe = this.get('currentWindowSize');
-    var wDim = {x: 0, y: 0, width: 1000, height: 1000};
-    if (wframe){
-      wDim.width = wframe.width;
-      wDim.height = wframe.height;
-    }
-    // Call the RootResponder instance...
-    else if (SC.RootResponder.responder) {
-      var wSize = SC.RootResponder.responder.get('currentWindowSize');
-      if (wSize){
-        wDim.width = wSize.width;
-        wDim.height = wSize.height;
-      }
-    }
-    // If all else fails then we need to Calculate it from the window size and DOM
-    else {
-      if (window.innerHeight) {
-        wDim.width = window.innerWidth;
-        wDim.height = window.innerHeight;
-      } else if (document.documentElement && document.documentElement.clientHeight) {
-        wDim.width = document.documentElement.clientWidth;
-        wDim.height = document.documentElement.clientHeight; 
-      } else if (document.body) {
-        wDim.width = document.body.clientWidth;
-        wDim.height = document.body.clientHeight;
-      }
-      this.windowSizeDidChange(null, wDim);
-    }    
-    return wDim;
+  computeParentDimensions: function() {
+    var pframe = this.get('currentWindowSize');
+    return {
+      width: (pframe) ? pframe.width : 1000,
+      height: (pframe) ? pframe.height : 1000
+    } ;
   },
-    
+  
   /** @private Disable caching due to an known bug in SC. */
   frame: function() {
     return this.computeFrameWithParentFrame(null) ;
@@ -9731,27 +9520,6 @@ SC.Pane = SC.View.extend( /** @scope SC.Pane.prototype */ {
     }
         
     return evt.mouseHandler || target ;
-  },
-
-  performKeyEquivalent: function(keystring, evt) {
-    var ret = arguments.callee.base.apply(this,arguments) ; // try normal view behavior first
-    if (!ret) {
-      var defaultResponder = this.get('defaultResponder') ;
-      if (defaultResponder) {
-        // try default responder's own performKeyEquivalent method,
-        // if it has one...
-        if (defaultResponder.performKeyEquivalent) {
-          ret = defaultResponder.performKeyEquivalent(keystring, evt) ;
-        }
-        
-        // even if it does have one, if it doesn't handle the event, give
-        // methodName-style key equivalent handling a try
-        if (!ret) {
-          ret = defaultResponder.tryToPerform(keystring, evt) ;
-        }
-      }
-    }
-    return ret ;
   },
 
   // .......................................................
@@ -10027,7 +9795,6 @@ SC.Pane = SC.View.extend( /** @scope SC.Pane.prototype */ {
     if (!this.get('isPaneAttached')) return this ; // nothing to do
     
     // remove layer...
-    this.set('isVisibleInWindow', NO);
     var dom = this.get('layer') ;
     if (dom.parentNode) dom.parentNode.removeChild(dom) ;
     dom = null ;
@@ -10043,6 +9810,7 @@ SC.Pane = SC.View.extend( /** @scope SC.Pane.prototype */ {
     
     // clean up some of my own properties
     this.set('isPaneAttached', NO) ;
+    this.parentViewDidChange() ;
     return this ;
   },
   
@@ -10166,9 +9934,6 @@ SC.Pane = SC.View.extend( /** @scope SC.Pane.prototype */ {
     this.set('isPaneAttached', YES) ;
     this.parentViewDidChange() ;
     
-    //notify that the layers have been appended to the document
-    this._notifyDidAppendToDocument();
-    
     return this ;
   },
   
@@ -10189,13 +9954,12 @@ SC.Pane = SC.View.extend( /** @scope SC.Pane.prototype */ {
     @returns {SC.Pane} receiver
   */
   recomputeIsVisibleInWindow: function(parentViewIsVisible) {
-    var last = this.get('isVisibleInWindow'),
-        cur = this.get('isVisible') ;
+    var last = this.get('isVisibleInWindow') ;
+    var cur = this.get('isPaneAttached') && this.get('isVisible') ;
 
     // if the state has changed, update it and notify children
-    // if (last !== cur) {
+    if (last !== cur) {
       this.set('isVisibleInWindow', cur) ;
-      this._needsVisibiltyChange = YES ; // update even if we aren't visible      
       
       // if we just became visible, update layer + layout if needed...
       if (cur && this.get('layerNeedsUpdate')) this.updateLayerIfNeeded();
@@ -10209,7 +9973,7 @@ SC.Pane = SC.View.extend( /** @scope SC.Pane.prototype */ {
       // if we were firstResponder, resign firstResponder also if no longer
       // visible.
       if (!cur && this.get('isFirstResponder')) this.resignFirstResponder();
-    // }
+    }
     
     // if we just became visible, update layer + layout if needed...
     if (cur) {
@@ -10248,6 +10012,7 @@ SC.Pane = SC.View.extend( /** @scope SC.Pane.prototype */ {
 /* >>>>>>>>>> BEGIN source/debug/control_test_pane.js */
 // ==========================================================================
 // Project:   SproutCore - JavaScript Application Framework
+// Copyright: �2006-2009 Sprout Systems, Inc. and contributors.
 //            portions copyright @2009 Apple Inc.
 // License:   Licened under MIT license (see license.js)
 // ==========================================================================
@@ -10870,53 +10635,43 @@ SC.Button = {
     @returns {SC.RenderContext} the context
   */
   renderTitle: function(context, firstTime) {
-    var icon = this.get('icon'),
-        image = '' ,
-        title = this.get('displayTitle') ,
-        needsTitle = (!SC.none(title) && title.length>0),
-        elem, htmlNode, imgTitle;
+    var icon = this.get('icon') ;
+    var image = '' ;
+    var title = this.get('displayTitle') ;
+    var needsTitle = (!SC.none(title) && title.length>0);
+    var elem, htmlNode;
     // get the icon.  If there is an icon, then get the image and update it.
     // if there is no image element yet, create it and insert it just before
     // title.
-    
     if (icon) {
       var blank = SC.BLANK_IMAGE_URL;
 
+      image = '<img src="%@1" alt="" class="%@2" />' ;
       if (icon.indexOf('/') >= 0) {
-        image = '<img src="'+icon+'" alt="" class="icon" />';
+        image = image.fmt(icon, 'icon');
       } else {
-        image = '<img src="'+blank+'" alt="" class="'+icon+'" />';
+        image = image.fmt(blank, icon);
       }
       needsTitle = YES ;
     }
-    imgTitle = image + title;
+    elem = this.$('label');
     if(firstTime){
       if(this.get('needsEllipsis')){
-        context.push('<label class="sc-button-label ellipsis">'+imgTitle+'</label>'); 
+        context.push('<label class="sc-button-label ellipsis">'+image+title+'</label>'); 
       }else{
-          context.push('<label class="sc-button-label">'+imgTitle+'</label>'); 
+          context.push('<label class="sc-button-label">'+image+title+'</label>'); 
       }  
-      this._ImageTitleCached = imgTitle;
-    }else{
-      elem = this.$('label');  
-      if ( (htmlNode = elem[0])){
-        if(needsTitle) { 
-          if(this.get('needsEllipsis')){
-            elem.addClass('ellipsis');
-            if(this._ImageTitleCached !== imgTitle) {
-              this._ImageTitleCached = imgTitle; // Update the cache
-              htmlNode.innerHTML = imgTitle;
-            }
-          }else{
-            elem.removeClass('ellipsis');
-            if(this._ImageTitleCached !== imgTitle) {
-              this._ImageTitleCached = imgTitle; // Update the cache
-              htmlNode.innerHTML = imgTitle;
-            }
-          } 
-        }
-        else { htmlNode.innerHTML = ''; } 
+    }else if ( (htmlNode = elem[0])){
+      if(needsTitle) { 
+        if(this.get('needsEllipsis')){
+          elem.addClass('ellipsis');
+          htmlNode.innerHTML = image + title;
+        }else{
+          elem.removeClass('ellipsis');
+          htmlNode.innerHTML = image + title;
+        } 
       }
+      else { htmlNode.innerHTML = ''; } 
     }  
     return context ;
   },
@@ -10930,8 +10685,8 @@ SC.Button = {
     @returns {SC.Button} receiver
   */
   contentPropertyDidChange: function(target, key) {
-    var del = this.get('displayDelegate'), 
-        content = this.get('content'), value ;
+    var del = this.get('displayDelegate');
+    var content = this.get('content'), value ;
 
     var valueKey = this.getDelegateProperty('contentValueKey', del) ;
     if (valueKey && (key === valueKey || key === '*')) {
@@ -11011,7 +10766,8 @@ SC.Button = {
     @returns {Boolean} return state
   */
   computeIsSelectedForValue: function(value) {
-    var targetValue = this.get('toggleOnValue'), state, next ;
+    var targetValue = this.get('toggleOnValue') ;
+    var state, next ;
     
     if (SC.typeOf(value) === SC.T_ARRAY) {
 
@@ -11033,8 +10789,7 @@ SC.Button = {
       
     // for single values, just compare to the toggleOnValue...use truthiness
     } else {
-      if(value === SC.MIXED_STATE) state = SC.MIXED_STATE;
-      else state = (value == targetValue) ;
+      state = (value == targetValue) ;
     }
     return state ;
   },
@@ -11050,8 +10805,8 @@ SC.Button = {
     Whenever the button value changes, update the selected state to match.
   */
   _button_valueDidChange: function() {
-    var value = this.get('value'),
-        state = this.computeIsSelectedForValue(value);
+    var value = this.get('value');  
+    var state = this.computeIsSelectedForValue(value);
     this.set('isSelected', state) ; // set new state...
   }.observes('value'),
   
@@ -11059,8 +10814,8 @@ SC.Button = {
     Whenever the selected state is changed, make sure the button value is also updated.  Note that this may be called because the value has just changed.  In that case this should do nothing.
   */
   _button_isSelectedDidChange: function() {
-    var newState = this.get('isSelected'),
-        curState = this.computeIsSelectedForValue(this.get('value'));
+    var newState = this.get('isSelected');
+    var curState = this.computeIsSelectedForValue(this.get('value'));
     
     // fix up the value, but only if computed state does not match.
     // never fix up value if isSelected is set to MIXED_STATE since this can
@@ -11933,6 +11688,14 @@ SC.FieldView = SC.View.extend(SC.Control, SC.Validatable,
      WARNING: Use only with textField** Juan
   */
   isTextArea: NO,
+  
+  /*
+    This variable is here to make the tab focus behavior work like safari's.
+    We believe that is a better experience for accesibility and the user in 
+    general to be able to access all controls through you keyboard. If you
+    disagree set this variable to YES.
+  */
+  followSafariTabFocusBehavior: NO,
 
 
   _field_isMouseDown: NO,
@@ -12075,17 +11838,6 @@ SC.FieldView = SC.View.extend(SC.Control, SC.Validatable,
     SC.Event.add(this.$input(), 'change', this, this._field_fieldValueDidChange) ;
   },
   
-  /** @private
-    after the layer is append to the doc, set the field value and observe events
-    only for textarea.
-  */
-  didAppendToDocument: function() {
-    if(this.get('isTextArea')){
-      this.setFieldValue(this.get('fieldValue'));
-      SC.Event.add(this.$input(), 'change', this, this._field_fieldValueDidChange) ;
-    }
-  },
-  
   willDestroyLayer: function() {
     SC.Event.remove(this.$input(), 'change', this, this._field_fieldValueDidChange); 
   },
@@ -12175,8 +11927,7 @@ SC.FieldView = SC.View.extend(SC.Control, SC.Validatable,
     // handle tab key
     if (evt.which === 9) {
       var view = evt.shiftKey ? this.get('previousValidKeyView') : this.get('nextValidKeyView');
-      if(view) view.becomeFirstResponder();
-      else evt.allowDefault();
+      view.becomeFirstResponder();
       return YES ; // handled
     }
     
@@ -12193,8 +11944,10 @@ SC.FieldView = SC.View.extend(SC.Control, SC.Validatable,
   
   /** tied to the isEnabled state */
   acceptsFirstResponder: function() {
-    if(!SC.SAFARI_FOCUS_BEHAVIOR) return this.get('isEnabled');
-    else return NO;
+    if(!this.get('followSafariTabFocusBehavior')){
+      return this.get('isEnabled');
+    }
+    return NO;
   }.property('isEnabled'),
   
   willBecomeKeyResponderFrom: function(keyView) {
@@ -12203,7 +11956,7 @@ SC.FieldView = SC.View.extend(SC.Control, SC.Validatable,
       this._isFocused = YES ;
       this.becomeFirstResponder();
       if (this.get('isVisibleInWindow')) {
-        this.$input()[0].focus();
+        this.$input().get(0).focus();
       }
     }
   },
@@ -12593,8 +12346,8 @@ SC.TextFieldView = SC.FieldView.extend(SC.StaticLayout, SC.Editable,
     @property {SC.TextSelection}
   */
   selection: function(key, value) {
-    var element = this.$input()[0],
-        range, start, end;
+    var element = this.$input().get(0) ;
+    var range, start, end;
 
     // Are we being asked to set the value, or return the current value?
     if (value === undefined) {
@@ -12704,23 +12457,17 @@ SC.TextFieldView = SC.FieldView.extend(SC.StaticLayout, SC.Editable,
     this.accessoryViewObserver() ;
   },
 
-  acceptsFirstResponder: function() {
-    return this.get('isEnabled');
-  }.property('isEnabled'),
-
 
   accessoryViewObserver: function() {
-    var classNames,
-        viewProperties = ['leftAccessoryView', 'rightAccessoryView'],
-        len = viewProperties.length , i, viewProperty, previousView, 
-        accessoryView;
-        
-    for (i=0; i<len; i++) {
-      viewProperty = viewProperties[i] ;
+    var classNames;
+    var viewProperties = ['leftAccessoryView', 'rightAccessoryView'] ;
+    var len = viewProperties.length ;
+    for (var i=0; i<len; i++) {
+      var viewProperty = viewProperties[i] ;
 
       // Is there an accessory view specified?
-      previousView = this['_'+viewProperty] ;
-      accessoryView = this.get(viewProperty) ;
+      var previousView = this['_'+viewProperty] ;
+      var accessoryView = this.get(viewProperty) ;
 
       // If the view is the same, there's nothing to do.  Otherwise, remove
       // the old one (if any) and add the new one.
@@ -12795,15 +12542,14 @@ SC.TextFieldView = SC.FieldView.extend(SC.StaticLayout, SC.Editable,
   render: function(context, firstTime) {
     arguments.callee.base.apply(this,arguments) ;
 
-    var disabled = this.get('isEnabled') ? '' : 'disabled="disabled"',
-        name = SC.guidFor(this),
-        type = this.get('isPassword') ? 'password' : 'text',
-        v, accessoryViewWidths, leftAdjustment, rightAdjustment;
+    var disabled = this.get('isEnabled') ? '' : 'disabled="disabled"';
+    var name = SC.guidFor(this);
+    var type = this.get('isPassword') ? 'password' : 'text';
 
     if (this.get('isTextArea')) context.addClass('text-area');
 
     // always have at least an empty string
-    v = this.get('fieldValue');
+    var v = this.get('fieldValue');
     if (SC.none(v)) v = '';
 
     // update layer classes always
@@ -12814,9 +12560,9 @@ SC.TextFieldView = SC.FieldView.extend(SC.StaticLayout, SC.Editable,
     // if we could add in the original padding, too, but there's no efficient
     // way to do that without first rendering the element somewhere on/off-
     // screen, and we don't want to take the performance hit.)
-    accessoryViewWidths = this._getAccessoryViewWidths() ;
-    leftAdjustment  = accessoryViewWidths['left'] ;
-    rightAdjustment = accessoryViewWidths['right'] ;
+    var accessoryViewWidths = this._getAccessoryViewWidths() ;
+    var leftAdjustment  = accessoryViewWidths['left'] ;
+    var rightAdjustment = accessoryViewWidths['right'] ;
 
     if (leftAdjustment)  leftAdjustment  += 'px' ;
     if (rightAdjustment) rightAdjustment += 'px' ;
@@ -12841,19 +12587,18 @@ SC.TextFieldView = SC.FieldView.extend(SC.StaticLayout, SC.Editable,
     // TODO:  The cleanest thing might be to create a sub- rendering context
     //        here, but currently SC.RenderContext will render sibling
     //        contexts as parent/child.
-    var hint = this.get('hint'), disabled, name, adjustmentStyle, type, 
-        hintElements, element, paddingElementStyle;
+    var hint = this.get('hint') ;
     
     if (firstTime || this._forceRenderFirstTime) {
       this._forceRenderFirstTime = NO;
-      disabled = this.get('isEnabled') ? '' : 'disabled="disabled"' ;
-      name = this.get('layerId');
+      var disabled = this.get('isEnabled') ? '' : 'disabled="disabled"' ;
+      var name = this.get('layerId');
       
       context.push('<span class="border"></span>');
 
       // Render the padding element, with any necessary positioning
       // adjustments to accommodate accessory views.
-      adjustmentStyle = '' ;
+      var adjustmentStyle = '' ;
       if (leftAdjustment  ||  rightAdjustment) {
         adjustmentStyle = 'style="' ;
         if (leftAdjustment)  adjustmentStyle += 'left: '  + leftAdjustment  + '; ' ;
@@ -12867,25 +12612,25 @@ SC.TextFieldView = SC.FieldView.extend(SC.StaticLayout, SC.Editable,
       
       // Render the input/textarea field itself, and close off the padding.
       if (this.get('isTextArea')) {
-        context.push('<textarea name="', name, '" ', disabled, '>', value, '</textarea></span>') ;
+        context.push('<textarea name="%@" %@>%@</textarea></span>'.fmt(name, disabled, value)) ;
       }
       else {
-        type = this.get('isPassword') ? 'password' : 'text' ;
-        context.push('<input type="', type,'" name="', name, '" ', disabled, ' value="', value,'"/></span>') ;
+        var type = this.get('isPassword') ? 'password' : 'text' ;
+        context.push('<input type="%@" name="%@" %@ value="%@"/></span>'.fmt(type, name, disabled, value)) ;
       }
 
     }
     else {
       // If this is not first time rendering, update the hint itself since we
       // can't just blow away the text field like we might most other controls
-      hintElements = this.$('.sc-hint') ;
+      var hintElements = this.$('.sc-hint') ;
       if (hint !== this._textField_currentHint) {
         this._textField_currentHint = hint ;
         hintElements.text(hint) ;
       }
       
       // Enable/disable the actual input/textarea as appropriate.
-      element = this.$input()[0];
+      var element = this.$input()[0];
       if (element) {
         if (!this.get('isEnabled')) {
           element.disabled = 'true' ;
@@ -12895,46 +12640,55 @@ SC.TextFieldView = SC.FieldView.extend(SC.StaticLayout, SC.Editable,
         }
 
         // Adjust the padding element to accommodate any accessory views.
-        paddingElementStyle = element.parentNode.style;
+        var paddingElement = element.parentNode;
         if (leftAdjustment) {
-          if (paddingElementStyle.left !== leftAdjustment) {
-            paddingElementStyle.left = leftAdjustment ;
+          if (paddingElement.style.left !== leftAdjustment) {
+            paddingElement.style.left = leftAdjustment ;
           }
         }
         else {
-          paddingElementStyle.left = null ;
+          paddingElement.style.left = null ;
         }
 
         if (rightAdjustment) {
-          if (paddingElementStyle.right !== rightAdjustment) {
-            paddingElementStyle.right = rightAdjustment ;
+          if (paddingElement.style.right !== rightAdjustment) {
+            paddingElement.style.right = rightAdjustment ;
           }
         }
         else {
-          paddingElementStyle.right = null ;
+          paddingElement.style.right = null ;
         }
+
+
+        // Firefox needs a bit of help to recalculate the width of the text
+        // field, if it has focus.  (Even though it's set to 100% of its
+        // parent, if we adjust the parent it doesn't always adjust in kind.)
+        // if (SC.browser.mozilla) {
+        //           if(paddingElement.clientWidth>0){
+        //             element.style.width = paddingElement.clientWidth + "px";
+        //           }
+        //         }
       }
     }
   },
 
 
   _getAccessoryViewWidths: function() {
-    var widths = {},
-        accessoryViewPositions = ['left', 'right'],
-        numberOfAccessoryViewPositions = accessoryViewPositions.length, i,
-        position, accessoryView, frames, width, layout, offset, frame;
-    for (i = 0;  i < numberOfAccessoryViewPositions;  i++) {
-      position = accessoryViewPositions[i];
-      accessoryView = this.get(position + 'AccessoryView');
+    var widths = {};
+    var accessoryViewPositions = ['left', 'right'] ;
+    var numberOfAccessoryViewPositions = accessoryViewPositions.length ;
+    for (var i = 0;  i < numberOfAccessoryViewPositions;  i++) {
+      var position = accessoryViewPositions[i];
+      var accessoryView = this.get(position + 'AccessoryView');
       if (accessoryView  &&  accessoryView.get) {
-        frame = accessoryView.get('frame');
+        var frame = accessoryView.get('frame');
         if (frame) {
-          width = frame.width;
+          var width = frame.width;
           if (width) {
             // Also account for the accessory view's inset.
-            layout = accessoryView.get('layout');
+            var layout = accessoryView.get('layout');
             if (layout) {
-              offset = layout[position];
+              var offset = layout[position];
               width += offset;
             }
             widths[position] = width;
@@ -12951,40 +12705,21 @@ SC.TextFieldView = SC.FieldView.extend(SC.StaticLayout, SC.Editable,
   //
 
   didCreateLayer: function() {
-    if(!this.get('isTextArea')){
-      arguments.callee.base.apply(this,arguments); 
-      this._addTextAreaEvents();
-    } 
-  },
-  
-  
-  didAppendToDocument: function() {
-    // Turns out that in safari and firefox you can attach events to a textarea
-    // only if it has been appended to the DOM or if you did did it during
-    // loading time. For input tags is the other way around. I tested in all
-    // browsers and if I add the event for input tag before being visible it works
-    // fine, and if I add the event after the textarea is visible then the 
-    // textarea works. In IE works fine both ways.
-    if(this.get('isTextArea')){
-      arguments.callee.base.apply(this,arguments);
-      this._addTextAreaEvents();
-    }
-  },
-  
-  _addTextAreaEvents: function() {
+    arguments.callee.base.apply(this,arguments);
+
     var input = this.$input();
     SC.Event.add(input, 'focus', this, this._textField_fieldDidFocus);
     SC.Event.add(input, 'blur',  this, this._textField_fieldDidBlur);
-    
+
     // There are certain ways users can select text that we can't identify via
     // our key/mouse down/up handlers (such as the user choosing Select All
     // from a menu).
     SC.Event.add(input, 'select', this, this._textField_selectionDidChange);
-        
+    
     if(SC.browser.mozilla){
       // cache references to layer items to improve firefox hack perf
-      this._cacheInputElement = this.$input();
-      this._cachePaddingElement = this.$('.padding');
+       this._cacheInputElement = this.$input();
+       this._cachePaddingElement = this.$('.padding');
     }
   },
 
@@ -13125,11 +12860,16 @@ SC.TextFieldView = SC.FieldView.extend(SC.StaticLayout, SC.Editable,
     if (evt.which === 27) return NO ;
 
     // handle tab key
-    if (evt.which === 9) {
+    if (evt.which === 9 && !this.get('isTextArea')) {
       var view = evt.shiftKey ? this.get('previousValidKeyView') : this.get('nextValidKeyView');
-      if(view) view.becomeFirstResponder();
-      else evt.allowDefault();
+      view.becomeFirstResponder();
       return YES ; // handled
+    }
+    
+    // handle delete key, set dontForceDeleteKey to allow the default behavior
+    // of the delete key.
+    if (evt.which === 8){
+      evt.dontForceDeleteKey=YES;
     }
 
     // validate keyDown...
@@ -13165,7 +12905,6 @@ SC.TextFieldView = SC.FieldView.extend(SC.StaticLayout, SC.Editable,
       evt.stop();
       return YES;
     } else if((this.value && this.value.length===0) || !this.value) {
-      this.$input()[0].focus();
       return YES;
     } else {
       // This fixes the double click issue in firefox
@@ -13185,17 +12924,9 @@ SC.TextFieldView = SC.FieldView.extend(SC.StaticLayout, SC.Editable,
       evt.stop();
       return YES;
     } else if((this.value && this.value.length===0) || !this.value) {
-      if(SC.browser.msie<8){
-        this.invokeLater(this.focusIE7, 1);
-      }else{
-        this.$input()[0].focus();
-      }
+      this.$input()[0].focus();
       return YES;
     } else return arguments.callee.base.apply(this,arguments);
-  },
-
-  focusIE7: function (){
-    this.$input()[0].focus();
   },
 
   selectStart: function(evt) {
@@ -13595,20 +13326,16 @@ SC.InlineTextFieldView = SC.TextFieldView.extend(SC.DelegateSupport,
   insertTab: function(evt) {
     this.resignFirstResponder();
     this.commitEditing() ;
-    if(this._delegate){
-      var next = this._delegate.nextValidKeyView();
-      if(next) next.beginEditing();
-    }
+    var next = this._delegate.nextValidKeyView();
+    if(next) next.beginEditing();
     return YES ;
   },
 
   /** @private */
   insertBacktab: function(evt) {
+    var prev = this._delegate.previousValidKeyView();
     this.commitEditing() ;
-    if(this._delegate){
-      var prev = this._delegate.previousValidKeyView();
-      if(prev) prev.beginEditing();
-    }
+    if(prev) prev.beginEditing();
     return YES ;
   },
   
@@ -14674,8 +14401,7 @@ SC.mixin(/** @scope SC */ {
     Execute callback function.
   */
   _scb_bundleDidLoad: function(bundleName, target, method, args) {
-    var m = method, t = target ;
-
+    var m, t;
     if(SC.typeOf(target) === SC.T_STRING) {
       t = SC.objectForPropertyPath(target);
     }
@@ -15120,34 +14846,11 @@ SC.Scanner = SC.Object.extend(
   A class representation of a date and time. It's basically a wrapper around
   the Date javascript object, KVO friendly and with common date/time
   manipulation methods.
-
-  This object differs from the standard JS Date object, however, in that it
-  supports time zones other than UTC and that local to the machine on which
-  it is running.  Any time zone can be specified when creating an SC.DateTime
-  object, e.g
-
-    // Creates a DateTime representing 5am in Washington, DC and 10am in London
-    var d = SC.DateTime.create({ hour: 5, timezone: 300 }); // -5 hours from UTC
-    var e = SC.DateTime.create({ hour: 10, timezone: 0 }); // same time, specified in UTC
-    
-    and it is true that d.isEqual(e).
-
-  The time zone specified upon creation is permanent, and any calls to get() on that
-  instance will return values expressed in that time zone.  So,
-  
-    d.get('hour') returns 5.
-    e.get('hour') returns 10.
-    
-    but
-    
-    d.get('milliseconds') === e.get('milliseconds') is true, since they are technically the same position in time.
   
   @extends SC.Object
   @extends SC.Freezable
   @extends SC.Copyable
   @author Martin Ottenwaelter
-  @author Jonathan Lewis
-  @author Josh Holt
   @since SproutCore 1.0
 */
 SC.DateTime = SC.Object.extend(SC.Freezable, SC.Copyable,
@@ -15162,10 +14865,8 @@ SC.DateTime = SC.Object.extend(SC.Freezable, SC.Copyable,
   */
   _ms: 0,
   
-  /** @read-only
+  /**
     The offset, in minutes, between UTC and the object's timezone.
-    All calls to get() will use this time zone to translate date/time
-    values into the zone specified here.
     
     @property
     @type {Integer}
@@ -15189,23 +14890,11 @@ SC.DateTime = SC.Object.extend(SC.Freezable, SC.Copyable,
     
     (Parts copied from the Ruby On Rails documentation)
     
-    If a time zone is passed in the options hash, all dates and times are assumed
-    to be local to it, and the returned DateTime instance has that time zone.  If
-    none is passed, it defaults to SC.DateTime.timezone.
-
-    Note that passing only a time zone does not affect the actual milliseconds since
-    Jan 1, 1970, only the time zone in which it is expressed when displayed.
-    
     @see SC.DateTime#create for the list of options you can pass
     @returns {DateTime} copy of receiver
   */
-  adjust: function(options, resetCascadingly) {
-    var timezone;
-    
-    options = options ? SC.clone(options) : {};
-    timezone = (options.timezone !== undefined) ? options.timezone : (this.timezone !== undefined) ? this.timezone : 0;
-    
-    return this.constructor._adjust(options, this._ms, timezone, resetCascadingly)._createFromCurrentState();
+  adjust: function(options) {
+    return this.constructor._adjust(options, this._ms, this.timezone)._createFromCurrentState();
   },
   
   /**
@@ -15217,7 +14906,7 @@ SC.DateTime = SC.Object.extend(SC.Freezable, SC.Copyable,
     @returns {DateTime} copy of the receiver
   */
   advance: function(options) {
-    return this.constructor._advance(options, this._ms, this.timezone)._createFromCurrentState();
+   return this.constructor._advance(options, this._ms, this.timezone)._createFromCurrentState();
   },
   
   /**
@@ -15257,34 +14946,32 @@ SC.DateTime = SC.Object.extend(SC.Freezable, SC.Copyable,
     like the C strftime function.
   
     The format parameter can contain the following characters:
-      - %a - The abbreviated weekday name (``Sun'')
-      - %A - The full weekday name (``Sunday'')
-      - %b - The abbreviated month name (``Jan'')
-      - %B - The full month name (``January'')
-      - %c - The preferred local date and time representation
-      - %d - Day of the month (01..31)
-      - %h - Hour of the day, 24-hour clock (0..23)
-      - %H - Hour of the day, 24-hour clock (00..23)
-      - %i - Hour of the day, 12-hour clock (1..12)
-      - %I - Hour of the day, 12-hour clock (01..12)
-      - %j - Day of the year (001..366)
-      - %m - Month of the year (01..12)
-      - %M - Minute of the hour (00..59)
-      - %p - Meridian indicator (``AM'' or ``PM'')
-      - %S - Second of the minute (00..60)
-      - %U - Week number of the current year,
+      %a - The abbreviated weekday name (``Sun'')
+      %A - The full weekday name (``Sunday'')
+      %b - The abbreviated month name (``Jan'')
+      %B - The full month name (``January'')
+      %c - The preferred local date and time representation
+      %d - Day of the month (01..31)
+      %H - Hour of the day, 24-hour clock (00..23)
+      %I - Hour of the day, 12-hour clock (01..12)
+      %j - Day of the year (001..366)
+      %m - Month of the year (01..12)
+      %M - Minute of the hour (00..59)
+      %p - Meridian indicator (``AM'' or ``PM'')
+      %S - Second of the minute (00..60)
+      %U - Week number of the current year,
           starting with the first Sunday as the first
           day of the first week (00..53)
-      - %W - Week number of the current year,
-          starting with the first Monday as the first 
+      %W - Week number of the current year,
+          starting with the first Monday as the first
           day of the first week (00..53)
-      - %w - Day of the week (Sunday is 0, 0..6)
-      - %x - Preferred representation for the date alone, no time
-      - %X - Preferred representation for the time alone, no date
-      - %y - Year without a century (00..99)
-      - %Y - Year with century
-      - %Z - Time zone (ISO 8601 formatted)
-      - %% - Literal ``%'' character
+      %w - Day of the week (Sunday is 0, 0..6)
+      %x - Preferred representation for the date alone, no time
+      %X - Preferred representation for the time alone, no date
+      %y - Year without a century (00..99)
+      %Y - Year with century
+      %Z - Time zone (ISO 8601 formatted)
+      %% - Literal ``%'' character
     
     @param {String} format the format string
     @return {String} the formatted string
@@ -15349,16 +15036,12 @@ SC.DateTime = SC.Object.extend(SC.Freezable, SC.Copyable,
     
     If you don't pass any argument, the target timezone is assumed to be 0,
     ie UTC.
-
-    Note that this method does not change the underlying position in time,
-    but only the time zone in which it is displayed.  In other words, the underlying
-    number of milliseconds since Jan 1, 1970 does not change.
     
     @return {DateTime}
   */
   toTimezone: function(timezone) {
     if (timezone === undefined) timezone = 0;
-    return this.advance({ timezone: timezone - this.timezone });
+    return this.advance({ timezone: timezone-this.timezone });
   }
   
 });
@@ -15433,14 +15116,6 @@ SC.DateTime.mixin(SC.Comparable,
     The unique internal Date object used to make computations. Better
     performance is obtained by having only one Date object for the whole
     application and manipulating it with setTime() and getTime().
-    
-    Note that since this is used for internal calculations across many
-    DateTime instances, it is not guaranteed to store the date/time that
-    any one DateTime instance represents.  So it might be that
-      
-      this._date.getTime() !== this._ms
-
-    Be sure to set it before using for internal calculations if necessary.
 
     @property
     @type {Date}
@@ -15494,239 +15169,106 @@ SC.DateTime.mixin(SC.Comparable,
   _DT_CACHE_MAX_LENGTH: 1000,
   
   /** @private
-    Both args are optional, but will only overwrite _date and _tz if defined.
-    This method does not affect the DateTime instance's actual time, but simply
-    initializes the one _date instance to a time relevant for a calculation.
-    (this._date is just a resource optimization)
-
-    This is mainly used as a way to store a recursion starting state during
-    internal calculations.
-
-    'milliseconds' is time since Jan 1, 1970.
-    'timezone' is the current time zone we want to be working in internally.
-
-    Returns a hash of the previous milliseconds and time zone in case they
-    are wanted for later restoration.
+    @see SC.DateTime#unknownProperty
   */
-  _setCalcState: function(ms, timezone) {
-    var previous = {
-      milliseconds: this._date.getTime(),
-      timezone: this._tz
-    };
-
-    if (ms !== undefined) this._date.setTime(ms);
+  _setState: function(start, timezone) {
+    if (start !== undefined) this._date.setTime(start);
     if (timezone !== undefined) this._tz = timezone;
-
-    return previous;
   },
-
-  /**
-    By this time, any time zone setting on 'hash' will be ignored.
-    'timezone' will be used, or the last this._tz.
-  */
-  _setCalcStateFromHash: function(hash, timezone) {
-    var tz = (timezone !== undefined) ? timezone : this._tz; // use the last-known time zone if necessary
-    var ms = this._toMilliseconds(hash, this._ms, tz); // convert the hash (local to specified time zone) to milliseconds (in UTC)
-    return this._setCalcState(ms, tz); // now call the one we really wanted
-  },
-
+  
   /** @private
     @see SC.DateTime#unknownProperty
   */
   _get: function(key, start, timezone) {
-    var ms, tz, doy, m, y, firstDayOfWeek, dayOfWeek, dayOfYear, prefix, suffix;
-    var currentWeekday, targetWeekday;
     var d = this._date;
-    var originalTime, v = null;
-
-    // Set up an absolute date/time using the given milliseconds since Jan 1, 1970.
-    // Only do it if we're given a time value, though, otherwise we want to use the
-    // last one we had because this _get() method is recursive.
-    //
-    // Note that because these private time calc methods are recursive, and because all DateTime instances
-    // share an internal this._date and this._tz state for doing calculations, methods
-    // that modify this._date or this._tz should restore the last state before exiting
-    // to avoid obscure calculation bugs.  So we save the original state here, and restore
-    // it before returning at the end.
-    originalTime = this._setCalcState(start, timezone); // save so we can restore it to how it was before we got here
-
-    // Check this first because it is an absolute value -- no tweaks necessary when calling for milliseconds
-    if (key === 'milliseconds') {
-      v = d.getTime();
-    }
-    else if (key === 'timezone') {
-      v = this._tz;
+    this._setState(start, timezone);
+    
+    // simple keys
+    switch (key) {
+      case 'year':           return d.getFullYear(); //TODO: investigate why some libraries do getFullYear().toString() or getFullYear()+""
+      case 'month':          return d.getMonth()+1; // January is 0 in JavaScript
+      case 'day':            return d.getDate();
+      case 'dayOfWeek':      return d.getDay();
+      case 'hour':           return d.getHours();
+      case 'minute':         return d.getMinutes();
+      case 'second':         return d.getSeconds();
+      case 'millisecond':    return d.getMilliseconds();
+      case 'milliseconds':   return d.getTime() + this._tz*60000;
+      case 'timezone':       return this._tz;
     }
     
-    // 'nextWeekday' or 'lastWeekday'.
-    // We want to do this calculation in local time, before shifting UTC below.
-    if (v === null) {
-      prefix = key.slice(0, 4);
-      suffix = key.slice(4);
-      if (prefix === 'last' || prefix === 'next') {
-        currentWeekday = d.getDay();
-        targetWeekday = this._englishDayNames.indexOf(suffix);    
-        if (targetWeekday >= 0) {
-          var delta = targetWeekday - currentWeekday;
-          if (prefix === 'last' && delta >= 0) delta -= 7;
-          if (prefix === 'next' && delta <  0) delta += 7;
-          this._advance({ day: delta });
-          v = this._createFromCurrentState();
-        }
+    // isLeapYear
+    if (key === 'isLeapYear') {
+      var y = this._get('year');
+      return (y%4 === 0 && y%100 !== 0) || y%400 === 0;
+    }
+    
+    // daysInMonth
+    if (key === 'daysInMonth') {
+      switch (this._get('month')) {
+        case 4:
+        case 6:
+        case 9:
+        case 11:
+          return 30;
+        case 2:
+          return this._get('isLeapYear') ? 29 : 28;
+        default:
+          return 31;
       }
     }
     
-    if (v === null) {
-      // need to adjust for alternate display time zone.
-      // Before calculating, we need to get everything into a common time zone to
-      // negate the effects of local machine time (so we can use all the 'getUTC...() methods on Date).
-      if (timezone !== undefined) {
-        this._setCalcState(d.getTime() - (timezone * 60000), 0); // make this instance's time zone the new UTC temporarily
+    // dayOfYear
+    if (key === 'dayOfYear') {
+      var ms = d.getTime(); // save time
+      var doy = this._get('day');
+      this._adjust({day: 1});
+      for (var m = this._get('month') - 1; m > 0; m--) {
+        doy += this._adjust({month: m})._get('daysInMonth');
       }
+      d.setTime(ms); // restore time
+      return doy;
+    }
     
-      // simple keys
-      switch (key) {
-        case 'year':
-          v = d.getUTCFullYear(); //TODO: investigate why some libraries do getFullYear().toString() or getFullYear()+""
-          break;
-        case 'month':
-          v = d.getUTCMonth()+1; // January is 0 in JavaScript
-          break;
-        case 'day':
-          v = d.getUTCDate();
-          break;
-        case 'dayOfWeek':
-          v = d.getUTCDay();
-          break;
-        case 'hour':
-          v = d.getUTCHours();
-          break;
-        case 'minute':
-          v = d.getUTCMinutes();
-          break;
-        case 'second':
-          v = d.getUTCSeconds();
-          break;
-        case 'millisecond':
-          v = d.getUTCMilliseconds();
-          break;
-      }
-      
-      // isLeapYear
-      if ((v === null) && (key === 'isLeapYear')) {
-        y = this._get('year');
-        v = (y%4 === 0 && y%100 !== 0) || y%400 === 0;
-      }
-
-      // daysInMonth
-      if ((v === null) && (key === 'daysInMonth')) {
-        switch (this._get('month')) {
-          case 4:
-          case 6:
-          case 9:
-          case 11:
-            v = 30;
-            break;
-          case 2:
-            v = this._get('isLeapYear') ? 29 : 28;
-            break;
-          default:
-            v = 31;
-            break;
-        }
-      }
+    // week, week0 or week1
+    if (key.slice(0, 4) === 'week') {
+      // firstDayOfWeek should be 0 (Sunday) or 1 (Monday)
+    	var firstDayOfWeek = key.length === 4 ? 1 : parseInt(key.slice('4'), 10);
+    	var dayOfWeek = this._get('dayOfWeek');
+      var dayOfYear = this._get('dayOfYear') - 1;
+    	if (firstDayOfWeek === 0) {
+    	  return parseInt((dayOfYear - dayOfWeek + 7) / 7, 10);
+    	} else {
+    	  return parseInt((dayOfYear - (dayOfWeek - 1 + 7) % 7 + 7) / 7, 10);
+    	}
+    }
     
-      // dayOfYear
-      if ((v === null) && (key === 'dayOfYear')) {
-        ms = d.getTime(); // save time
-        doy = this._get('day');
-        this._setCalcStateFromHash({ day: 1 });
-        for (m = this._get('month') - 1; m > 0; m--) {
-          this._setCalcStateFromHash({ month: m });
-          doy += this._get('daysInMonth');
-        }
-        d.setTime(ms); // restore time
-        v = doy;
-      }
-
-      // week, week0 or week1
-      if ((v === null) && (key.slice(0, 4) === 'week')) {
-        // firstDayOfWeek should be 0 (Sunday) or 1 (Monday)
-        firstDayOfWeek = key.length === 4 ? 1 : parseInt(key.slice('4'), 10);
-        dayOfWeek = this._get('dayOfWeek');
-        dayOfYear = this._get('dayOfYear') - 1;
-        if (firstDayOfWeek === 0) {
-          v = parseInt((dayOfYear - dayOfWeek + 7) / 7, 10);
-        }
-        else {
-          v = parseInt((dayOfYear - (dayOfWeek - 1 + 7) % 7 + 7) / 7, 10);
-        }
+    // nextWeekday or lastWeekday
+    var prefix = key.slice(0, 4);
+    var suffix = key.slice(4);
+    if (prefix === 'last' || prefix === 'next') {
+      var currentWeekday = d.getDay();
+      var targetWeekday = this._englishDayNames.indexOf(suffix);    
+      if (targetWeekday >= 0) {
+        var delta = targetWeekday - currentWeekday;
+        if (prefix === 'last' && delta >= 0) delta -= 7;
+        if (prefix === 'next' && delta <  0) delta += 7;
+        this._advance({day: delta})._adjust({hour: 0});
+        return this._createFromCurrentState();
       }
     }
 
-    // restore the internal calculation state in case someone else was in the
-    // middle of a calculation (we might be recursing).
-    this._setCalcState(originalTime.milliseconds, originalTime.timezone);
-
-    return v;
-  },
-
-  /**
-    Sets the internal calculation state to something specified.
-  */
-  _adjust: function(options, start, timezone, resetCascadingly) {
-    var opts = options ? SC.clone(options) : {};
-    var ms = this._toMilliseconds(options, start, timezone, resetCascadingly);
-    this._setCalcState(ms, timezone);
-    return this; // for chaining
+    return null;
   },
   
   /** @private
-    @see SC.DateTime#advance
+    @see SC.DateTime#adjust
   */
-  _advance: function(options, start, timezone) {
+  _adjust: function(options, start, timezone, resetCascadingly) {
     var opts = options ? SC.clone(options) : {};
-    var tz;
-
-    for (var key in opts) {
-      opts[key] += this._get(key, start, timezone);
-    }
     
-    // The time zone can be advanced by a delta as well, so try to use the
-    // new value if there is one.
-    tz = (opts.timezone !== undefined) ? opts.timezone : timezone; // watch out for zero, which is acceptable as a time zone
-
-    return this._adjust(opts, start, tz, NO);
-  },
-  
-  /* @private
-    Converts a standard date/time options hash to an integer representing that position
-    in time relative to Jan 1, 1970
-  */
-  _toMilliseconds: function(options, start, timezone, resetCascadingly) {
-    var opts = options ? SC.clone(options) : {};
     var d = this._date;
-    var previousMilliseconds = d.getTime(); // rather than create a new Date object, we'll reuse the instance we have for calculations, then restore it
-    var ms, tz;
-
-    // Initialize our internal for-calculations Date object to our current date/time.
-    // Note that this object was created in the local machine time zone, so when we set
-    // its params later, it will be assuming these values to be in the same time zone as it is.
-    // It's ok for start to be null, in which case we'll just keep whatever we had in 'd' before.
-    if (!SC.none(start)) {
-      d.setTime(start); // using milliseconds here specifies an absolute location in time, regardless of time zone, so that's nice
-    }
-    
-    // We have to get all time expressions, both in 'options' (assume to be in time zone 'timezone')
-    // and in 'd', to the same time zone before we can any calculations correctly.  So because the Date object provides
-    // a suite of UTC getters and setters, we'll temporarily redefine 'timezone' as our new
-    // 'UTC', so we don't have to worry about local machine time.  We do this by subtracting
-    // milliseconds for the time zone offset.  Then we'll do all our calculations, then convert
-    // it back to real UTC.
-    
-    // (Zero time zone is considered a valid value.)
-    tz = (timezone !== undefined) ? timezone : (this.timezone !== undefined) ? this.timezone : 0;
-    d.setTime(d.getTime() - (tz * 60000)); // redefine 'UTC' to establish a new local absolute so we can use all the 'getUTC...()' Date methods
+    this._setState(start, timezone);
     
     // the time options (hour, minute, sec, millisecond)
     // reset cascadingly (see documentation)
@@ -15743,36 +15285,33 @@ SC.DateTime.mixin(SC.Comparable,
         opts.millisecond = 0;
       }
     }
+
+    if (!SC.none(opts.year))        d.setFullYear(opts.year);
+    if (!SC.none(opts.month))       d.setMonth(opts.month-1); // January is 0 in JavaScript
+    if (!SC.none(opts.day))         d.setDate(opts.day);
+    if (!SC.none(opts.hour))        d.setHours(opts.hour);
+    if (!SC.none(opts.minute))      d.setMinutes(opts.minute);
+    if (!SC.none(opts.second))      d.setSeconds(opts.second);
+    if (!SC.none(opts.millisecond)) d.setMilliseconds(opts.millisecond);
+    if (!SC.none(opts.timezone))    this._tz = opts.timezone;
     
-    // Get the current values for any not provided in the options hash.
-    // Since everything is in 'UTC' now, use the UTC accessors.  We do this because,
-    // according to javascript Date spec, you have to set year, month, and day together
-    // if you're setting any one of them.  So we'll use the provided Date.UTC() method
-    // to get milliseconds, and we need to get any missing values first...
-    if (SC.none(opts.year))        opts.year = d.getUTCFullYear();
-    if (SC.none(opts.month))       opts.month = d.getUTCMonth() + 1; // January is 0 in JavaScript
-    if (SC.none(opts.day))         opts.day = d.getUTCDate();
-    if (SC.none(opts.hour))        opts.hour = d.getUTCHours();
-    if (SC.none(opts.minute))      opts.minute = d.getUTCMinutes();
-    if (SC.none(opts.second))      opts.second = d.getUTCSeconds();
-    if (SC.none(opts.millisecond)) opts.millisecond = d.getUTCMilliseconds();
-
-    // Ask the JS Date to calculate milliseconds for us (still in redefined UTC).  It
-    // is best to set them all together because, for example, a day value means different things
-    // to the JS Date object depending on which month or year it is.  It can now handle that stuff
-    // internally as it's made to do.
-    ms = Date.UTC(opts.year, opts.month - 1, opts.day, opts.hour, opts.minute, opts.second, opts.millisecond);
-
-    // Now that we've done all our calculations in a common time zone, add back the offset
-    // to move back to real UTC.
-    d.setTime(ms + (tz * 60000));
-    ms = d.getTime(); // now get the corrected milliseconds value
+    return this;
+  },
+  
+  /** @private
+    @see SC.DateTime#advance
+  */
+  _advance: function(options, start, timezone) {
+    var opts = options ? SC.clone(options) : {};
+    this._setState(start, timezone);
     
-    // Restore what was there previously before leaving in case someone called this method
-    // in the middle of another calculation.
-    d.setTime(previousMilliseconds);
-
-    return ms;
+    if (!SC.none(opts.timezone)) {
+      if (SC.none(opts.minute)) opts.minute = 0;
+      opts.minute -= opts.timezone;
+    }
+    for (var key in opts) opts[key] += this._get(key);
+    
+    return this._adjust(opts, start, timezone, NO);
   },
   
   /**
@@ -15800,41 +15339,31 @@ SC.DateTime.mixin(SC.Comparable,
   */
   create: function() {
     var arg = arguments.length === 0 ? {} : arguments[0];
-    var timezone;
     
-    // if simply milliseconds since Jan 1, 1970 are given, just use those
     if (SC.typeOf(arg) === SC.T_NUMBER) {
-      arg = { milliseconds: arg };
+      arg = { milliseconds: arg, timezone: 0 };
+    } else if (SC.none(arg.timezone)) {
+      arg.timezone = this.timezone;
     }
-
-    // Default to local machine time zone if none is given
-    timezone = (arg.timezone !== undefined) ? arg.timezone : this.timezone;
-    if (timezone === undefined) timezone = 0;
-
-    // Desired case: create with milliseconds if we have them.
-    // If we don't, convert what we have to milliseconds and recurse.
+    
     if (!SC.none(arg.milliseconds)) {
-
       // quick implementation of a FIFO set for the cache
-      var key = 'nu' + arg.milliseconds + timezone, cache = this._dt_cache;
+      var key = 'nu'+arg.milliseconds+arg.timezone, cache = this._dt_cache;
       var ret = cache[key];
       if (!ret) {
         var previousKey, idx = this._dt_cache_index, C = this;
-        ret = cache[key] = new C([{ _ms: arg.milliseconds, timezone: timezone }]);
+        ret = cache[key] = new C([{_ms: arg.milliseconds, timezone: arg.timezone}]);
         idx = this._dt_cache_index = (idx + 1) % this._DT_CACHE_MAX_LENGTH;
         previousKey = cache[idx];
         if (previousKey !== undefined && cache[previousKey]) delete cache[previousKey];
         cache[idx] = key;
       }
       return ret;
-    }
-    // otherwise, convert what we have to milliseconds and try again
-    else {
+    } else {
       var now = new Date();
-
-      return this.create({ // recursive call with new arguments
-        milliseconds: this._toMilliseconds(arg, now.getTime(), timezone, arg.resetCascadingly),
-        timezone: timezone
+      return this.create({
+        milliseconds: this._adjust(arg, now.getTime())._date.getTime(),
+        timezone: arg.timezone
       });
     }
     
@@ -15938,19 +15467,9 @@ SC.DateTime.mixin(SC.Comparable,
   },
   
   /** @private
-    @see SC.DateTime#_toFormattedString
+    @see SC.DateTime#toFormattedString
   */
-  __toFormattedString: function(part, start, timezone) {
-    var hour, offset;
-
-    // Note: all calls to _get() here should include only one
-    // argument, since _get() is built for recursion and behaves differently
-    // if arguments 2 and 3 are included.
-    //
-    // This method is simply a helper for this._toFormattedString() (one underscore);
-    // this is only called from there, and _toFormattedString() has already
-    // set up the appropriate internal date/time/timezone state for it.
-    
+  __toFormattedString: function(part) {
     switch(part[1]) {
       case 'a': return this.abbreviatedDayNames[this._get('dayOfWeek')];
       case 'A': return this.dayNames[this._get('dayOfWeek')];
@@ -15958,13 +15477,9 @@ SC.DateTime.mixin(SC.Comparable,
       case 'B': return this.monthNames[this._get('month')-1];
       case 'c': return this._date.toString();
       case 'd': return this._pad(this._get('day'));
-      case 'h': return this._get('hour');
       case 'H': return this._pad(this._get('hour'));
-      case 'i':
-        hour = this._get('hour');
-        return (hour === 12 || hour === 0) ? 12 : (hour + 12) % 12;
       case 'I': 
-        hour = this._get('hour');
+        var hour = this._get('hour');
         return this._pad((hour === 12 || hour === 0) ? 12 : (hour + 12) % 12);
       case 'j': return this._pad(this._get('dayOfYear'), 3);
       case 'm': return this._pad(this._get('month'));
@@ -15980,7 +15495,7 @@ SC.DateTime.mixin(SC.Comparable,
       case 'y': return this._pad(this._get('year') % 100);
       case 'Y': return this._get('year');
       case 'Z':
-        offset = -1 * timezone;
+        var offset = -1 * this._tz;
         return (offset >= 0 ? '+' : '-')
                + this._pad(parseInt(Math.abs(offset)/60, 10))
                + ':'
@@ -15993,15 +15508,11 @@ SC.DateTime.mixin(SC.Comparable,
     @see SC.DateTime#toFormattedString
   */
   _toFormattedString: function(format, start, timezone) {
+    this._setState(start, timezone);
+    
     var that = this;
-    var tz = (timezone !== undefined) ? timezone : (this.timezone !== undefined) ? this.timezone : 0;
-
-    // need to move into local time zone for these calculations
-    this._setCalcState(start - (timezone * 60000), 0); // so simulate a shifted 'UTC' time
-
     return format.replace(/\%([aAbBcdHIjmMpSUWwxXyYZ\%])/g, function() {
-      var v = that.__toFormattedString.call(that, arguments, start, timezone);
-      return v;
+      return that.__toFormattedString.call(that, arguments);
     });
   },
   
@@ -16080,7 +15591,7 @@ if (SC.RecordAttribute && !SC.RecordAttribute.transforms[SC.guidFor(SC.DateTime)
       Convert a String to a DateTime
     */
     to: function(str, attr) {
-      if (SC.none(str) || SC.instanceOf(str, SC.DateTime)) return str;
+      if (SC.none(str)) return str;
       var format = attr.get('format');
       return SC.DateTime.parse(str, format ? format : SC.DateTime.recordFormat);
     },
@@ -17088,7 +16599,7 @@ SC.Page = SC.Object.extend(
       this[key] = value = value.create({ page: this }) ;
       if (!this.get('inDesignMode')) value.awake() ;
       return value ;
-    } else return arguments.callee.base.apply(this,arguments);
+    } else return arguments.callee.base.apply(this,arguments) ;
   },
   
   /**
@@ -17101,10 +16612,9 @@ SC.Page = SC.Object.extend(
   */
   awake: function() {
     // step through all views and build them
-    var value, key;
-    for(key in this) {
+    for(var key in this) {
       if (!this.hasOwnProperty(key)) continue ;
-      value = this[key] ;
+      var value = this[key] ;
       if (value && value.isViewClass) {
         this[key] = value = value.create({ page: this }) ;
       }
@@ -17126,10 +16636,9 @@ SC.Page = SC.Object.extend(
     Applies a localization to every view builder defined on the page.  You must call this before you construct a view to apply the localization.
   */
   loc: function(locs) {
-    var view, key;
-    for(key in locs) {
+    for(var key in locs) {
       if (!locs.hasOwnProperty(key)) continue ;
-      view = this[key] ;
+      var view = this[key] ;
       if (!view || !view.isViewClass) continue ;
       view.loc(locs[key]);
     }
@@ -17249,7 +16758,6 @@ SC.mixin({
     // Only call once
     if (SC.isReady) return ;
     if (typeof SC.mapDisplayNames === SC.T_FUNCTION) SC.mapDisplayNames();
-    if (typeof SC.addInvokeOnceLastDebuggingInfo === SC.T_FUNCTION) SC.addInvokeOnceLastDebuggingInfo();
      
     // setup locale
     SC.Locale.createCurrentLocale();
@@ -17652,8 +17160,6 @@ SC.RenderContext = SC.Builder.create(/** SC.RenderContext.fn */ {
     var elem = this._elem, 
         mode = this.updateMode,
         key, value, styles, factory, cur, next, before;
-        
-    this._innerHTMLReplaced = NO;
     
     if (!elem) {
       // throw "Cannot update context because there is no source element";
@@ -17666,7 +17172,6 @@ SC.RenderContext = SC.Builder.create(/** SC.RenderContext.fn */ {
     
     // replace innerHTML
     if (this.length>0) {
-      this._innerHTMLReplaced = YES;
       if (mode === SC.MODE_REPLACE) {
         elem.innerHTML = this.join();
       } else {
@@ -17756,9 +17261,9 @@ SC.RenderContext = SC.Builder.create(/** SC.RenderContext.fn */ {
     // generate opening tag.
     
     // get attributes first.  Copy in className + styles...
-    var tag = this._TAG_ARRAY, pair, joined, key ,
-        attrs = this._attrs, className = this._classNames,
-        id = this._id, styles = this._styles;
+    var tag = this._TAG_ARRAY, pair, joined, key ;
+    var attrs = this._attrs, className = this._classNames ;
+    var id = this._id, styles = this._styles;
     
     // add tag to tag array
     tag[0] = '<';  tag[1] = this._tagName ;
@@ -17780,7 +17285,7 @@ SC.RenderContext = SC.Builder.create(/** SC.RenderContext.fn */ {
           pair[1] = styles[key];
           if (pair[1] === null) continue; // skip empty styles
           
-          if(typeof pair[1] === SC.T_NUMBER) pair[1] = pair[1]+"px";
+          if(typeof pair[1] === SC.T_NUMBER) pair[1] = "%@px".fmt(pair[1]);
           joined.push(pair.join(': '));
         }
         attrs.style = joined.join('; ') ;
@@ -17840,7 +17345,7 @@ SC.RenderContext = SC.Builder.create(/** SC.RenderContext.fn */ {
   },
   
   /**
-    Generates a tag with the passed options.  Like calling context.begin().end().
+    Generates a with the passed options.  Like calling context.begin().end().
     
     @param {String} tagName optional tag name.  default 'div'
     @param {Hash} opts optional tag options.  defaults to empty options.
@@ -18053,7 +17558,7 @@ SC.RenderContext = SC.Builder.create(/** SC.RenderContext.fn */ {
   // CSS Styles Support
   // 
     
-  _STYLE_REGEX: /\s*([^:\s]+)\s*:\s*([^;]+)\s*;?/g,
+  _STYLE_REGEX: /\s*([^:\s]+)\s*:\s*([^;\s]+)\s*;?/g,
   
   /**
     Retrieves or sets the current styles for the outer tag.  If you retrieve
@@ -18453,18 +17958,6 @@ SC.Response = SC.Object.extend(
   */
   isCancelled: NO,
   
-  /**
-    Set to YES if the request timed out.  Set to NO if the request has
-    completed before the timeout value.  Set to null if the timeout timer is
-    still ticking.
-  */
-  timedOut: null,
-  
-  /**
-    The timer tracking the timeout
-  */
-  timeoutTimer: null,
-  
   // ..........................................................
   // METHODS
   // 
@@ -18475,6 +17968,7 @@ SC.Response = SC.Object.extend(
     begin the actual request.
   */
   fire: function() {
+    
     var req = this.get('request'),
         source = req ? req.get('source') : null;
     
@@ -18489,20 +17983,6 @@ SC.Response = SC.Object.extend(
     // immediately if it is synchronous.
     if (!this.get('isCancelled')) this.invokeTransport();
 
-
-    // If the request specified a timeout value, then set a timer for it now.
-    var timeout = req.get('timeout');
-    if (timeout) {
-      var timer = SC.Timer.schedule({
-        target:   this, 
-        action:   'timeoutReached', 
-        interval: timeout,
-        repeats:  NO
-      });
-      this.set('timeoutTimer', timer);
-    }
-
-
     // if the transport did not cancel the request for some reason, let the
     // source know that the request was sent
     if (!this.get('isCancelled') && source && source.didSend) {
@@ -18515,9 +17995,9 @@ SC.Response = SC.Object.extend(
   },
   
   /**
-    Invoked by the transport when it receives a response.  The passed-in
+    Invoked by the transport when it receives a response.  The passed 
     callback will be invoked to actually process the response.  If cancelled
-    we will pass NO.  You should clean up instead.
+    we will pass NO.  You sould cleanup instead.
     
     Invokes callbacks on the source request also.
     
@@ -18526,33 +18006,25 @@ SC.Response = SC.Object.extend(
     @returns {SC.Response} receiver
   */
   receive: function(callback, context) {
-    // If we timed out, we should ignore this response.
-    if (!this.get('timedOut')) {
-      // If we had a timeout timer scheduled, invalidate it now.
-      var timer = this.get('timeoutTimer');
-      if (timer) timer.invalidate();
-      this.set('timedOut', NO);
+    var req = this.get('request');
+    var source = req ? req.get('source') : null;
     
-      var req = this.get('request');
-      var source = req ? req.get('source') : null;
+    // invoke the source, giving a chance to fixup the reponse or (more 
+    // likely) cancel the request.
+    if (source && source.willReceive) source.willReceive(req, this);
     
-      // invoke the source, giving a chance to fixup the reponse or (more 
-      // likely) cancel the request.
-      if (source && source.willReceive) source.willReceive(req, this);
+    // invoke the callback.  note if the response was cancelled or not
+    callback.call(context, !this.get('isCancelled'));
     
-      // invoke the callback.  note if the response was cancelled or not
-      callback.call(context, !this.get('isCancelled'));
-    
-      // if we weren't cancelled, then give the source first crack at handling
-      // the response.  if the source doesn't want listeners to be notified,
-      // it will cancel the response.
-      if (!this.get('isCancelled') && source && source.didReceive) {
-        source.didReceive(req, this);
-      }
-
-      // notify listeners if we weren't cancelled.
-      if (!this.get('isCancelled')) this.notify();
+    // if we weren't cancelled, then give the source first crack at handling
+    // the response.  if the source doesn't want listeners to be notified,
+    // it will cancel the response.
+    if (!this.get('isCancelled') && source && source.didReceive) {
+      source.didReceive(req, this);
     }
+
+    // notify listeners if we weren't cancelled.
+    if (!this.get('isCancelled')) this.notify();
     
     // no matter what, remove from inflight queue
     SC.Request.manager.transportDidClose(this) ;
@@ -18565,35 +18037,9 @@ SC.Response = SC.Object.extend(
   */
   cancel: function() {
     if (!this.get('isCancelled')) {
-      this.set('isCancelled', YES) ;
-      this.cancelTransport() ;
-      SC.Request.manager.transportDidClose(this) ;
-    }
-  },
-  
-  /**
-    Default method just closes the connection.
-  */
-  timeoutReached: function() {
-    // If we already received a response yet the timer still fired for some
-    // reason, do nothing.
-    if (this.get('timedOut') === null) {
-      this.set('timedOut', YES);
+      this.set('isCancelled', YES);
       this.cancelTransport();
-      SC.Request.manager.transportDidClose(this);
-      
-      // Set our value to an error.
-      var error = SC.$error("HTTP Request timed out", "Request", 408) ;
-      error.set("errorValue", this) ;
-      this.set('isError', YES);
-      this.set('errorObject', error);
-      
-      // Invoke the didTimeout callback.
-      var req = this.get('request');
-      var source = req ? req.get('source') : null;
-      if (!this.get('isCancelled') && source && source.didTimeout) {
-        source.didTimeout(req, this);
-      }
+      SC.Request.manager.transportDidClose(this) ;
     }
   },
   
@@ -18792,13 +18238,7 @@ SC.XHRResponse = SC.Response.extend({
 
         // if there was an error - setup error and save it
         if ((status < 200) || (status >= 300)) {
-          
-          try {
-            msg = rawRequest.statusText || '';
-          } catch(e2) {
-            msg = '';
-          }
-          
+          msg = rawRequest.statusText;
           error = SC.$error(msg || "HTTP Request failed", "Request", status) ;
           error.set("errorValue", this) ;
           this.set('isError', YES);
@@ -18835,7 +18275,7 @@ sc_require('system/response');
   Implements support for Ajax requests using XHR, JSON-P and other prototcols.
   
   SC.Request is much like an inverted version of the request/response objects
-  you receive when implementing HTTP servers.  
+  you receive when implement HTTP servers.  
   
   To send a request, you just need to create your request object, configure
   your options, and call send() to initiate the request.
@@ -18924,21 +18364,6 @@ SC.Request = SC.Object.extend(SC.Copyable, SC.Freezable,
   type: 'GET',
   
   /**
-    An optional timeout value of the request, in milliseconds.  The timer
-    begins when SC.Response#fire is actually invoked by the request manager
-    and not necessarily when SC.Request#send is invoked.  If this timeout is
-    reached before a response is received, the equivalent of
-    SC.Request.manager#cancel() will be invoked on the SC.Response instance
-    and the didTimeout() callback will be called.
-    
-    An exception will be thrown if you try to invoke send() on a request that
-    has both a timeout and isAsyncronous set to NO.
-    
-    @property {Number}
-  */
-  timeout: null,
-  
-  /**
     The body of the request.  May be an object is isJSON or isXML is set,
     otherwise should be a string.
   */
@@ -18986,9 +18411,9 @@ SC.Request = SC.Object.extend(SC.Copyable, SC.Freezable,
   
   /**
     Invoked when a response has been received but not yet processed.  This is
-    your chance to fix up the response based on the results.  If you don't
-    want to continue processing the response call response.cancel().
-
+    your chance to fixup the response based on the results.  If you don't want
+    to continue processing the response call response.cancel().
+    
     @param {SC.Response} response the response
     @returns {void}
   */
@@ -19005,21 +18430,11 @@ SC.Request = SC.Object.extend(SC.Copyable, SC.Freezable,
   */
   didReceive: function(request, response) {},
   
-  /**
-    Invoked when a request times out before a response has been received, as
-    determined by the 'timeout' property.  Note that if a request times out,
-    neither willReceive() nor didReceive() will be called.
-
-    @param {SC.Response} response the response
-    @returns {void}
-  */
-  didTimeout: function(request, response) {},
-  
   // ..........................................................
   // HELPER METHODS
   // 
 
-  COPY_KEYS: 'isAsynchronous isJSON isXML address type timeout body responseClass willSend didSend willReceive didReceive'.w(),
+  COPY_KEYS: 'isAsynchronous isJSON isXML address type body responseClass willSend didSend willReceive didReceive'.w(),
   
   /**
     Returns a copy of the current request.  This will only copy certain
@@ -19138,16 +18553,6 @@ SC.Request = SC.Object.extend(SC.Copyable, SC.Freezable,
     @returns {SC.Response} new response object
   */  
   send: function(body) {
-    // Sanity-check:  Be sure a timeout value was not specified if the request
-    // is synchronous (because it wouldn't work).
-    var timeout = this.get('timeout');
-    if (timeout) {
-      if (!this.get('isAsynchronous')) throw "Timeout values cannot be used with synchronous requests";
-    }
-    else if (timeout === 0) {
-      throw "The timeout value must either not be specified or must be greater than 0";
-    }
-    
     if (body) this.set('body', body);
     return SC.Request.manager.sendRequest(this.copy()._prep());
   },
@@ -19200,7 +18605,7 @@ SC.Request = SC.Object.extend(SC.Copyable, SC.Freezable,
   notify: function(status, target, action, params) {
     
     // normalize status
-    var hasStatus = YES ;
+    var hasStatus = YES, params ;
     if (SC.typeOf(status) !== SC.T_NUMBER) {
       params = SC.A(arguments).slice(2);
       action = target;
@@ -19830,98 +19235,7 @@ SC.RootResponder = SC.Object.extend({
     
     @returns {void}
   */
-  setup: function() {
-    this.listenFor('touchstart touchmove touchend touchcancel'.w(), document);
-  },
-  
-  touchstart: function(evt) {
-    try {
-      var view = this.targetViewForEvent(evt) ;
-      view = this._touchView = this.sendEvent('touchStart', evt, view) ;
-      if (view && view.respondsTo('touchDragged')) this._touchCanDrag = YES ;
-    } catch (e) {
-      console.log('Exception during touchStart: %@'.fmt(e)) ;
-      this._touchView = null ;
-      this._touchCanDrag = NO ;
-      return NO ;
-    }
-    return view ? evt.hasCustomEventHandling : YES;
-  },
-
-  touchmove: function(evt) {
-    SC.RunLoop.begin();
-    try {
-      var lh = this._lastHovered || [] ;
-      var nh = [] ;
-      var view = this.targetViewForEvent(evt) ;
-        
-      // work up the view chain.  Notify of touchEntered and
-      // touchMoved if implemented.
-      while(view && (view !== this)) {
-        if (lh.indexOf(view) !== -1) {
-          view.tryToPerform('touchMoved', evt);
-          nh.push(view) ;
-        } else {
-          view.tryToPerform('touchEntered', evt);
-          nh.push(view) ;
-        }
-        
-        view = view.get('nextResponder');
-      }
-      
-      // now find those views last hovered over that were no longer found 
-      // in this chain and notify of mouseExited.
-      for(var loc=0; loc < lh.length; loc++) {
-        view = lh[loc] ;
-        var exited = view.respondsTo('touchExited') ;
-        if (exited && !(nh.indexOf(view) !== -1)) {
-          view.tryToPerform('touchExited',evt);
-        }
-      }
-      
-      this._lastHovered = nh; 
-      
-      // also, if a touchView exists, call the touchDragged action, if 
-      // it exists.
-      if (this._touchView) this._touchView.tryToPerform('touchDragged', evt);
-    } catch (e) {
-      console.log('Exception during touchMove: %@'.fmt(e)) ;
-    }
-    SC.RunLoop.end();
-    return YES ;
-  },
-  
-  touchend: function(evt) {
-    try {
-      evt.cancel = NO ;
-      var handler = null, view = this._touchView ;
-      
-      // attempt the call only if there's a target.
-      // don't want a touch end going to anyone unless they handled the 
-      // touch start...
-      if (view) handler = this.sendEvent('touchEnd', evt, view) ;
-      
-      // try whoever's under the mouse if we haven't handle the mouse up yet
-      if (!handler) view = this.targetViewForEvent(evt) ;
-      
-      // cleanup
-      this._touchCanDrag = NO; this._touchView = null ;
-    } catch (e) {
-      console.log('Exception during touchEnd: %@'.fmt(e)) ;
-      this._touchCanDrag = NO; this._touchView = null ;
-      return NO ;
-    }
-    return (handler) ? evt.hasCustomEventHandling : YES ;
-  },
-  
-  /** @private
-    Handle touch cancel event.  Works just like touch end except evt.cancel
-    is set to YES.
-  */
-  touchcancel: function(evt) {
-    evt.cancel = YES ;
-    return this.touchend(evt);
-  }
+  setup: function() {}
     
 });
 
@@ -20128,7 +19442,7 @@ SC.routes = SC.Object.create(
   /** @private */
   init: function() {
     arguments.callee.base.call(this) ;
-    if (SC.browser.isSafari && parseInt(SC.browser.version,0) < 417) {
+    if (SC.browser.isSafari && !(SC.browser.safari >= 3)) {
       SC.mixin(this,this.browserFuncs.safari) ;  
     } else if (SC.browser.isIE) {
       SC.mixin(this,this.browserFuncs.ie) ;  
@@ -21870,6 +21184,7 @@ SC.mixin( /** @scope SC */ {
    */
   rectsEqual: function(r1, r2, delta) {
     if (!r1 || !r2) return (r1 == r2) ;
+  
     if (!delta && delta !== 0) delta = 0.1;
     if ((r1.y != r2.y) && (Math.abs(r1.y - r2.y) > delta)) return NO ; 
     if ((r1.x != r2.x) && (Math.abs(r1.x - r2.x) > delta)) return NO ; 
@@ -22986,15 +22301,15 @@ SC.Validator.Number = SC.Validator.extend(
     
     // strip out commas
     value = value.replace(/,/g,'');
+    
     switch(SC.typeOf(value)) {
       case SC.T_STRING:
-        if (value.length === 0) {
+        if (value.length == '') {
           value = null ;
         } else if (this.get('places') > 0) {
           value = parseFloat(value) ;
         } else {
-          if(value.length==1 && value.match(/-/)) value = null;
-          else value = parseInt(value,0) ;
+          value = parseInt(value,0) ;
         }
         break ;
       case SC.T_NULL:
@@ -23007,7 +22322,7 @@ SC.Validator.Number = SC.Validator.extend(
   
   validate: function(form, field) { 
     var value = field.get('fieldValue') ;
-    return (value === '') || !(isNaN(value) || isNaN(parseFloat(value))) ; 
+    return (value == '') || !(isNaN(value) || isNaN(parseFloat(value))) ; 
   },
   
   validateError: function(form, field) {
@@ -23019,11 +22334,7 @@ SC.Validator.Number = SC.Validator.extend(
     Allow only numbers, dashes, period, and commas
   */
   validateKeyDown: function(form, field, charStr) {
-    if(this.get('places')===0){
-      return (charStr.match(/^[\-+]?[0-9,\0]*/)[0]===charStr) || charStr.length === 0;
-    }else {
-      return (charStr.match(/^[\-+]?[0-9,\0]*\.?[0-9\0]+/)===charStr) || charStr.length === 0;
-    }
+    return !!charStr.match(/[0-9\.,\-]/);
   }
     
 }) ;
@@ -23276,7 +22587,7 @@ SC.IMAGE_STATE_SPRITE = 'sprite';
 */
 SC.BLANK_IMAGE_DATAURL = "data:image/gif;base64,R0lGODlhAQABAJAAAP///wAAACH5BAUQAAAALAAAAAABAAEAAAICBAEAOw==";
 
-SC.BLANK_IMAGE_URL = SC.browser.msie && SC.browser.msie<8 ? '/static/sproutcore/foundation/en/current/blank.gif?1269632160' : SC.BLANK_IMAGE_DATAURL;
+SC.BLANK_IMAGE_URL = SC.browser.msie && SC.browser.msie<8 ? '/static/sproutcore/foundation/en/current/blank.gif?1259494255' : SC.BLANK_IMAGE_DATAURL;
 
 /**
   @class

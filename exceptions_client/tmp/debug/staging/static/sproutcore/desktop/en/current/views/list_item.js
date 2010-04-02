@@ -241,7 +241,7 @@ SC.ListItemView = SC.View.extend(
       this.renderCount(working, value) ;
       var digits = ['zero', 'one', 'two', 'three', 'four', 'five'];
       var digit = (value.toString().length < digits.length) ? digits[value.toString().length] : digits[digits.length-1];
-      context.addClass('has-count '+digit+'-digit');
+      context.addClass('has-count %@-digit'.fmt(digit));
     }
     
     // handle action 
@@ -281,7 +281,7 @@ SC.ListItemView = SC.View.extend(
     html = cache[key];
 
     if (!html) {
-      html = cache[key] = '<img src="'+SC.BLANK_IMAGE_URL+'" class="disclosure button '+key+'" />';
+      html = cache[key] = '<img src="%@" class="disclosure button %@" />'.fmt(SC.BLANK_IMAGE_URL, key);
     }
     
     context.push(html);
@@ -453,7 +453,7 @@ SC.ListItemView = SC.View.extend(
     
     var el = SC.$(evt.target) ;
     var ret = NO, classNames ;
-    while(!ret && el.length>0 && (el[0] !== layer)) {
+    while(!ret && el.length>0 && (el.get(0) !== layer)) {
       if (el.hasClass(className)) ret = YES ;
       el = el.parent() ;
     }
@@ -480,15 +480,6 @@ SC.ListItemView = SC.View.extend(
     return this._isInsideElementWithClassName('disclosure', evt);
   },
   
-  /** @private 
-    Returns YES if the list item has a right icon and the event 
-    occurred inside of it.
-  */
-  _isInsideRightIcon: function(evt) {
-    var del = this.displayDelegate ;
-    var rightIconKey = this.getDelegateProperty('hasContentRightIcon', del) ;
-    return rightIconKey && this._isInsideElementWithClassName('right-icon', evt);
-  },
   
   /** @private 
   mouseDown is handled only for clicks on the checkbox view or or action
@@ -512,11 +503,7 @@ SC.ListItemView = SC.View.extend(
       this._isMouseDownOnDisclosure = YES;
       this._isMouseInsideDisclosure = YES ;
       return YES;
-    } else if (this._isInsideRightIcon(evt)) {
-      this._addRightIconActiveState();
-      this._isMouseDownOnRightIcon = YES;
-      this._isMouseInsideRightIcon = YES ;
-      return YES;
+
     }
     
     return NO ; // let the collection view handle this event
@@ -568,17 +555,11 @@ SC.ListItemView = SC.View.extend(
      
       this._removeDisclosureActiveState();
       ret = YES ;
-    // if mouse was down in right icon -- then handle mouse up, otherwise 
-    // allow parent view to handle event.
-    } else if (this._isMouseDownOnRightIcon) {
-      this._removeRightIconActiveState() ;
-      ret = YES ;
     } 
    
     // clear cached info
     this._isMouseInsideCheckbox = this._isMouseDownOnCheckbox = NO ;
     this._isMouseDownOnDisclosure = this._isMouseInsideDisclosure = NO ;
-    this._isMouseInsideRightIcon = this._isMouseDownOnRightIcon = NO ;
     return ret ;
   },
   
@@ -590,9 +571,6 @@ SC.ListItemView = SC.View.extend(
    } else if (this._isMouseDownOnDisclosure) {
      this._removeDisclosureActiveState();
      this._isMouseInsideDisclosure = NO ;
-   } else if (this._isMouseDownOnRightIcon) {
-     this._removeRightIconActiveState();
-     this._isMouseInsideRightIcon = NO ;
    }
    return NO ;
   },
@@ -605,9 +583,6 @@ SC.ListItemView = SC.View.extend(
    } else if (this._isMouseDownOnDisclosure) {
      this._addDisclosureActiveState();
      this._isMouseInsideDisclosure = YES;
-   } else if (this._isMouseDownOnRightIcon) {
-     this._addRightIconActiveState();
-     this._isMouseInsideRightIcon = YES;
    }
    return NO ;
   },
@@ -629,14 +604,6 @@ SC.ListItemView = SC.View.extend(
   _removeDisclosureActiveState: function() {
    this.$('img.disclosure').removeClass('active');
   },
-
-  _addRightIconActiveState: function() {
-   this.$('img.right-icon').setClass('active', YES);
-  },
-  
-  _removeRightIconActiveState: function() {
-   this.$('img.right-icon').removeClass('active');
-  },
   
   /**
     Returns true if a click is on the label text itself to enable editing.
@@ -655,7 +622,7 @@ SC.ListItemView = SC.View.extend(
    if (!labelKey) return NO ;
    
    // get the element to check for.
-   var el = this.$label()[0] ;
+   var el = this.$label().get(0) ;
    if (!el) return NO ; // no label to check for.
    
    var cur = evt.target, layer = this.get('layer') ;

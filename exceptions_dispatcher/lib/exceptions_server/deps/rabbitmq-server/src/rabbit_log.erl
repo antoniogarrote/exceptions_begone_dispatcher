@@ -18,11 +18,11 @@
 %%   are Copyright (C) 2007-2008 LShift Ltd, Cohesive Financial
 %%   Technologies LLC, and Rabbit Technologies Ltd.
 %%
-%%   Portions created by LShift Ltd are Copyright (C) 2007-2009 LShift
+%%   Portions created by LShift Ltd are Copyright (C) 2007-2010 LShift
 %%   Ltd. Portions created by Cohesive Financial Technologies LLC are
-%%   Copyright (C) 2007-2009 Cohesive Financial Technologies
+%%   Copyright (C) 2007-2010 Cohesive Financial Technologies
 %%   LLC. Portions created by Rabbit Technologies Ltd are Copyright
-%%   (C) 2007-2009 Rabbit Technologies Ltd.
+%%   (C) 2007-2010 Rabbit Technologies Ltd.
 %%
 %%   All Rights Reserved.
 %%
@@ -75,7 +75,7 @@ debug(Fmt, Args) when is_list(Args) ->
 
 message(Direction, Channel, MethodRecord, Content) ->
     gen_server:cast(?SERVER,
-		    {message, Direction, Channel, MethodRecord, Content}).
+                    {message, Direction, Channel, MethodRecord, Content}).
 
 info(Fmt) ->
     gen_server:cast(?SERVER, {info, Fmt}).
@@ -112,11 +112,11 @@ handle_cast({debug, Fmt, Args}, State) ->
     {noreply, State};
 handle_cast({message, Direction, Channel, MethodRecord, Content}, State) ->
     io:format("~s ch~p ~p~n",
-	      [case Direction of
-		   in -> "-->";
-		   out -> "<--" end,
-	       Channel,
-	       {MethodRecord, Content}]),
+              [case Direction of
+                   in -> "-->";
+                   out -> "<--" end,
+               Channel,
+               {MethodRecord, Content}]),
     {noreply, State};
 handle_cast({info, Fmt}, State) ->
     error_logger:info_msg(Fmt),
