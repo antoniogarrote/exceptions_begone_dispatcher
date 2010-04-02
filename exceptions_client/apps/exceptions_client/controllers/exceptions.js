@@ -22,6 +22,7 @@ ExceptionsClient.exceptionsController = SC.ArrayController.create(
     // CRUD operations
 
     addException: function(data) {
+
         var json = data.notification.payload;
         json['identifier'] = data.notification.identifier;
 

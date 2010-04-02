@@ -180,7 +180,7 @@
             (erase-buffer)
             (set-buffer *exceptions-begone*)
             (insert acum-data))
-        (error )))))
+        (error)))))
 
 (defun exceptions-begone-start-client ()
   (interactive)
