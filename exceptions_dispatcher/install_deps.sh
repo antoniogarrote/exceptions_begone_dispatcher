@@ -20,17 +20,19 @@ echo ""
 
 cd lib/exceptions_server/deps
 
-echo "*** compiling rabbitmq-server"
+echo "*** Compiling rabbitmq-server"
 cd rabbitmq-server
 make PYTHON=`which python`
 
-echo "*** compiling rabbitmq-erlang-client"
+echo "*** Compiling rabbitmq-erlang-client"
 cd .. && cd rabbitmq-erlang-client
 make
 
-echo "*** compiling mochiweb"
+echo "*** Compiling mochiweb"
 cd .. && cd mochiweb-0.0.1
 make
 
 
 cd ../../../../
+
+echo " *** finished"

@@ -10,7 +10,7 @@
 -behaviour(application).
 
 %% Application callbacks
--export([start/2, stop/1]).
+-export([start/2, stop/1, shell_start/0]).
 
 %%%===================================================================
 %%% Application callbacks
@@ -58,3 +58,5 @@ stop(_State) ->
 %%%===================================================================
 
 
+shell_start() ->
+    application:start(exceptions_server) .

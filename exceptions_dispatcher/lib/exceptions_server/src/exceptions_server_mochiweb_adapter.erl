@@ -158,13 +158,13 @@ handle_request(Req, DocRoot) ->
                     Req:not_found() ;
 
                 _Match ->
-                    error_logger:info_msg("received exception: ~p", [Req:parse_post()]),
+                    Req:parse_post(),
+                    error_logger:info_msg("received exception...", []),
                     try
                         Star = ?STAR,
                         Exception = ?EXCEPTION,
                         Dot = ?DOT,
                         Data = get(mochiweb_request_body),
-                        error_logger:info_msg("received exception parsed: ~p", [Data]),
                         case es_json:process_json_message(Data) of
                             {exception, C, M, JsonStr} ->  Keys = [<<Exception/binary,Dot/binary,C/binary,Dot/binary,M/binary>>],
                                                            es_rabbit_backend:publish(JsonStr, Keys) ;

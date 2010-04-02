@@ -30,19 +30,12 @@ Client: A Sprotucore Javascript client that can be used to connect to a Exceptio
 
 === Exceptions Begone Server : Build
 
-  - Install Erlware Sinan
-  - $ sinan
-  - $ sinana test
-
-  If you don't have a mochiweb, rabbitmq and the rabbitmq client library you can install them
-  from the 'deps' directory of the project using Makefiles.
+  - $./install_deps.sh    #intall dependencies
+  - $./install            # builds the server
 
 === Exceptions Begone Client : Running
 
-  - $ cd /exceptions_dispatcher/_build/development/apps/exceptions_server-0.1.0
-  - $ erl -pa ebin
-  - erl> application:start(exceptions_server) .
-
+  - $./exceptions_dispatcher.sh
 
 
 Right now, it only slightly works.
