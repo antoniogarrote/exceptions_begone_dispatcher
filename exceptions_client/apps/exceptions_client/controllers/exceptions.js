@@ -22,6 +22,7 @@ ExceptionsClient.exceptionsController = SC.ArrayController.create(
     // CRUD operations
 
     addException: function(data) {
+        SC.RunLoop.begin(); // running this events in a new run loop to get inmediate UI refresh
 
         var json = data.notification.payload;
         json['identifier'] = data.notification.identifier;
@@ -34,9 +35,11 @@ ExceptionsClient.exceptionsController = SC.ArrayController.create(
 
         var date = SC.DateTime.create();
 
-        this.totalExceptionCount += 1;
-        ExceptionsClient.exceptionsController.notifyPropertyChange('exceptionsCountProperty');
-
+        console.log("notifying change at totalExceptionCount");
+        var oldCount = this.get('totalExceptionCount');
+        this.propertyWillChange('totalExceptionCount');
+        this.set('totalExceptionCount', oldCount + 1);
+        this.propertyDidChange('totalExceptionCount');
 
         if (exception) {
             // if the exception is already stored, we just update the counter and
@@ -44,7 +47,6 @@ ExceptionsClient.exceptionsController = SC.ArrayController.create(
             json['timestamp'] = date;
 
             exception.updateProperties(json);
-
         } else {
             // The exception is new, we add the exception to the collection
             json['count'] = 1;
@@ -52,6 +54,8 @@ ExceptionsClient.exceptionsController = SC.ArrayController.create(
             var newException = ExceptionsClient.store.createRecord(ExceptionsClient.Exception, json);
             newException.set('timestamp', date);
         }
+
+        SC.RunLoop.end(); // We finish this run loop
 
         return YES;
     },
@@ -131,11 +135,6 @@ ExceptionsClient.exceptionsController = SC.ArrayController.create(
     connectionString: function() {
         return this.connectionUri;
     }.property('connectionUri'),
-
-
-    exceptionsCountProperty: function() {
-        return this.totalExceptionCount;
-    }.property('totalExceptionCount'),
 
 
     // Socket connection

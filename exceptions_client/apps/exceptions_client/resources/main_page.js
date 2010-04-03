@@ -52,7 +52,6 @@ ExceptionsClient.mainPage = SC.Page.design({
               layout: { top:0, left:0, right:0, bottom:0 },
               contentBinding: 'ExceptionsClient.exceptionsController.arrangedObjects',
               selectionBinding: 'ExceptionsClient.exceptionsController.selection',
-              //contentValueKey: "display",
               rowHeight: 31,
               showAlternatingRows: YES
           }),
@@ -131,7 +130,7 @@ ExceptionsClient.mainPage = SC.Page.design({
 
           countView: SC.LabelView.design({
               layout: { bottom: 3, right: 12, height:20 },
-              valueBinding: 'ExceptionsClient.exceptionsController.exceptionsCountProperty',
+              valueBinding: 'ExceptionsClient.exceptionsController.totalExceptionCount',
               fontWeight: SC.BOLD_WEIGHT,
               textAlign: SC.ALIGN_RIGHT
            })
