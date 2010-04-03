@@ -48,11 +48,11 @@ ExceptionsClient.mainPage = SC.Page.design({
           topLeftMinThickness: 200,
           topLeftMaxThickness: 900,
           topLeftView: SC.ListView.design({
-              //exampleView: ExceptionsClient.ExceptionListView,
+              exampleView: ExceptionsClient.ExceptionsListItemView,
               layout: { top:0, left:0, right:0, bottom:0 },
               contentBinding: 'ExceptionsClient.exceptionsController.arrangedObjects',
               selectionBinding: 'ExceptionsClient.exceptionsController.selection',
-              contentValueKey: "display",
+              //contentValueKey: "display",
               rowHeight: 31,
               showAlternatingRows: YES
           }),
@@ -60,7 +60,6 @@ ExceptionsClient.mainPage = SC.Page.design({
           dividerView: SC.SplitDividerView,
 
           bottomRightView: SC.View.design({
-              //childViews: "counterView identifierView urlLabel urlView ipLabel ipView timestampView",
               childViews: "counterView identifierView urlLabel urlView ipLabel ipView dateLabel dateView".w(),
 
               backgroundColor: 'gray',
