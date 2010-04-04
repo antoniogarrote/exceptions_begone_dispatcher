@@ -58,61 +58,21 @@ ExceptionsClient.mainPage = SC.Page.design({
 
           dividerView: SC.SplitDividerView,
 
-          bottomRightView: SC.View.design({
-              childViews: "counterView identifierView urlLabel urlView ipLabel ipView dateLabel dateView".w(),
+          bottomRightView: SC.TabView.design({
 
-              backgroundColor: 'gray',
+              value: 'ExceptionsClient.exceptionPage.summaryView',
 
-              // Views
-              counterView: SC.LabelView.design({
-                  layout: {top: 10, left: 10, height: 50, width: 30},
-                  valueBinding: 'ExceptionsClient.exceptionsController.selectedCount',
-                  escapeHTML: NO,
-                  textAlign: SC.ALIGN_RIGHT
-              }),
+              items: [
+                  { title: 'Summary', value: 'ExceptionsClient.exceptionPage.summaryView' },
+                  { title: 'Environment', value: 'ExceptionsClient.exceptionPage.environmentView' }
+              ],
 
-              identifierView: SC.LabelView.design({
-                  layout: {top: 10, left: 50, height: 50, right: 50},
-                  valueBinding: 'ExceptionsClient.exceptionsController.selectedIdentifier',
-                  escapeHTML: NO
-              }),
+              itemTitleKey: 'title',
+              itemValueKey: 'value',
 
-              urlLabel: SC.LabelView.design({
-                  layout: {top: 100, left: 20, height: 50, width: 60},
-                  value: 'URL:',
-                  fontWeight: SC.BOLD_WEIGHT,
-                  textAlign: SC.ALIGN_RIGHT
-              }),
+              layout: { top: 0, left: 0, right: 0 },
 
-              urlView: SC.LabelView.design({
-                  layout: {top: 100, left: 90, height: 50, right: 20},
-                  valueBinding: 'ExceptionsClient.exceptionsController.selectedUrl'
-              }),
-
-              ipLabel: SC.LabelView.design({
-                  layout: {top: 130, left: 20, height: 50, width: 60},
-                  value: 'IP:',
-                  fontWeight: SC.BOLD_WEIGHT,
-                  textAlign: SC.ALIGN_RIGHT
-              }),
-
-              ipView: SC.LabelView.design({
-                  layout: {top: 130, left: 90, height: 50, right: 20},
-                  valueBinding: 'ExceptionsClient.exceptionsController.selectedIp'
-              }),
-
-              dateLabel: SC.LabelView.design({
-                  layout: {top: 160, left: 20, height: 50, width: 60},
-                  value: 'Received:',
-                  fontWeight: SC.BOLD_WEIGHT,
-                  textAlign: SC.ALIGN_RIGHT
-              }),
-
-              dateView: SC.LabelView.design({
-                  layout: {top: 160, left: 90, height: 50, right: 20},
-                  valueBinding: 'ExceptionsClient.exceptionsController.updatedTimestamp'
-              })
-
+              userDefaultKey: "mainPane"
           })
       }),
 
