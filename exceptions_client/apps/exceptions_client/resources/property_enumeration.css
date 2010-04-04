@@ -8,3 +8,7 @@
 .prop-key {
    margin-left: 25px
 }
+
+.tab-overflow {
+   overflow:auto
+}

@@ -9,3 +9,7 @@
 .backtrace {
    padding-left: 25px
 }
+
+.tab-overflow {
+   overflow:auto
+}

@@ -67,12 +67,14 @@ ExceptionsClient.exceptionPage = SC.Page.create({
     environmentView: ExceptionsClient.PropertyEnumerationView.design({
         titleContent: 'Environment',
         backgroundColor: 'gray',
+        classNames: ['tab-overflow'],
         propertyToEnumerate: 'environment',
         valueBinding: 'ExceptionsClient.exceptionsController.selectedEnvironment'
     }),
 
     sessionView: ExceptionsClient.PropertyEnumerationView.design({
         titleContent: 'Session',
+        classNames: ['tab-overflow'],
         backgroundColor: 'gray',
         propertyToEnumerate: 'session',
         valueBinding: 'ExceptionsClient.exceptionsController.selectedSession'
@@ -80,6 +82,7 @@ ExceptionsClient.exceptionPage = SC.Page.create({
 
     backtraceView: ExceptionsClient.BacktraceView.design({
         backgroundColor: 'gray',
+        classNames: ['tab-overflow'],
         valueBinding: 'ExceptionsClient.exceptionsController.selectedBacktrace'
     })
 });
