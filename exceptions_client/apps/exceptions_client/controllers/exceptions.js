@@ -18,6 +18,7 @@ ExceptionsClient.exceptionsController = SC.ArrayController.create(
     connectionUri: ('connected to: ws://' + ExceptionsClient.WebSocketsConfiguration['domain'] + ':' + ExceptionsClient.WebSocketsConfiguration['port'] + '/' + ExceptionsClient.WebSocketsConfiguration['path']),
 
     totalExceptionCount: 0,
+    selectedException: null,
 
     // CRUD operations
 
@@ -35,7 +36,6 @@ ExceptionsClient.exceptionsController = SC.ArrayController.create(
 
         var date = SC.DateTime.create();
 
-        console.log("notifying change at totalExceptionCount");
         var oldCount = this.get('totalExceptionCount');
         this.propertyWillChange('totalExceptionCount');
         this.set('totalExceptionCount', oldCount + 1);
@@ -63,9 +63,23 @@ ExceptionsClient.exceptionsController = SC.ArrayController.create(
 
     // Precalculated properties
 
-
     // There should be other way of doing this using KVO and bindings
     // but the selection property gets cached.
+    // All this section of the code *must* be refactored!
+
+    testObserver: function() {
+        if(ExceptionsClient.exceptionPage.backtraceView.updateLayer != undefined) {
+            ExceptionsClient.exceptionPage.backtraceView.updateLayer();
+        }
+        if(ExceptionsClient.exceptionPage.sessionView.updateLayer != undefined) {
+            ExceptionsClient.exceptionPage.sessionView.updateLayer();
+        }
+        if(ExceptionsClient.exceptionPage.environmentView.updateLayer != undefined) {
+            ExceptionsClient.exceptionPage.environmentView.updateLayer();
+        }
+    }.observes('ExceptionsClient.exceptionsController.selection'),
+
+
     details: function() {
         var selection = this.get('selection');
 
@@ -91,6 +105,32 @@ ExceptionsClient.exceptionsController = SC.ArrayController.create(
         }
     }.property('selection'),
 
+    selectedBacktrace: function() {
+        var selection = this.get('selection');
+        if(selection.get('length') > 0) {
+            return selection.get('firstObject').get('backtrace');
+        } else {
+            return null;
+        }
+    }.property('selection'),
+
+    selectedSession: function() {
+        var selection = this.get('selection');
+        if(selection.get('length') > 0) {
+            return selection.get('firstObject').get('session');
+        } else {
+            return null;
+        }
+    }.property('selection'),
+
+    selectedEnvironment: function() {
+        var selection = this.get('selection');
+        if(selection.get('length') > 0) {
+            return selection.get('firstObject').get('environment');
+        } else {
+            return null;
+        }
+    }.property('selection'),
 
     selectedCount: function() {
         var selection = this.get('selection');

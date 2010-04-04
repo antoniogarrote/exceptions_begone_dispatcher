@@ -3,7 +3,8 @@
 // Copyright: ©2010 My Company, Inc.
 // ==========================================================================
 /*globals ExceptionsClient */
-sc_require('views/exception_environment');
+sc_require('views/property_enumeration');
+sc_require('views/backtrace');
 
 // This page describes the main user interface for your application.
 ExceptionsClient.exceptionPage = SC.Page.create({
@@ -63,12 +64,22 @@ ExceptionsClient.exceptionPage = SC.Page.create({
           })
     }),
 
-    environmentView: SC.ScrollView.design({
-        layout: { left:0, right:0, top:0, bottom:0 },
+    environmentView: ExceptionsClient.PropertyEnumerationView.design({
+        titleContent: 'Environment',
+        backgroundColor: 'gray',
+        propertyToEnumerate: 'environment',
+        valueBinding: 'ExceptionsClient.exceptionsController.selectedEnvironment'
+    }),
 
-        hasHorizontalScroller: NO,
-        contentView: ExceptionsClient.ExceptionEnvironmentView.design({
-            valueBinding: 'ExceptionsClient.exceptionsController.selection'
-        })
+    sessionView: ExceptionsClient.PropertyEnumerationView.design({
+        titleContent: 'Session',
+        backgroundColor: 'gray',
+        propertyToEnumerate: 'session',
+        valueBinding: 'ExceptionsClient.exceptionsController.selectedSession'
+    }),
+
+    backtraceView: ExceptionsClient.BacktraceView.design({
+        backgroundColor: 'gray',
+        valueBinding: 'ExceptionsClient.exceptionsController.selectedBacktrace'
     })
 });

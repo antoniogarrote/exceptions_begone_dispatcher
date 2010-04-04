@@ -64,7 +64,9 @@ ExceptionsClient.mainPage = SC.Page.design({
 
               items: [
                   { title: 'Summary', value: 'ExceptionsClient.exceptionPage.summaryView' },
-                  { title: 'Environment', value: 'ExceptionsClient.exceptionPage.environmentView' }
+                  { title: 'Session', value: 'ExceptionsClient.exceptionPage.sessionView' },
+                  { title: 'Environment', value: 'ExceptionsClient.exceptionPage.environmentView' },
+                  { title: 'Backtrace', value: 'ExceptionsClient.exceptionPage.backtraceView' }
               ],
 
               itemTitleKey: 'title',

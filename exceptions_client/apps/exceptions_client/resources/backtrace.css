@@ -1,0 +1,11 @@
+.backtrace-title {
+   margin-top: 15px;
+   margin-left: 15px;
+   margin-bottom: 15px;
+   font-weight: bold;
+   font-size: 20px
+}
+
+.backtrace {
+   padding-left: 25px
+}
