@@ -4,9 +4,11 @@
 
 exceptions_dispatcher/_build/
 exceptions_dispatcher/Mnesia*/
-exceptions_dispatcher/lib/exceptions_server/ebin/
+exceptions_dispatcher/lib/exceptions_server/ebin/*.beam
 exceptions_dispatcher/lib/exceptions_server/deps/mochiweb-0.0.1/ebin/
 exceptions_dispatcher/lib/exceptions_server/deps/rabbitmq-erlang-client/ebin/
+exceptions_dispatcher/lib/exceptions_server/deps/rabbitmq-erlang-client/deps/
+exceptions_dispatcher/lib/exceptions_server/deps/rabbitmq-erlang-client/dist/
 exceptions_dispatcher/lib/exceptions_server/deps/rabbitmq-server/ebin/
 exceptions_dispatcher/lib/exceptions_server/deps/rabbitmq-codegen/
 exceptions_client/tmp/

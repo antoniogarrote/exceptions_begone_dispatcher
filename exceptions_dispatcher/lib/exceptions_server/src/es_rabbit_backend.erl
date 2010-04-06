@@ -22,10 +22,15 @@
 %% @doc
 %% Starts the rabbitmq application
 start() ->
-    application:start(sasl) ,
-    application:start(mnesia) ,
-    application:start(os_mon) ,
-    application:start(rabbit) .
+    case application:get_env(exceptions_server,use_embedded_rabbit) of
+        {ok, true} ->
+            application:start(sasl) ,
+            application:start(mnesia) ,
+            application:start(os_mon) ,
+            application:start(rabbit) ;
+        {ok, false}  ->
+            dont_care
+    end .
 
 
 %% @doc
@@ -55,8 +60,7 @@ consume(F, RoutingKeys) ->
 
 
 init(_Arguments) ->
-    Params = #amqp_params{ username = <<"guest">>,
-                           password = <<"guest">> },
+    Params = make_amqp_params_from_config(),
     ConnectionPid = amqp_connection:start_direct(Params),
     {Channel, Ticket} = channel_setup(ConnectionPid),
 
@@ -279,6 +283,24 @@ spawn_consumer(Function, Channel) ->
 
 code_change(_OldVsn, State, _Extra) ->
     {ok, State} .
+
+
+%% @doc
+%% Decides which connection to rabbitmq to use: local or remote
+%% using configuration data.
+make_amqp_params_from_config() ->
+    case application:get_env(exceptions_server,use_embedded_rabbit) of
+        {ok, true} ->
+            {ok, Params} = application:get_env(exceptions_server, rabbit_config),
+            #amqp_params{ username          = proplists:get_value(username, Params),
+                          password          = proplists:get_value(password, Params),
+                          virtual_host      = proplists:get_value(virtual_host, Params),
+                          host              = proplists:get_value(host, Params),
+                          port              = proplists:get_value(port, Params) } ;
+        {ok, false} ->
+            #amqp_params{ username = <<"guest">>,
+                           password = <<"guest">> }
+    end .
 
 
 %% tests
