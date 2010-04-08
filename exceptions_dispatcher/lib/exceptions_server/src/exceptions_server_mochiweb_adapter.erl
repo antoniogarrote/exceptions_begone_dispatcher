@@ -154,8 +154,27 @@ handle_request(Req, DocRoot) ->
         'POST' ->
             case match_project_path(Path) of
                 nomatch ->
-                    error_logger:info_msg("No hay match"),
-                    Req:not_found() ;
+                    case Path of
+                        %% params:
+                        %%   -name
+                        %%   -capacity
+                        %%   -exceptions
+                        %%   -mails
+                        "buffers" ->
+                            Data = Req:parse_post(),
+                            error_logger:info_msg("The data: ~p",[Data]),
+                            Name = proplists:get_value("name", Data),
+                            Capacity = proplists:get_value("capacity",Data),
+                            Exceptions = proplists:get_value("exceptions",Data),
+                            Mails = proplists:get_value("mails",Data),
+                            case (Name == undefined) or (Capacity == undefined) or (Exceptions == undefined) or (Mails == undefined) of
+                                true  -> error_logger:info_msg("missing info",[]), Req:not_found();
+                                false -> error_logger:info_msg("got all the info",[]), Req:not_found()
+                            end ;
+                        _Other ->
+                            error_logger:info_msg("No hay match"),
+                            Req:not_found()
+                    end ;
 
                 _Match ->
                     Req:parse_post(),

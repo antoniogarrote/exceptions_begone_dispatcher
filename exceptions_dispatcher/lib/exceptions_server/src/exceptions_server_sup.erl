@@ -64,8 +64,10 @@ init([]) ->
     RabbitBackend  = {es_rabbit_backend, {es_rabbit_backend, start_link, []},
                       Restart, Shutdown, Type, [es_rabbit_backend]},
 
+    BufferServices  = {es_buffers_service, {es_buffers_service, start_link, []},
+                       Restart, Shutdown, Type, [es_buffers_service]},
 
-    {ok, {SupFlags, [Webserver, RabbitBackend]}}.
+    {ok, {SupFlags, [Webserver, RabbitBackend, BufferServices]}}.
 
 %%%===================================================================
 %%% Internal functions

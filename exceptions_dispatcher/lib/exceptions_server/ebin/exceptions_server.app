@@ -7,7 +7,9 @@
               exceptions_server_sup,
               exceptions_server_mochiweb_adapter,
               es_rabbit_backend,
-              es_json]},
+              es_json,
+              es_mongodb_utils,
+              es_buffers_service]},
    {env, [{port, 8080},
           {docroot, "/Users/antonio.garrote/Desktop/www"},
             %% Should I start rabbitmq with this application or
@@ -21,7 +23,13 @@
                            {password, <<"guest">>},
                            {virtual_host, <<"/">>},
                            {host, "localhost"},
-                           {port, 65535}]}]},
+                           {port, 65535}]},
+            %% Should I start the exceptions_agent service
+          {use_buffers_service, true},
+            %% MongoDB connection to use in the exceptions_agent service
+          {mongodb_config, [{host, "localhost"},
+                            {port, 27017},
+                            {pool_size, 1}]}]},
    {registered,[exceptions_server_sup]},
    {applications, [kernel, stdlib]},
    {mod, {exceptions_server_app,[]}},
