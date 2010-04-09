@@ -15,7 +15,8 @@
 -include_lib("eunit/include/eunit.hrl").
 
 
--export([start_mongodb/0, start_link/0, init/1, handle_call/3, handle_cast/2, terminate/2, handle_info/2, code_change/3]) .
+-export([start_mongodb/0, start_link/0, init/1, handle_call/3, handle_cast/2, terminate/2, handle_info/2, code_change/3,
+        find/1,create_buffer/4]) .
 
 
 %% public API
@@ -32,6 +33,17 @@ start_mongodb() ->
     end .
 
 %% @doc
+%% Finds a buffer process provided the name of the buffer
+find(Name) ->
+    gen_server:call(es_buffers_service, {find,Name}) .
+
+%% @doc
+%% Create a new buffer
+create_buffer(Name,Capacity, Exceptions, Mails) ->
+    gen_server:call(es_buffers_service, {create_buffer,Name, Capacity, Exceptions, Mails}) .
+
+
+%% @doc
 %% Starts the service
 start_link() ->
     start_mongodb() ,
@@ -43,16 +55,22 @@ start_link() ->
 init(_Arguments) ->
     Buffers = es_mongodb_utils:find_all_buffers(),
     BufferProcesses = lists:map(fun(B) -> {ok,Pid} = es_buffer_process:start_link(B),
-                                          {#exceptions_buffer.name, Pid}
+                                          {B#exceptions_buffer.name, Pid}
                                 end,
                                 Buffers),
     { ok, BufferProcesses } .
 
 %% dummy callbacks so no warning are shown at compile time
 
-handle_call({create, _Options}, _From, State) ->
-    {reply, ok, State } .
-
+handle_call({create_buffer,Name, Capacity, Exceptions, Mails}, _From, State) ->
+    es_mongodb_utils:create_buffer(Name,Mails,Exceptions,Capacity),
+    {reply, ok, State } ;
+handle_call({find, Name}, _From, State) ->
+    Res = case proplists:get_value(Name,State) of
+              undefined  -> undefined ;
+              Pid  -> Pid
+          end,
+    {reply, Res, State}.
 handle_cast(_Msg, State) ->
     {noreply, State} .
 

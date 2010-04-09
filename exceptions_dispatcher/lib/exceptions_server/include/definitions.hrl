@@ -1,0 +1,4 @@
+-define(STAR, <<"*">>).
+-define(EXCEPTION,<<"exception">>).
+-define(DOT,<<".">>).
+-define(SHARP,<<"#">>).

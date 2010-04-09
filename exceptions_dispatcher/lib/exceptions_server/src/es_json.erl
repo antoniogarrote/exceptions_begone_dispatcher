@@ -10,9 +10,10 @@
 -author("Antonio Garrote Hernandez") .
 
 -include_lib("eunit/include/eunit.hrl").
+-include_lib("../include/definitions.hrl").
 
 -export([decode_json/1, is_exception/1, get_identifier/1, is_valid/1, is_notification/1, sample_json/0,
-         parse_identifier/1, process_json_message/1, sanitize_json/1]) .
+         parse_identifier/1, process_json_message/1, sanitize_json/1, transform_keys/1, binaries_to_json_array/1]) .
 
 
 %% Public API
@@ -122,6 +123,34 @@ process_json_message(JsonStr) ->
             end
     end .
 
+%% @doc
+%% Transforms an list of lists [c,m] controller method into a list of RabbitMQ topic queue binding key
+transform_keys(Json) ->
+    Exception = ?EXCEPTION,
+    Dot = ?DOT,
+    lists:map(fun([C,M]) ->
+                <<Exception/binary,Dot/binary,C/binary,Dot/binary,M/binary>>
+              end,
+              Json).
+
+binaries_to_json_array(Bins) ->
+    Res = binaries_to_json_array_int(Bins,<<"">>),
+    First = <<"[">>,
+    Last = <<"]">>,
+    <<First/binary,Res/binary,Last/binary>> .
+
+binaries_to_json_array_int([], Acum) ->
+    Acum ;
+binaries_to_json_array_int([H|[]], <<"">>) ->
+    H ;
+binaries_to_json_array_int([H|[]], Acum) ->
+    <<Acum/binary,H/binary>> ;
+binaries_to_json_array_int([H|T], <<"">>) ->
+    Comma = <<",">>,
+    binaries_to_json_array_int(T,<<H/binary,Comma/binary>>) ;
+binaries_to_json_array_int([H|T], Acum) ->
+    Comma = <<",">>,
+    binaries_to_json_array_int(T,<<Acum/binary,H/binary,Comma/binary>>) .
 
 
 %%
@@ -154,3 +183,16 @@ sanitize_json_test() ->
     JsonStr = sanitize_json(BadJsonStr),
     Json = decode_json(JsonStr),
     ?assertEqual([[<<"base">>,<<"core">>]], Json) .
+
+transform_keys_test() ->
+    Json = [[<<"a">>,<<"b">>]],
+    Keys = transform_keys(Json),
+    ?assertEqual([<<"exception.a.b">>],Keys) .
+
+binaries_to_json_array_test() ->
+    A = es_json:binaries_to_json_array([<<"a">>,<<"b">>]),
+    ?assertEqual(A,<<"[a,b]">>),
+    B = es_json:binaries_to_json_array([<<"a">>]),
+    ?assertEqual(B,<<"[a]">>),
+    C = es_json:binaries_to_json_array([]),
+    ?assertEqual(C,<<"[]">>) .

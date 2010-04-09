@@ -12,16 +12,11 @@
 -behaviour(gen_server) .
 
 -include_lib("eunit/include/eunit.hrl").
-
+-include_lib("../include/definitions.hrl").
 
 -export([start_link/0, loop/2]) .
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3, handle_potential_client/3]).
 
-
--define(STAR, <<"*">>).
--define(EXCEPTION,<<"exception">>).
--define(DOT,<<".">>).
--define(SHARP,<<"#">>).
 
 %% Public API
 
@@ -85,11 +80,18 @@ handle_request(Req, DocRoot) ->
         Method when Method =:= 'GET'; Method =:= 'HEAD' ->
             case Path of
 
-                "test" ->
-                    Req:respond({200,
-                                 [{"Content-Type", "text/plain"},
-                                  {"Charset", "UTF-8"}],
-                                 "Hola mundo!"}) ;
+                "buffer/" ++ BufferName ->
+                    case es_buffers_service:find(BufferName) of
+                        undefined ->
+                            error_logger:info_msg("No match for buffer ~p",[BufferName]),
+                            Req:not_found() ;
+                        Pid       ->
+                            ExceptionsJson = es_buffer_process:all_exceptions(Pid),
+                            Req:respond({200,
+                                         [{"Content-Type", "application/json"},
+                                          {"Charset", "UTF-8"}],
+                                         ExceptionsJson})
+                    end ;
 
                 "exceptions" ->
                     case parse_ws_upgrade(Req) of
@@ -110,7 +112,7 @@ handle_request(Req, DocRoot) ->
                                     error_logger:info_msg("Decoded: ~p",[Json]),
 
                                     % Generate keys
-                                    Keys = transform_keys(Json),
+                                    Keys = es_json:transform_keys(Json),
 
                                     % Declare queues
                                     lists:foreach(fun(Key) ->
@@ -169,10 +171,14 @@ handle_request(Req, DocRoot) ->
                             Mails = proplists:get_value("mails",Data),
                             case (Name == undefined) or (Capacity == undefined) or (Exceptions == undefined) or (Mails == undefined) of
                                 true  -> error_logger:info_msg("missing info",[]), Req:not_found();
-                                false -> error_logger:info_msg("got all the info",[]), Req:not_found()
+                                false -> es_mongodb_utils:create_buffer(Name,Mails,Exceptions,Capacity),
+                                         Req:respond({201,
+                                                      [{"Content-Type", "text/plain"},
+                                                       {"Charset", "UTF-8"}],
+                                                      "created"})
                             end ;
                         _Other ->
-                            error_logger:info_msg("No hay match"),
+                            error_logger:info_msg("No match"),
                             Req:not_found()
                     end ;
 
@@ -297,13 +303,6 @@ header(Req,Key) ->
 
 
 
-transform_keys(Json) ->
-    Exception = ?EXCEPTION,
-    Dot = ?DOT,
-    lists:map(fun([C,M]) ->
-                <<Exception/binary,Dot/binary,C/binary,Dot/binary,M/binary>>
-              end,
-              Json).
 
 match_project_path(Path) ->
     {ok,RE} = re:compile("projects\/.*\/notifications"),
@@ -319,9 +318,3 @@ match_path_test() ->
     ?assertEqual(Res1,{match,[{0,27}]}),
     Res2 = match_project_path("projects_wrong/test/notifications"),
     ?assertEqual(Res2,nomatch) .
-
-
-transform_keys_test() ->
-    Json = [[<<"a">>,<<"b">>]],
-    Keys = transform_keys(Json),
-    ?assertEqual([<<"exception.a.b">>],Keys) .
