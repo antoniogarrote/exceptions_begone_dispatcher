@@ -16,7 +16,7 @@
 
 
 -export([start_mongodb/0, start_link/0, init/1, handle_call/3, handle_cast/2, terminate/2, handle_info/2, code_change/3,
-        find/1,create_buffer/4, test_state/0]) .
+        find/1,create_buffer/4, register_timer/0, extract_mails/1, send_summaries/1, build_summary/1]) .
 
 
 %% public API
@@ -27,6 +27,9 @@
 start_mongodb() ->
     case application:get_env(exceptions_server,use_buffers_service) of
         {ok, true} ->
+            esmtp:start(),
+            timer:start(),
+            register_timer(),
             es_mongodb_utils:start_service();
         {ok, false}  ->
             dont_care
@@ -44,8 +47,19 @@ find(Name) ->
 create_buffer(Name,Capacity, Exceptions, Mails) ->
     gen_server:call(es_buffers_service, {create_buffer,Name, Capacity, Exceptions, Mails}) .
 
-test_state() ->
-    gen_server:call(es_buffers_service, {state}) .
+%% @doc
+%% Register the timer function
+
+register_timer() ->
+    {{_Year,_Month,_Day},{Hour,Minutes,Seconds}} = erlang:localtime(),
+    Secs = 59 - Seconds,
+    Mins = 58 - case Minutes of
+                    59     -> 0 ;
+                    _Other -> Minutes
+                end,
+    Hours = 23 - Hour,
+    Milsecs = timer:hms(Hours, Mins, Secs),
+    timer:apply_after(Milsecs, ?MODULE, send_summaries,[]).
 
 %% @doc
 %% Starts the service
@@ -92,4 +106,45 @@ code_change(_A, _B, _C) ->
 
 %% private API
 
+%% @doc
+%% Creates a summary for a buffer
+build_summary(Buffer) ->
+    error_logger:info_msg("1"),
+    Name = Buffer#exceptions_buffer.name,
+    error_logger:info_msg("2"),
+    Pid = es_buffers_service:find(Name),
+    error_logger:info_msg("3"),
+    Exceptions = es_buffer_process:all_exceptions(Pid),
+    ExcepsJson = es_json:decode_json(Exceptions),
+    lists:foldl(fun(E,Acum) ->
+                        case es_json:is_exception(E) of
+                            true  ->
+                                Id = binary_to_list(es_json:get_identifier(E)),
+                                Acum ++ Id ++ "\r\n" ;
+                            false ->
+                                Acum
+                        end
+                end,
+                "Total exceptions: " ++ io_lib:format("~p",[length(ExcepsJson)]) ++ "\r\n\r\nList of exceptions :\r\n",
+                ExcepsJson) .
 
+%% @doc
+%% Creates a summary for a buffer
+extract_mails(Buffer) ->
+    lists:map(fun(M) -> binary_to_list(M) end, Buffer#exceptions_buffer.mails) .
+
+
+%% @doc
+%% Send the summaries
+send_summaries(_Args) ->
+    Buffers = es_mongodb_utils:find_all_buffers(),
+    lists:foreach(fun(B) ->
+                          Mails = extract_mails(B),
+                          Msg = build_summary(B),
+                          lists:foreach(fun(Mail) ->
+                                                esmtp:send(Mail,Msg)
+                                        end,
+                                        Mails)
+                  end,
+                  Buffers),
+    register_timer() .

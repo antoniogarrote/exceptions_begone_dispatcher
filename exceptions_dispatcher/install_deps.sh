@@ -1,4 +1,4 @@
-!#/bin/env bash
+#!/bin/env bash
 
 echo "****************************************************"
 echo " Building Exceptions Begone Dispatcher dependencies "
@@ -31,6 +31,15 @@ make
 echo "*** Compiling mochiweb"
 cd .. && cd mochiweb-0.0.1
 make
+
+echo "*** Compiling mongodb"
+cd .. && cd emongo
+make
+
+echo "*** Compiling esmtp"
+cd .. && cd esmtp
+make
+rm ebin/esmtp.app
 
 
 cd ../../../../
