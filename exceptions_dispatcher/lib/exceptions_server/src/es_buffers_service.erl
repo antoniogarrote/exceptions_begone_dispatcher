@@ -16,7 +16,7 @@
 
 
 -export([start_mongodb/0, start_link/0, init/1, handle_call/3, handle_cast/2, terminate/2, handle_info/2, code_change/3,
-        find/1,create_buffer/4]) .
+        find/1,create_buffer/4, test_state/0]) .
 
 
 %% public API
@@ -34,6 +34,8 @@ start_mongodb() ->
 
 %% @doc
 %% Finds a buffer process provided the name of the buffer
+find(Name) when is_binary(Name) ->
+    find(binary_to_list(Name)) ;
 find(Name) ->
     gen_server:call(es_buffers_service, {find,Name}) .
 
@@ -42,6 +44,8 @@ find(Name) ->
 create_buffer(Name,Capacity, Exceptions, Mails) ->
     gen_server:call(es_buffers_service, {create_buffer,Name, Capacity, Exceptions, Mails}) .
 
+test_state() ->
+    gen_server:call(es_buffers_service, {state}) .
 
 %% @doc
 %% Starts the service
@@ -70,7 +74,10 @@ handle_call({find, Name}, _From, State) ->
               undefined  -> undefined ;
               Pid  -> Pid
           end,
-    {reply, Res, State}.
+    {reply, Res, State} ;
+handle_call({state}, _From, State) ->
+    {reply, State, State}.
+
 handle_cast(_Msg, State) ->
     {noreply, State} .
 

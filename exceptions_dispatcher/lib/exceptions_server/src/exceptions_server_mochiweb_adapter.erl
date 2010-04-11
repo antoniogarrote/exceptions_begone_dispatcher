@@ -163,14 +163,19 @@ handle_request(Req, DocRoot) ->
                         %%   -exceptions
                         %%   -mails
                         "buffers" ->
-                            Data = Req:parse_post(),
+                            Data = case Req:recv_body() of
+                                       [] -> [] ;
+                                       Json -> {struct, ToReturn} = es_json:decode_json(Json),
+                                               ToReturn
+                                   end,
                             error_logger:info_msg("The data: ~p",[Data]),
-                            Name = proplists:get_value("name", Data),
-                            Capacity = proplists:get_value("capacity",Data),
-                            Exceptions = proplists:get_value("exceptions",Data),
-                            Mails = proplists:get_value("mails",Data),
+                            Name = proplists:get_value(<<"name">>, Data),
+                            Capacity = proplists:get_value(<<"capacity">>,Data),
+                            Exceptions = proplists:get_value(<<"exceptions">>,Data),
+                            Mails = proplists:get_value(<<"mails">>,Data),
                             case (Name == undefined) or (Capacity == undefined) or (Exceptions == undefined) or (Mails == undefined) of
-                                true  -> error_logger:info_msg("missing info",[]), Req:not_found();
+                                true  -> error_logger:info_msg("missing info",[]),
+                                         Req:not_found();
                                 false -> es_mongodb_utils:create_buffer(Name,Mails,Exceptions,Capacity),
                                          Req:respond({201,
                                                       [{"Content-Type", "text/plain"},

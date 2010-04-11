@@ -45,8 +45,8 @@ create_buffer(BufferName, Mails, Exceptions, Size) ->
             [[{<<"ok">>,1.0}]] = create_capped_collection(?EXCEPTIONS_POOL, BufferName, Size, 1024),
             emongo:insert(?CONFIG_POOL, ?BUFFERS_COLLECTION, [{"name", BufferName},
                                                               {"database", BufferName},
-                                                              {"mails", Mails},
-                                                              {"exceptions", Exceptions},
+                                                              {"mails", es_json:encode_json(Mails)},
+                                                              {"exceptions", es_json:encode_json(Exceptions)},
                                                               {"inmediate", false}]) ;
         _Buffer   ->
             already_created
@@ -68,10 +68,11 @@ find_buffer(Name) ->
 
 
 buffer_from_mongo_to_record(Data) ->
+    error_logger:info_msg("CONVERTING: ~p",[Data]),
     #exceptions_buffer{ name = binary_to_list(proplists:get_value(<<"name">>, Data)),
                         database = binary_to_list(proplists:get_value(<<"database">>, Data)),
-                        mails = es_json:decode_json(binary_to_list(proplists:get_value(<<"mails">>, Data))),
-                        exceptions = es_json:decode_json(binary_to_list(proplists:get_value(<<"exceptions">>, Data))),
+                        mails = es_json:decode_json(proplists:get_value(<<"mails">>, Data)),
+                        exceptions = es_json:decode_json(proplists:get_value(<<"exceptions">>, Data)),
                         inmediate = proplists:get_value(<<"inmediate">>,Data) } .
 
 

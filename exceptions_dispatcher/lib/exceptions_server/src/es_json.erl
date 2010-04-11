@@ -13,7 +13,7 @@
 -include_lib("../include/definitions.hrl").
 
 -export([decode_json/1, is_exception/1, get_identifier/1, is_valid/1, is_notification/1, sample_json/0,
-         parse_identifier/1, process_json_message/1, sanitize_json/1, transform_keys/1, binaries_to_json_array/1]) .
+         parse_identifier/1, process_json_message/1, sanitize_json/1, transform_keys/1, binaries_to_json_array/1, encode_json/1]) .
 
 
 %% Public API
@@ -25,6 +25,15 @@ decode_json(Data) when is_binary(Data) ->
     decode_json(binary_to_list(Data)) ;
 decode_json(Data) ->
     mochijson2:decode(sanitize_json(Data)) .
+
+%% @doc
+%% Tries to encode data into JSON
+%% using mochiweb JSON support
+encode_json(Data) when is_binary(Data) ->
+    decode_json(binary_to_list(Data)) ;
+encode_json(Data) ->
+    mochijson2:encode(Data) .
+
 
 %% @doc
 %% Cleans problematic chars in some Json string
