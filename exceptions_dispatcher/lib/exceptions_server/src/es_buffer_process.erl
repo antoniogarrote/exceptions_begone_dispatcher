@@ -39,7 +39,6 @@ init([BufferData]) ->
     % Create a mongodb pool
     Pool = list_to_atom(BufferData#exceptions_buffer.name),
     es_mongodb_utils:start_pool(Pool,?EXCEPTIONS_DATABASE),
-
     % Generate keys
     Keys = es_json:transform_keys(BufferData#exceptions_buffer.exceptions),
 
@@ -49,13 +48,11 @@ init([BufferData]) ->
                           es_rabbit_backend:create_queue(list_to_binary(QueueName),Key)
                   end,
                   Keys),
-
     % Creates a new consumer process for the keys
     MyPid = self(),
     Fun = fun(Data) ->
                   gen_server:call(MyPid,{exception, Data})
           end,
-
     es_rabbit_backend:consume(Fun,Keys),
     { ok, {Pool,BufferData} } .
 

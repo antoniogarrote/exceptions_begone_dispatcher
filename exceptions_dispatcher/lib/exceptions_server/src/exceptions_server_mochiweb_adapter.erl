@@ -176,7 +176,9 @@ handle_request(Req, DocRoot) ->
                             case (Name == undefined) or (Capacity == undefined) or (Exceptions == undefined) or (Mails == undefined) of
                                 true  -> error_logger:info_msg("missing info",[]),
                                          Req:not_found();
-                                false -> es_mongodb_utils:create_buffer(Name,Mails,Exceptions,Capacity),
+                                false -> Buffer = es_mongodb_utils:create_buffer(Name,Mails,Exceptions,Capacity),
+                                         error_logger:info_msg("STARTING THE CREATED BUFFER: ~p",[Buffer]),
+                                         es_buffers_service:start_buffer(Buffer),
                                          Req:respond({201,
                                                       [{"Content-Type", "text/plain"},
                                                        {"Charset", "UTF-8"}],

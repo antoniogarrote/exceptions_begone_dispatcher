@@ -47,7 +47,8 @@ create_buffer(BufferName, Mails, Exceptions, Size) ->
                                                               {"database", BufferName},
                                                               {"mails", es_json:encode_json(Mails)},
                                                               {"exceptions", es_json:encode_json(Exceptions)},
-                                                              {"inmediate", false}]) ;
+                                                              {"inmediate", false}]),
+            buffer_from_mongo_to_record(find_buffer(BufferName));
         _Buffer   ->
             already_created
     end .

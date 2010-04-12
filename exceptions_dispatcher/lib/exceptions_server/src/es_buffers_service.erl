@@ -16,7 +16,7 @@
 
 
 -export([start_mongodb/0, start_link/0, init/1, handle_call/3, handle_cast/2, terminate/2, handle_info/2, code_change/3,
-        find/1,create_buffer/4, register_timer/0, extract_mails/1, send_summaries/1, build_summary/1]) .
+        find/1,create_buffer/4, register_timer/0, extract_mails/1, send_summaries/1, build_summary/1, start_buffer/1]) .
 
 
 %% public API
@@ -41,6 +41,11 @@ find(Name) when is_binary(Name) ->
     find(binary_to_list(Name)) ;
 find(Name) ->
     gen_server:call(es_buffers_service, {find,Name}) .
+
+%% @doc
+%% Starts a buffer process provided the buffer name
+start_buffer(Buffer) ->
+    gen_server:call(es_buffers_service, {start_buffer,Buffer}) .
 
 %% @doc
 %% Create a new buffer
@@ -83,6 +88,11 @@ init(_Arguments) ->
 handle_call({create_buffer,Name, Capacity, Exceptions, Mails}, _From, State) ->
     es_mongodb_utils:create_buffer(Name,Mails,Exceptions,Capacity),
     {reply, ok, State } ;
+handle_call({start_buffer,Buffer}, _From, State) ->
+    error_logger:info_msg("Starting buffer with name: ~p",[Buffer#exceptions_buffer.name]),
+    {ok, Pid} = es_buffer_process:start_link(Buffer),
+    StateP = [{Buffer#exceptions_buffer.name, Pid} | State],
+    {reply, ok, StateP } ;
 handle_call({find, Name}, _From, State) ->
     Res = case proplists:get_value(Name,State) of
               undefined  -> undefined ;
