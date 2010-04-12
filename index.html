@@ -15,18 +15,33 @@
 <div id="what" class="section">
   <h2>What?</h2>
   <div class="explanation">
-    A system for dispatching exceptions in 'real time' from a production Rails application to a web browser.
+    A system for dispatching exceptions in 'real time' from a production Rails
+  application to a web browser.<br/>
+    It also includes a system for creating buffers where exceptions can be
+  temporary stored and retrieved, as well as notified by email to users.
   </div>
   <div class="explanation">
     Exceptions Begone original server is open source and was developed at XING AG.
     The Exceptions Begone Dispatcher is still under development.
- </div>
-</div>
+  </div>
+  <br/>
+  <div class="explanation">
+    You can take a look at this demo:
+  </div>
+  <br/>
+</div
+  <div class="multimedia" style="text-align:center">
 
+    <object width="600" height="399"><param name="allowfullscreen" value="true" /><param name="allowscriptaccess" value="always" /><param name="movie" value="http://vimeo.com/moogaloop.swf?clip_id=10872869&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=00ADEF&amp;fullscreen=1" /><embed src="http://vimeo.com/moogaloop.swf?clip_id=10872869&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=00ADEF&amp;fullscreen=1" type="application/x-shockwave-flash" allowfullscreen="true" allowscriptaccess="always" width="600" height="399"></embed></object>
+
+  </div>
 <div id="how" class="section">
   <h2>How?</h2>
   <div class="explanation">
-    <img src="images/components.png"></img>
+    <h3>Exceptions service</h3>
+    <div class="multimedia" style="text-align:center">
+      <img src="images/components.png"></img>
+    </div>
     <ul>
       <li>A web client opens a web socket to the Exceptions Begone Dispatcher</li>
       <li>A set of Erlang processes in the Exceptions Begone Dispatcher start listening for messages in some queues inside a RabbitMQ queue system. </li>
@@ -35,6 +50,24 @@
       <li>RabbitMQ routes the exception to the queues of the listener Erlang processes</li>
       <li>The listener Erlang processes receive the exception from RabbitMQ and send it back to the web browser through the open web socket</li>
       <li>The web browser shows the information about the received exception</li>
+    </ul>
+  </div>
+    <div class="explanation">
+    <h3>Buffers service</h3>
+    <div class="multimedia" style="text-align:center">
+      <img src="images/components2.png"></img>
+    </div>
+    <ul>
+      <li>A web client sends a HTTP request with the information for a new
+  buffer</li>
+      <li>The exceptions server stores the information in MongoDB and creates a new capped collection for storing the requested exceptions</li>
+      <li>A set of Erlang processes, associated to the buffer start listening for messages in some queues inside a RabbitMQ queue system. </li>
+      <li>The Exceptions Begone Rails plugin integrates with your application and send any raised exception to the Exceptions Begone Dispatcher using a JSON representation of the exception</li>
+      <li>Some Erlang process in the Exceptions Begone Dispatcher routes the exception to a AMQP exchange in a RabbitMQ queue system</li>
+      <li>RabbitMQ routes the exception to the queues of the listener Erlang processes</li>
+      <li>The listener Erlang processes receive the exception from RabbitMQ and store it in the MongodDB capped collection associated to the buffer</li>
+      <li>A web browser can request the exceptions stored in the buffer and display them</li>
+      <li>At midnight, a summary with the information of the exceptions stored in the buffer is sent to the users registered in the buffer</li>
     </ul>
   </div>
 </div>
